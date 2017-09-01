@@ -1,0 +1,5 @@
+dat
+*pyc
+fig/*
+.ipynb_checkpoints/
+*hdf5
