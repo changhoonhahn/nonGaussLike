@@ -23,6 +23,10 @@ class Pk:
             f = ''.join([UT.dat_dir(), 'nseries/power_CutskyN', str(i), '.dat.grid360.P020000.box3600'])
 
             k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, 1, -1]) # k, p0(k), and number of modes 
+        elif name == 'qpm': 
+            f = ''.join([UT.dat_dir(), 'qpm/power_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed.dat.grid360.P020000.box3600'])
+
+            k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, 1, -1]) # k, p0(k), and number of modes 
         else: 
             raise NotImplementedError
 
