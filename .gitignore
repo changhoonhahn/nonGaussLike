@@ -1,5 +1,6 @@
 dat
 *pyc
 fig/*
+*png
 .ipynb_checkpoints/
 *hdf5
