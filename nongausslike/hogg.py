@@ -1,11 +1,6 @@
 """
-This file is part of the InferenceOfVariance project.
+This file is part of David W. Hogg's InferenceOfVariance project.
 Copyright 2016 David W. Hogg (SCDA).
-# To-do
-- Doesn't conform to what's written in paper for Sigma^2
-- Needs to output LaTeX table for inclusion in paper.
-- Write M-H MCMC code. Right now it uses simple prior sampling, which SUX.
-- Horrible, horrible `for` loops.
 """
 
 import numpy as np
