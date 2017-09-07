@@ -16,9 +16,13 @@ class Pk:
         self.pk = None 
         self.counts = None 
 
-    def Read(self, name, i): 
-        ''' Read in the i th mock catalog P(k) 
+    def Read(self, name, i, ell=0): 
+        ''' ***NEED TO IMPLEMENT quadrupole and hexadecapole*** 
+        Read in the i th mock catalog P(k) 
         '''
+        if ell != 0: 
+            raise NotImplementedError
+
         if name == 'nseries': 
             f = ''.join([UT.dat_dir(), 'nseries/power_CutskyN', str(i), '.dat.grid360.P020000.box3600'])
 
@@ -71,3 +75,14 @@ class Pk:
             raise NotImplementedError
 
         return [np.array(k_rebin), np.array(pk_rebin), np.array(tot_counts)]
+    
+    def _n_mock(self, name): 
+        ''' Given name of mock return n_mock. 
+        '''
+        if name == 'nseries': 
+            n_mock = 84
+        elif name == 'qpm': 
+            n_mock = 1000 
+        else: 
+            raise ValueError
+        return n_mock 

@@ -24,7 +24,7 @@ def dat_dir():
 def fig_dir(): 
     ''' 
     '''
-    return dat_dir()+'fig/'
+    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/figs/'
 
 
 def bar_plot(bin_edges, values): 
@@ -40,3 +40,6 @@ def bar_plot(bin_edges, values):
         yy.append(val)
 
     return [np.array(xx), np.array(yy)]
+
+def gauss(x, sigma, mu): 
+    return 1./(np.sqrt(2.*np.pi)*sigma) * np.exp((-(x - mu)**2)/(2*sigma**2))
