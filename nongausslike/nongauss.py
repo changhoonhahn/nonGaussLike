@@ -7,8 +7,115 @@ of the Likelihood for galaxy clustering analyses.
 '''
 import numpy as np 
 from scipy.stats import gaussian_kde as gkde
+from scipy.stats import multivariate_normal as multinorm
+from sklearn.decomposition import FastICA, PCA
 # -- local -- 
 import data as Data
+
+
+def lnL_ica(pk_obv, Pk):
+    ''' Given 'observed' P(k) and mock P(k) data, calculate the ICA log likelihood estimate.
+    '''
+    X, mu_X = meansub(Pk) # mean subtract
+    X_w, W = whiten(X) # whitened data
+    
+    X_ica, W_ica = Ica(X_w) # get ICA transformation 
+    
+    if len(pk_obv.shape) == 1: 
+        x_obv = np.dot(np.dot(W.T, pk_obv - mu_X), W_ica) # mean subtract, whiten, and ica transform observd pk
+        p_Xica = 0. 
+    else: 
+        x_obv = np.zeros(pk_obv.shape)
+        for i_obv in range(pk_obv.shape[1]):
+            x_obv[:,i_obv] = np.dot(np.dot(W.T, pk_obv[:,i_obv] - mu_X), W_ica)
+        p_Xica = np.zeros(pk_obv.shape[1]) 
+
+    for i in range(X_ica.shape[0]):
+        if len(pk_obv.shape) == 1: 
+            x_obv_i = x_obv[i]
+        else: 
+            x_obv_i = x_obv[i,:]
+        p_Xica += np.log(p_Xw_i(X_ica, i, x=x_obv_i))
+    return p_Xica
+
+
+def lnL_pca(pk_obv, Pk): 
+    ''' Gaussian pseudo-likelihood calculated using PCA decomposition for 
+    convenience. 
+    '''
+    X, mu_X = meansub(Pk) # mean subtract
+    X_w, W = whiten(X) # whitened data
+    
+    X_pca, W_pca = Pca(X_w) # get PCA transformation 
+    var_pca = np.zeros(X_pca.shape[0])
+    for i in range(X_pca.shape[0]): 
+        var_pca[i] = np.var(X_pca[i,:])
+    cov = np.diag(var_pca)
+    ggg = multinorm(np.zeros(len(mu_X)), cov) 
+    
+    if len(pk_obv.shape) == 1: 
+        x_obv = np.dot(np.dot(W.T, pk_obv - mu_X), W_pca) # mean subtract, whiten, and ica transform observd pk
+        p_Xpca = 0. 
+    else: 
+        x_obv = np.zeros(pk_obv.shape)
+        for i_obv in range(pk_obv.shape[1]):
+            x_obv[:,i_obv] = np.dot(np.dot(W.T, pk_obv[:,i_obv] - mu_X), W_pca)
+        p_Xpca = np.zeros(pk_obv.shape[1]) 
+    
+    return np.log(ggg.pdf(x_obv.T))
+
+
+def lnL_gauss(pk_obv, Pk): 
+    ''' Given 'observed' P(k)  and mock P(k) data, calculate the log pseudo-likelihood 
+    *with* Gaussian functional form assumption. 
+    '''
+    X, mu_X = meansub(Pk) # mean subtract
+
+    C_X = np.cov(X) 
+    
+    ggg = multinorm(np.zeros(len(mu_X)), C_X)
+
+    #offset = 0.5 * np.float(pk_obv.shape[0]) * np.log(2.*np.pi) + 0.5 * np.log(np.linalg.det(C_X))
+    
+    if len(pk_obv.shape) == 1: 
+        return np.log(ggg.pdf(pk_obv - mu_X))
+        #return -0.5 * np.sum(np.dot(x, np.linalg.solve(C_X, x))) - offset
+    else: 
+        lnL = np.zeros(pk_obv.shape[1])
+        for i in range(pk_obv.shape[1]):
+            lnL[i] = np.log(ggg.pdf(pk_obv[:,i] - mu_X))
+            #lnL[i] = -0.5 * np.sum(np.dot(x, np.linalg.solve(C_X, x)))
+        return lnL #- offset
+
+
+def Pca(X, whiten=False, **pca_kwargs): 
+    ''' Given mean subtracted and whitened data (presumably non-whitened data should work), 
+    input data should be in N_k x N_mock form. returns ICA transformed data and unmixing matrix.
+    '''
+    n_comp = X.shape[0] # number of ICA components 
+
+    pca = PCA(n_components=n_comp, whiten=whiten, **pca_kwargs)
+    pca.fit_transform(X.T)
+    
+    # X_ica = np.dot(X, ica.components_.T) 
+    X_pca = pca.transform(X.T)
+    
+    return X_pca.T, pca.components_.T
+
+
+def Ica(X, algorithm='deflation', whiten=False, **ica_kwargs): 
+    ''' Given mean subtracted and whitened data (presumably non-whitened data should work), 
+    input data should be in N_k x N_mock form. returns ICA transformed data and unmixing matrix.
+    '''
+    n_comp = X.shape[0] # number of ICA components 
+
+    ica = FastICA(n_components=n_comp, algorithm=algorithm, whiten=whiten, **ica_kwargs)
+    ica.fit_transform(X.T)
+    
+    # X_ica = np.dot(X, ica.components_.T) 
+    X_ica = ica.transform(X.T)
+    
+    return X_ica.T, ica.components_.T
 
 
 def p_Xwi_Xwj(X_w, ij_bins, x=np.linspace(-5., 5., 100), y=np.linspace(-5., 5., 100)):  
@@ -31,13 +138,16 @@ def p_Xwi_Xwj(X_w, ij_bins, x=np.linspace(-5., 5., 100), y=np.linspace(-5., 5., 
 def p_Xw_i(X_w, i_bins, x=np.linspace(-5., 5., 100)): 
     ''' Calculate the gaussian KDE of the pdf for Xw[ibins,:]
     '''
-    if isinstance(i_bins, float): 
+    if isinstance(i_bins, int): 
         i_bins = [i_bins]
     pdfs = []
     for i_bin in i_bins: 
         kern = gkde(X_w[i_bin,:]) # gaussian KDE kernel using "rule of thumb" scott's rule. 
-        pdfs.append(kern.evaluate(x))
-    return pdfs 
+        if len(i_bins) == 1: 
+            return kern.evaluate(x)
+        else: 
+            pdfs.append(kern.evaluate(x))
+    return np.array(pdfs)
 
 
 def whiten(X): 
@@ -56,6 +166,18 @@ def whiten(X):
     # whitened data
     X_w = np.dot(W.T, X)
     return X_w, W 
+
+
+def meansub(X): 
+    ''' Given data matrix X (N_k x N_mock), subtract out the mean 
+    '''
+    # calculate < P(k) > from the mock. This will serve as m(theta)
+    n_mock = X.shape[1]
+    mu_X = np.sum(X, axis=1)/np.float(n_mock)
+
+    Xp = (X.T - mu_X).T 
+    
+    return Xp, mu_X
 
 
 def dataX(mock, ell=0, rebin=None): 
@@ -77,9 +199,4 @@ def dataX(mock, ell=0, rebin=None):
         if i == 1: 
             pks = np.zeros((len(k), n_mock))
         pks[:, i-1] = pk 
-
-    # calculate < P(k) > from the mock. This will serve as m(theta)
-    mu_pk = np.sum(pks, axis=1)/np.float(n_mock)
-
-    X = (pks.T - mu_pk).T 
-    return X
+    return pks

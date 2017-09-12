@@ -17,10 +17,75 @@ from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
 
+def lnL(mock, ell=0, rebin=None): 
+    ''' Test the ICA likelihood estimation and pseudo gaussian likelihood 
+    '''
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    ica = NG.lnL_ica(Pk, Pk) 
+    gauss = NG.lnL_pca(Pk, Pk)
+    
+    prettyplot()
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    if Pk.shape[1] < 100: 
+        nbin = 10
+    else: 
+        nbin = 32
+    sub.hist(gauss, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
+            normed=True, alpha=0.75, label='Gaussian $\mathcal{L^\mathtt{pseudo}}$')
+    sub.hist(ica, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
+            normed=True, alpha=0.75, label='ICA')
+    sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
+    sub.set_xlim([-2.2*Pk.shape[0], -0.8*Pk.shape[0]])
+    sub.legend(loc='upper left', prop={'size': 20}) 
+
+    if rebin is None: # save fig
+        f = ''.join([UT.fig_dir(), 'tests/test.lnL.', mock, '.ell', str(ell), '.png'])
+    else: 
+        f = ''.join([UT.fig_dir(), 'tests/test.lnL.', mock, '.ell', str(ell), '.rebin', str(rebin), '.png'])
+    fig.savefig(f, bbox_inches='tight') 
+    return None 
+
+
+def ica(mock, ell=0, rebin=None): 
+    ''' *** TESTED *** 
+    Test that the ICA works!
+    '''
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    X, _ = NG.meansub(Pk)
+    X_w, W = NG.whiten(X) # whitened data
+
+    X_ica, W = NG.ica(X_w)
+    
+    # compare covariance? 
+    C_X = np.cov(X)
+    C_Xica = np.cov(X_ica) 
+
+    prettyplot()
+    fig = plt.figure(figsize=(20, 8))
+    sub = fig.add_subplot(121)
+    im = sub.imshow(np.log10(C_X), interpolation='none')
+    sub.set_title('log(Cov.) of Data')
+    fig.colorbar(im, ax=sub) 
+
+    sub = fig.add_subplot(122)
+    im = sub.imshow(C_Xica, interpolation='none')
+    fig.colorbar(im, ax=sub) 
+    sub.set_title('Cov. of ICA transformed Data')
+    # save fig
+    if rebin is None: 
+        f = ''.join([UT.fig_dir(), 'tests/test.ICAcov.', mock, '.ell', str(ell), '.png'])
+    else: 
+        f = ''.join([UT.fig_dir(), 'tests/test.ICAcov.', mock, '.ell', str(ell), '.rebin', str(rebin), '.png'])
+    fig.savefig(f, bbox_inches='tight') 
+    return None
+    
+
 def p_Xwi_Xwj(mock, ell=0, rebin=None): 
     ''' Compare the joint pdfs of p(X_w^i, X_w^j) 
     '''
-    X = NG.dataX(mock, ell=ell, rebin=rebin) # data matrix
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    X, _ = NG.meansub(Pk)
     X_w, W = NG.whiten(X) # whitened data
     
     x, y = np.linspace(-5., 5., 50), np.linspace(-5., 5., 50)
@@ -78,7 +143,8 @@ def Xw_i_outlier(mock, ell=0, rebin=None):
     ''' Examine the pdf of X_w^i components that deviate significantly from  
     N(0,1) 
     '''
-    X = NG.dataX(mock, ell=ell, rebin=rebin) # data matrix
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    X, _ = NG.meansub(Pk)
     X_w, W = NG.whiten(X) # whitened data
     
     # calculate the chi-squared values of each p(X_w^i)  
@@ -117,7 +183,8 @@ def p_Xw_i(mock, ell=0, rebin=None):
     component -- p(X_w^i). First compare the histograms of p(X_w^i) 
     with N(0,1). Then compare the gaussian KDE of p(X_w^i).
     '''
-    X = NG.dataX(mock, ell=ell, rebin=rebin) # data matrix
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    X, _ = NG.meansub(Pk)
     X_w, W = NG.whiten(X) # whitened data
     
     prettyplot() 
@@ -162,7 +229,8 @@ def whiten(mock, ell=0, rebin=None):
     P(k) because the precision matrix estimate is not positive definite***
     test the data whitening. 
     '''
-    X = NG.dataX(mock, ell=ell, rebin=rebin) # data matrix
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    X, _ = NG.meansub(Pk)
     X_w, W = NG.whiten(X) # whitened data
     
     prettyplot()
@@ -193,7 +261,8 @@ def dataX(mock, ell=0, rebin=None):
     ''' ***TESTED***
     Test the data X calculation 
     '''
-    X = NG.dataX(mock, ell=ell, rebin=rebin)
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    X, _ = NG.meansub(Pk)
     
     prettyplot()
     fig = plt.figure()
@@ -246,4 +315,6 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    p_Xwi_Xwj('qpm', ell=0, rebin=5)
+    lnL('qpm', ell=0, rebin=5)
+    lnL('qpm', ell=0, rebin=10)
+    lnL('nseries', ell=0, rebin=20)
