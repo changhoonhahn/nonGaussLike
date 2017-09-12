@@ -39,9 +39,12 @@ def lnL_ica(pk_obv, Pk):
     return p_Xica
 
 
-def lnL_pca(pk_obv, Pk): 
+def lnL_pca_gauss(pk_obv, Pk): 
     ''' Gaussian pseudo-likelihood calculated using PCA decomposition for 
-    convenience. 
+    convenience. i.e. the data vector is decomposed in PCA components so that
+    L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated using 
+    N(0, sig_pca,i). *Note by construction this gives the same likelihood 
+    as the Gaussian functional pseudo-likelihood.*
     '''
     X, mu_X = meansub(Pk) # mean subtract
     X_w, W = whiten(X) # whitened data
@@ -65,8 +68,38 @@ def lnL_pca(pk_obv, Pk):
     return np.log(ggg.pdf(x_obv.T))
 
 
+def lnL_pca(pk_obv, Pk): 
+    ''' Gaussian pseudo-likelihood calculated using PCA decomposition for 
+    convenience. i.e. the data vector is decomposed in PCA components so that
+    L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated by 
+    gaussian KDE of the PCA transformed mock data. 
+    '''
+    X, mu_X = meansub(Pk) # mean subtract
+    X_w, W = whiten(X) # whitened data
+    
+    X_pca, W_pca = Pca(X_w) # get PCA transformation 
+    
+    if len(pk_obv.shape) == 1: 
+        x_obv = np.dot(np.dot(W.T, pk_obv - mu_X), W_pca) # mean subtract, whiten, and pca transform observd pk
+        p_Xpca = 0. 
+    else: 
+        x_obv = np.zeros(pk_obv.shape)
+        for i_obv in range(pk_obv.shape[1]):
+            x_obv[:,i_obv] = np.dot(np.dot(W.T, pk_obv[:,i_obv] - mu_X), W_pca)
+        p_Xpca = np.zeros(pk_obv.shape[1]) 
+
+    for i in range(X_pca.shape[0]):
+        if len(pk_obv.shape) == 1: 
+            x_obv_i = x_obv[i]
+        else: 
+            x_obv_i = x_obv[i,:]
+        p_Xpca += np.log(p_Xw_i(X_pca, i, x=x_obv_i))
+    return p_Xpca
+
+
 def lnL_gauss(pk_obv, Pk): 
-    ''' Given 'observed' P(k)  and mock P(k) data, calculate the log pseudo-likelihood 
+    ''' *** Some silly issues with the offset that I don't want to deal with...***
+    Given 'observed' P(k)  and mock P(k) data, calculate the log pseudo-likelihood 
     *with* Gaussian functional form assumption. 
     '''
     X, mu_X = meansub(Pk) # mean subtract
@@ -150,7 +183,7 @@ def p_Xw_i(X_w, i_bins, x=np.linspace(-5., 5., 100)):
     return np.array(pdfs)
 
 
-def whiten(X): 
+def whiten(X, hartlap=False): 
     ''' Given data matrix X, use Choletsky decomposition of the 
     precision matrix in order to decorrelate (aka whiten) the data.  
 
@@ -189,6 +222,8 @@ def dataX(mock, ell=0, rebin=None):
     '''
     pkay = Data.Pk() # read in P(k) data 
     n_mock = pkay._n_mock(mock) 
+    if mock == 'qpm' and ell != 0: 
+        n_mock = 100 
     for i in range(1, n_mock+1):  
         pkay.Read(mock, i, ell=ell) 
         if rebin is None: 
