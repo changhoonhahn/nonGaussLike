@@ -17,18 +17,53 @@ from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
 
+def lnL_sys(mock, ell=0, rebin=None, sys='fc'): 
+    ''' Compare the pseudo gaussian L with no systematics, ICA L estimation with 
+    no systematics, and ICA L estimation with fiber collisions.
+    '''
+    # Likelihood without systematics 
+    Pk_nosys = NG.dataX(mock, ell=ell, rebin=rebin, sys=None)
+    gauss = NG.lnL_pca_gauss(Pk_nosys, Pk_nosys)
+    ica_nosys = NG.lnL_ica(Pk_nosys, Pk_nosys)
+    
+    # Likelihood with specified systematics 
+    Pk_sys = NG.dataX(mock, ell=ell, rebin=rebin, sys=sys)
+    ica_sys = NG.lnL_ica(Pk_sys, Pk_sys)
+    
+    prettyplot()
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    nbin = 32
+    sub.hist(gauss, bins=nbin, range=[-2.2*Pk_nosys.shape[0], -0.8*Pk_nosys.shape[0]], 
+            normed=True, alpha=0.75, label='Gaussian $\mathcal{L^\mathtt{pseudo}}$; no sys.')
+    sub.hist(ica_nosys, bins=nbin, range=[-2.2*Pk_nosys.shape[0], -0.8*Pk_nosys.shape[0]], 
+            normed=True, alpha=0.75, label='ICA; no sys.')
+    sub.hist(ica_sys, bins=nbin, range=[-2.2*Pk_nosys.shape[0], -0.8*Pk_nosys.shape[0]], 
+            normed=True, alpha=0.75, label='ICA; w/ sys.')
+    sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
+    sub.set_xlim([-2.2*Pk_nosys.shape[0], -0.5*Pk_nosys.shape[0]])
+    sub.legend(loc='upper left', prop={'size': 20}) 
+
+    if rebin is None: # save fig
+        f = ''.join([UT.fig_dir(), 'tests/test.lnL_sys.', mock, '.ell', str(ell), '.png'])
+    else: 
+        f = ''.join([UT.fig_dir(), 'tests/test.lnL_sys.', mock, '.ell', str(ell), '.rebin', str(rebin), '.png'])
+    fig.savefig(f, bbox_inches='tight') 
+    return None 
+
+
 def lnL(mock, ell=0, rebin=None): 
     ''' Test the ICA likelihood estimation and pseudo gaussian likelihood 
     '''
     Pk = NG.dataX(mock, ell=ell, rebin=rebin)
     ica = NG.lnL_ica(Pk, Pk) 
-    gauss = NG.lnL_pca(Pk, Pk)
+    gauss = NG.lnL_pca_gauss(Pk, Pk)
     
     prettyplot()
     fig = plt.figure()
     sub = fig.add_subplot(111)
     if Pk.shape[1] < 100: 
-        nbin = 10
+        nbin = 20  
     else: 
         nbin = 32
     sub.hist(gauss, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
@@ -36,13 +71,47 @@ def lnL(mock, ell=0, rebin=None):
     sub.hist(ica, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
             normed=True, alpha=0.75, label='ICA')
     sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
-    sub.set_xlim([-2.2*Pk.shape[0], -0.8*Pk.shape[0]])
+    sub.set_xlim([-2.2*Pk.shape[0], -0.5*Pk.shape[0]])
     sub.legend(loc='upper left', prop={'size': 20}) 
 
     if rebin is None: # save fig
         f = ''.join([UT.fig_dir(), 'tests/test.lnL.', mock, '.ell', str(ell), '.png'])
     else: 
         f = ''.join([UT.fig_dir(), 'tests/test.lnL.', mock, '.ell', str(ell), '.rebin', str(rebin), '.png'])
+    fig.savefig(f, bbox_inches='tight') 
+    return None 
+
+
+def lnL_pca_kde(mock, ell=0, rebin=None): 
+    ''' ***TESTED: expectedly, more discrepant for low number of 
+    mock catalogs. For Nseries monopole with 1000 mocks, no 
+    significant discrepancy in the likelihood distribution 
+    *** 
+    Test whether or not the Gaussian KDE approximation of pdfs 
+    is sufficiently accurate by comparing the likelihood estimated
+    from NG.lnL_pca vs NG.lnL_pca_gauss. If they are highly 
+    discrepant, then KDE estimate of the pdfs are not very accurate. 
+    '''
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    pca_gauss = NG.lnL_pca_gauss(Pk, Pk)
+    pca_kde = NG.lnL_pca(Pk, Pk) 
+
+    prettyplot()
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    nbin = 32 
+    sub.hist(pca_gauss, bins=nbin, range=[-2.2*Pk.shape[0], -0.5*Pk.shape[0]], 
+            normed=True, alpha=0.75, label='Gaussian $\mathcal{L^\mathtt{pseudo}}$')
+    sub.hist(pca_kde, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
+            normed=True, alpha=0.75, label='$\mathcal{L^\mathtt{pseudo}}$ KDE estimate')
+    sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
+    sub.set_xlim([-2.2*Pk.shape[0], -0.5*Pk.shape[0]])
+    sub.legend(loc='upper left', prop={'size': 20}) 
+
+    if rebin is None: # save fig
+        f = ''.join([UT.fig_dir(), 'tests/test.lnL_kde_test.', mock, '.ell', str(ell), '.png'])
+    else: 
+        f = ''.join([UT.fig_dir(), 'tests/test.lnL_kde_test.', mock, '.ell', str(ell), '.rebin', str(rebin), '.png'])
     fig.savefig(f, bbox_inches='tight') 
     return None 
 
@@ -315,6 +384,9 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    lnL('qpm', ell=0, rebin=5)
-    lnL('qpm', ell=0, rebin=10)
-    lnL('nseries', ell=0, rebin=20)
+    lnL_sys('nseries', ell=0, rebin=5)
+    lnL_sys('qpm', ell=0, rebin=None)
+    lnL_sys('nseries', ell=2, rebin=5)
+    lnL_sys('qpm', ell=2, rebin=5)
+    lnL_sys('nseries', ell=4, rebin=5)
+    lnL_sys('qpm', ell=4, rebin=5)

@@ -213,7 +213,7 @@ def meansub(X):
     return Xp, mu_X
 
 
-def dataX(mock, ell=0, rebin=None): 
+def dataX(mock, ell=0, rebin=None, sys=None): 
     ''' Construct data matrix X from P(k) measures of mock catalogs.
 
     X_i = P_i - < P > 
@@ -225,7 +225,7 @@ def dataX(mock, ell=0, rebin=None):
     if mock == 'qpm' and ell != 0: 
         n_mock = 100 
     for i in range(1, n_mock+1):  
-        pkay.Read(mock, i, ell=ell) 
+        pkay.Read(mock, i, ell=ell, sys=sys) 
         if rebin is None: 
             k, pk = pkay.k, pkay.pk
         else: 
