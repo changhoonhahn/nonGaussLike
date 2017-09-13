@@ -130,7 +130,7 @@ def Pca(X, whiten=False, **pca_kwargs):
     pca = PCA(n_components=n_comp, whiten=whiten, **pca_kwargs)
     pca.fit_transform(X.T)
     
-    # X_ica = np.dot(X, ica.components_.T) 
+    # X_pca = np.dot(X, pca.components_.T) 
     X_pca = pca.transform(X.T)
     
     return X_pca.T, pca.components_.T
@@ -193,7 +193,12 @@ def whiten(X, hartlap=False):
     Returns X_w (the whitened matrix) and W (the whitening matrix) -- X_w = W.T * X
     '''
     C_x = np.cov(X)  # covariance matrix of X 
-    invC_x = np.linalg.inv(C_x) # precision matrix of X 
+    if not hartlap: 
+        invC_x = np.linalg.inv(C_x) # precision matrix of X 
+    else: 
+        # include Hartlap et al. (2007) factor (i.e. the hartlap factor) 
+        invC_x = np.linalg.inv(C_x) 
+        invC_x *= (float(X.shape[1]) - float(invC_x.shape[0]) - 2.)/(float(X.shape[1]) - 1.)
     W = np.linalg.cholesky(invC_x) 
 
     # whitened data
@@ -213,7 +218,7 @@ def meansub(X):
     return Xp, mu_X
 
 
-def dataX(mock, ell=0, rebin=None, sys=None): 
+def dataX(mock, ell=0, krange=None, rebin=None, sys=None): 
     ''' Construct data matrix X from P(k) measures of mock catalogs.
 
     X_i = P_i - < P > 
@@ -226,10 +231,11 @@ def dataX(mock, ell=0, rebin=None, sys=None):
         n_mock = 100 
     for i in range(1, n_mock+1):  
         pkay.Read(mock, i, ell=ell, sys=sys) 
+        pkay.krange(krange)
         if rebin is None: 
             k, pk = pkay.k, pkay.pk
         else: 
-            k, pk, cnt = pkay.rebin(rebin)
+            k, pk, _ = pkay.rebin(rebin)
 
         if i == 1: 
             pks = np.zeros((len(k), n_mock))

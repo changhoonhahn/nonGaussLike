@@ -70,6 +70,27 @@ class Pk:
             raise NotImplementedError
 
         return [np.array(k_rebin), np.array(pk_rebin), np.array(tot_counts)]
+
+    def krange(self, krange): 
+        ''' impose some k_max on self.k and self.pk  
+        Ideally kmax has to be imposed *before* rebinning.
+        '''
+        if krange is None: # do nothing
+            return None
+        kmin, kmax = krange
+        if self.k is None: 
+            raise ValueError("k and Pk have to be read in")
+        if self.pk is None: 
+            raise ValueError("k and Pk have to be read in")
+        kbin = np.where((self.k >= kmin) & (self.k <= kmax)) 
+        k = self.k[kbin]
+        pk = self.pk[kbin]
+        counts = self.counts[kbin]
+
+        self.k = k
+        self.pk = pk
+        self.counts = counts
+        return None 
     
     def _n_mock(self, name): 
         ''' Given name of mock return n_mock. 

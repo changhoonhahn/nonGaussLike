@@ -52,6 +52,32 @@ def lnL_sys(mock, ell=0, rebin=None, sys='fc'):
     return None 
 
 
+def lnL_b2017_krange(mock, ell=0): 
+    ''' Test the ICA likelihood estimation and pseudo gaussian likelihood 
+    within the k-range of the Beutler et al. (2017) 
+    '''
+    Pk = NG.dataX(mock, ell=ell, krange=[0.01, 0.15], rebin=5)
+    ica = NG.lnL_ica(Pk, Pk) 
+    gauss = NG.lnL_pca_gauss(Pk, Pk)
+    
+    prettyplot()
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    nbin = 32
+    sub.hist(gauss, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
+            normed=True, alpha=0.75, label='Gaussian $\mathcal{L^\mathtt{pseudo}}$')
+    sub.hist(ica, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
+            normed=True, alpha=0.75, label='ICA')
+    sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
+    sub.set_xlim([-2.2*Pk.shape[0], -0.5*Pk.shape[0]])
+    sub.legend(loc='upper left', prop={'size': 20}) 
+    # save fig
+    f = ''.join([UT.fig_dir(), 'tests/test.lnL.b2017.krange.', mock, '.ell', str(ell), '.png'])
+    fig.savefig(f, bbox_inches='tight') 
+    return None 
+
+
+
 def lnL(mock, ell=0, rebin=None): 
     ''' Test the ICA likelihood estimation and pseudo gaussian likelihood 
     '''
@@ -384,9 +410,12 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    lnL_sys('nseries', ell=0, rebin=5)
-    lnL_sys('qpm', ell=0, rebin=None)
-    lnL_sys('nseries', ell=2, rebin=5)
-    lnL_sys('qpm', ell=2, rebin=5)
-    lnL_sys('nseries', ell=4, rebin=5)
-    lnL_sys('qpm', ell=4, rebin=5)
+    lnL_b2017_krange('qpm', ell=0)
+    lnL_b2017_krange('qpm', ell=2)
+    lnL_b2017_krange('qpm', ell=4)
+    #lnL_sys('nseries', ell=0, rebin=5)
+    #lnL_sys('qpm', ell=0, rebin=None)
+    #lnL_sys('nseries', ell=2, rebin=5)
+    #lnL_sys('qpm', ell=2, rebin=5)
+    #lnL_sys('nseries', ell=4, rebin=5)
+    #lnL_sys('qpm', ell=4, rebin=5)
