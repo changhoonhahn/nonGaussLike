@@ -1,0 +1,82 @@
+% This document is part of the InferenceOfVariance project.
+% Copyright 2016 the author.
+
+% To-do
+% - get smarter about terminology between observation and theory and simulation etc.
+% - make absolutely clear what is speculation and what is demonstrated.
+
+\documentclass[12pt, letterpaper, preprint]{aastex}
+\usepackage{hyperref}
+\input{vc}
+
+% typesetting shih
+\linespread{1.08} % close to 10/13 spacing
+\setlength{\parindent}{1.08\baselineskip} % Bringhurst
+\setlength{\parskip}{0ex}
+\let\oldbibliography\thebibliography % killin' me.
+\renewcommand{\thebibliography}[1]{%
+  \oldbibliography{#1}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parsep}{0pt}%
+  \setlength{\parskip}{0pt}%
+  \setlength{\bibsep}{0ex}
+  \raggedright
+}
+\setlength{\footnotesep}{0ex} % seriously?
+
+% math shih
+\newcommand{\setof}[1]{\left\{{#1}\right\}}
+\newcommand{\given}{\,|\,}
+\newcommand{\pseudo}{{\mathrm{pseudo}}}
+\newcommand{\Var}{\mathrm{Var}}
+
+% text shih
+\newcommand{\foreign}[1]{\textsl{#1}}
+\newcommand{\etal}{\foreign{et~al.}}
+\newcommand{\opcit}{\foreign{Op.~cit.}}
+\newcommand{\documentname}{\textsl{Article}}
+\newcommand{\equationname}{equation}
+
+\begin{document}\sloppy\sloppypar\frenchspacing % oh yeah
+
+\title{some title}
+\date{\texttt{DRAFT~---~\githash~---~\gitdate~---~NOT READY FOR DISTRIBUTION}}
+\author{ChangHoon~Hahn\refstepcounter{footnote}\refstepcounter{footnote}}
+\affil{Lawrence Berkeley National Laboratory, 1 Cyclotron Rd, Berkeley CA 94720, USA}
+\email{changhoon.hahn@lbl.gov}
+
+\begin{abstract}
+    abstract here 
+\end{abstract}
+
+\keywords{
+methods: data analysis
+---
+methods: statistical
+---
+galaxies: statistics
+---
+cosmological parameters
+---
+cosmology: observations
+---
+large-scale structure of universe
+}
+
+\section{Introduction}
+\begin{itemize}
+    \item Talk about the use of Bayesian parameter inference and getting the posterior in LSS cosmology 
+    \item Explain the two major assumptions that go into evaluating the likelihood
+    \item Emphasize that we are not talking about non-Gaussian contributions to the likelihood
+    \item Emphasize the scope of this paper is to address whether one of the assumptions matters for 
+        galaxy clustering analyses. 
+\end{itemize}
+
+\section{}
+
+
+\acknowledgements
+
+%\bibliography{}
+
+\end{document}
