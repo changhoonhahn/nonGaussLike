@@ -5,8 +5,10 @@ code for assessing galaxy clustering data and etc.
 
 '''
 import numpy as np 
+import tarfile 
 # -- local -- 
 import util as UT
+
 
 class Pk: 
     def __init__(self):
@@ -21,9 +23,17 @@ class Pk:
         '''
         if ell not in [0, 2, 4]: 
             raise ValueError("ell can only be 0, 2, or 4") 
+    
+        # compressed file 
+        tar = tarfile.open(self._tarfile(name, ell, sys))
 
-        f = self._file_name(name, i, ell, sys) # file name 
-
+        fname = self._file_name(name, i, ell, sys) # file name 
+    
+        for mem in tar.getmembers(): 
+            if mem.name == fname: 
+                member = mem 
+                continue 
+        f = tar.extractfile(member)
         if ell == 0: 
             k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, 1, -1]) # k, p0(k), and number of modes 
         else: 
@@ -66,6 +76,19 @@ class Pk:
                 pk_rebin.append(np.sum(pk[indices] * counts[indices])/cnts)
             # note that if rebin does not divide evenly into N, 
             # the last bin will be uneven
+
+        elif rebin == 'beutler': 
+            # rebin to match Florian's binning 
+            k_binedge = np.linspace(0.0, 1.0, 101) # dk = 0.01 
+            
+            tot_counts, k_rebin, pk_rebin = [], [], []
+            for i_bin in range(len(k_binedge)-1): 
+                inbin = np.where((k >= k_binedge[i_bin]) & (k < k_binedge[i_bin+1]))
+                if len(inbin[0]) > 0: 
+                    cnts = np.sum(counts[inbin]) # number of modes in bin 
+                    tot_counts.append(cnts)
+                    k_rebin.append(np.sum(k[inbin] * counts[inbin])/cnts)
+                    pk_rebin.append(np.sum(pk[inbin] * counts[inbin])/cnts)
         else: 
             raise NotImplementedError
 
@@ -102,6 +125,22 @@ class Pk:
         else: 
             raise ValueError
         return n_mock 
+    
+    def _tarfile(self, name, ell, sys): 
+        '''
+        '''
+        if sys is None: 
+            str_sys = ''
+        elif sys == 'fc':  # fiber collisions 
+            str_sys = '.fibcoll'
+        else: 
+            raise NotImplementedError
+
+        if ell == 0: 
+            str_ell = ''
+        else: 
+            str_ell = '_q'
+        return ''.join([UT.dat_dir(), name, '/', 'power', str_ell, '_', name, '.tar'])
 
     def _file_name(self, name, i, ell, sys): 
         ''' Messy code for dealing with all the different file names 
@@ -115,14 +154,14 @@ class Pk:
 
         if name == 'nseries': 
             if ell == 0: 
-                f = ''.join([UT.dat_dir(), 'nseries/power_CutskyN', str(i), str_sys, '.dat.grid360.P020000.box3600'])
+                f = ''.join(['power_CutskyN', str(i), str_sys, '.dat.grid360.P020000.box3600'])
             else: 
-                f = ''.join([UT.dat_dir(), 'nseries/POWER_Q_CutskyN', str(i), '.fidcosmo', str_sys, '.dat.grid480.P020000.box3600'])
+                f = ''.join(['POWER_Q_CutskyN', str(i), '.fidcosmo', str_sys, '.dat.grid480.P020000.box3600'])
         elif name == 'qpm': 
             if ell == 0: 
-                f = ''.join([UT.dat_dir(), 'qpm/power_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed', str_sys, '.dat.grid360.P020000.box3600'])
+                f = ''.join(['power_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed', str_sys, '.dat.grid360.P020000.box3600'])
             else: 
-                f = ''.join([UT.dat_dir(), 'qpm/POWER_Q_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed.fidcosmo', str_sys, '.dat.grid480.P020000.box3600']) 
+                f = ''.join(['POWER_Q_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed.fidcosmo', str_sys, '.dat.grid480.P020000.box3600']) 
         else: 
             raise NotImplementedError
         return f 

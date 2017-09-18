@@ -12,12 +12,15 @@ from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
 
-def readPk(): 
+def readPk(catalog, ell=0): 
     ''' ***TESTED*** 
     test of reading in P(k). 
     '''
     # mocks
-    i_sample = np.random.choice(range(1,85), 5, replace=False) 
+    if catalog == 'nseries': 
+        i_sample = np.random.choice(range(1,85), 5, replace=False) 
+    elif catalog == 'qpm':   
+        i_sample = np.random.choice(range(1,1001), 5, replace=False) 
 
     pkay = Data.Pk() 
     
@@ -26,7 +29,7 @@ def readPk():
     sub = fig.add_subplot(111) 
 
     for i in i_sample: 
-        pkay.Read('nseries', i)
+        pkay.Read(catalog, i, ell=ell)
         k, pk = pkay.k, pkay.pk
         
         sub.plot(k, pk) 
@@ -41,12 +44,15 @@ def readPk():
     return None
 
 
-def Pk_rebin(rebin): 
+def Pk_rebin(catalog, rebin, ell=0, krange=None): 
     ''' ***TESTED*** 
     Test the rebinning of P(k)  
     '''
     # mocks
-    i_sample = np.random.choice(range(1,85), 5, replace=False) 
+    if catalog == 'nseries': 
+        i_sample = np.random.choice(range(1,85), 5, replace=False) 
+    elif catalog == 'qpm':   
+        i_sample = np.random.choice(range(1,1001), 5, replace=False) 
 
     pkay = Data.Pk() 
     
@@ -58,10 +64,13 @@ def Pk_rebin(rebin):
     for ii, i in enumerate(i_sample): 
         offset = (ii+1)*2
 
-        pkay.Read('nseries', i)
+        pkay.Read(catalog, i, ell=ell)
         k, pk = pkay.k, pkay.pk
         sub.plot(k, pk/offset, ls='--', c=pretty_colors[ii]) 
         print 'initially ', len(k), ' bins' 
+
+        # impose krange and rebin 
+        pkay.krange(krange)
         k, pk, cnt = pkay.rebin(rebin) 
         sub.scatter(k, pk/offset, c=pretty_colors[ii]) 
         print 'to ', len(k), ' bins' 
@@ -77,4 +86,4 @@ def Pk_rebin(rebin):
 
 
 if __name__=="__main__":
-    Pk_rebin(10) 
+    Pk_rebin('qpm', 'beutler', ell=2, krange=[0.01, 0.15])
