@@ -183,7 +183,7 @@ def p_Xw_i(X_w, i_bins, x=np.linspace(-5., 5., 100)):
     return np.array(pdfs)
 
 
-def whiten(X, hartlap=False): 
+def whiten(X, method='choletsky', hartlap=False): 
     ''' Given data matrix X, use Choletsky decomposition of the 
     precision matrix in order to decorrelate (aka whiten) the data.  
 
@@ -199,10 +199,21 @@ def whiten(X, hartlap=False):
         # include Hartlap et al. (2007) factor (i.e. the hartlap factor) 
         invC_x = np.linalg.inv(C_x) 
         invC_x *= (float(X.shape[1]) - float(invC_x.shape[0]) - 2.)/(float(X.shape[1]) - 1.)
-    W = np.linalg.cholesky(invC_x) 
 
-    # whitened data
-    X_w = np.dot(W.T, X)
+    if method == 'choletsky':
+        W = np.linalg.cholesky(invC_x) 
+
+        # whitened data
+        X_w = np.dot(W.T, X)
+    elif method == 'pca': 
+        d, V = np.linalg.eigh(C_x)
+
+        D = np.diag(1. / np.sqrt(d+1e-18))
+
+        W = np.dot(np.dot(V, D), V.T) 
+        
+        X_w = np.dot(W.T, X) 
+
     return X_w, W 
 
 
@@ -218,7 +229,7 @@ def meansub(X):
     return Xp, mu_X
 
 
-def dataX(mock, ell=0, krange=None, rebin=None, sys=None): 
+def dataX(mock, ell=0, krange=None, rebin=None, sys=None, k_arr=False): 
     ''' Construct data matrix X from P(k) measures of mock catalogs.
 
     X_i = P_i - < P > 
@@ -227,8 +238,6 @@ def dataX(mock, ell=0, krange=None, rebin=None, sys=None):
     '''
     pkay = Data.Pk() # read in P(k) data 
     n_mock = pkay._n_mock(mock) 
-    if mock == 'qpm' and ell != 0: 
-        n_mock = 100 
     for i in range(1, n_mock+1):  
         pkay.Read(mock, i, ell=ell, sys=sys) 
         pkay.krange(krange)
@@ -240,4 +249,7 @@ def dataX(mock, ell=0, krange=None, rebin=None, sys=None):
         if i == 1: 
             pks = np.zeros((len(k), n_mock))
         pks[:, i-1] = pk 
-    return pks
+    if not k_arr:
+        return pks
+    else: 
+        return pks, k
