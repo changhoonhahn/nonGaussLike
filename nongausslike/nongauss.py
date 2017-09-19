@@ -39,7 +39,7 @@ def lnL_ica(pk_obv, Pk):
     return p_Xica
 
 
-def lnL_pca_gauss(pk_obv, Pk): 
+def lnL_pca_gauss(pk_obv, Pk, method='whiten'): 
     ''' Gaussian pseudo-likelihood calculated using PCA decomposition for 
     convenience. i.e. the data vector is decomposed in PCA components so that
     L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated using 
@@ -47,9 +47,12 @@ def lnL_pca_gauss(pk_obv, Pk):
     as the Gaussian functional pseudo-likelihood.*
     '''
     X, mu_X = meansub(Pk) # mean subtract
-    X_w, W = whiten(X) # whitened data
-    
-    X_pca, W_pca = Pca(X_w) # get PCA transformation 
+    if method == 'whiten': 
+        X_pca, W_pca = whiten(X, method='pca') # whitened data
+    elif method == 'sklearn':  
+        X_w, W = whiten(X) # whitened data
+        X_pca, W_pca = Pca(X_w) # get PCA transformation 
+
     var_pca = np.zeros(X_pca.shape[0])
     for i in range(X_pca.shape[0]): 
         var_pca[i] = np.var(X_pca[i,:])
@@ -57,35 +60,50 @@ def lnL_pca_gauss(pk_obv, Pk):
     ggg = multinorm(np.zeros(len(mu_X)), cov) 
     
     if len(pk_obv.shape) == 1: 
-        x_obv = np.dot(np.dot(W.T, pk_obv - mu_X), W_pca) # mean subtract, whiten, and ica transform observd pk
+        if method == 'whiten': 
+            x_obv = np.dot(W_pca.T, pk_obv - mu_X) 
+        elif method == 'sklearn': 
+            x_obv = np.dot(np.dot(W.T, pk_obv - mu_X), W_pca) 
         p_Xpca = 0. 
     else: 
         x_obv = np.zeros(pk_obv.shape)
         for i_obv in range(pk_obv.shape[1]):
-            x_obv[:,i_obv] = np.dot(np.dot(W.T, pk_obv[:,i_obv] - mu_X), W_pca)
+            if method == 'whiten': 
+                x_obv[:,i_obv] = np.dot(W_pca.T, pk_obv[:,i_obv] - mu_X)
+            elif method == 'sklearn': 
+                x_obv[:,i_obv] = np.dot(np.dot(W.T, pk_obv[:,i_obv] - mu_X), W_pca)
         p_Xpca = np.zeros(pk_obv.shape[1]) 
     
     return np.log(ggg.pdf(x_obv.T))
 
 
-def lnL_pca(pk_obv, Pk): 
+def lnL_pca(pk_obv, Pk, method='whiten'): 
     ''' Gaussian pseudo-likelihood calculated using PCA decomposition for 
     convenience. i.e. the data vector is decomposed in PCA components so that
     L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated by 
     gaussian KDE of the PCA transformed mock data. 
     '''
     X, mu_X = meansub(Pk) # mean subtract
-    X_w, W = whiten(X) # whitened data
-    
-    X_pca, W_pca = Pca(X_w) # get PCA transformation 
+    if method == 'whiten': 
+        X_pca, W_pca = whiten(X, method='pca') # whitened data
+    elif method == 'sklearn':  
+        X_w, W = whiten(X) # whitened data
+        X_pca, W_pca = Pca(X_w) # get PCA transformation 
     
     if len(pk_obv.shape) == 1: 
-        x_obv = np.dot(np.dot(W.T, pk_obv - mu_X), W_pca) # mean subtract, whiten, and pca transform observd pk
+        # PCA transform pk_obv
+        if method == 'whiten': 
+            x_obv = np.dot(W_pca.T, pk_obv - mu_X) 
+        elif method == 'sklearn':
+            x_obv = np.dot(np.dot(W.T, pk_obv - mu_X), W_pca) 
         p_Xpca = 0. 
     else: 
         x_obv = np.zeros(pk_obv.shape)
         for i_obv in range(pk_obv.shape[1]):
-            x_obv[:,i_obv] = np.dot(np.dot(W.T, pk_obv[:,i_obv] - mu_X), W_pca)
+            if method == 'whiten': 
+                x_obv[:,i_obv] = np.dot(W_pca.T, pk_obv[:,i_obv] - mu_X)
+            elif method == 'sklearn': 
+                x_obv[:,i_obv] = np.dot(np.dot(W.T, pk_obv[:,i_obv] - mu_X), W_pca)
         p_Xpca = np.zeros(pk_obv.shape[1]) 
 
     for i in range(X_pca.shape[0]):
@@ -122,10 +140,10 @@ def lnL_gauss(pk_obv, Pk):
 
 
 def Pca(X, whiten=False, **pca_kwargs): 
-    ''' Given mean subtracted and whitened data (presumably non-whitened data should work), 
-    input data should be in N_k x N_mock form. returns ICA transformed data and unmixing matrix.
+    ''' Given mean subtracted data, return PCA transformed data and unmixing matrix.
+    input data should be in N_k x N_mock form. 
     '''
-    n_comp = X.shape[0] # number of ICA components 
+    n_comp = X.shape[0] # number of PCA components 
 
     pca = PCA(n_components=n_comp, whiten=whiten, **pca_kwargs)
     pca.fit_transform(X.T)
