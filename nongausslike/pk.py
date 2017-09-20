@@ -4,17 +4,18 @@ import subprocess
 import os.path
 import numpy as np 
 
+import util as UT
 
-def catalog(catalog, n_mock):
+def Catalog(catalog, n_mock):
     ''' name of the original catalog files. These will be fed into the FFT 
     '''
     if catalog == 'patchy': 
-        return ''.join([UT.dat_dir(), 'patchy/Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str("%04d" % n_mock), '.dat']])
+        return ''.join([UT.dat_dir(), 'patchy/Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str("%04d" % n_mock), '.dat'])
     else:
         raise NotImplementedError
 
 
-def random(catalog):
+def Random(catalog):
     ''' name of the original catalog files. These will be fed into the FFT 
     '''
     if catalog == 'patchy': 
@@ -23,26 +24,25 @@ def random(catalog):
         raise NotImplementedError
 
 
-def fft(catalog_name, Lbox=None, Ngrid=None, n_interp=None, P0=None, sys=None, comp=None, zbin=None): 
+def FFT(catalog, Lbox=None, Ngrid=None, n_interp=None, P0=None, sys=None, comp=None, zbin=None): 
     ''' fft file name 
     '''
-    if catalog == 'patchy': 
-        name = catalog_name.split('.dat')[0]
-        name += '.Lbox'+str(Lbox)
-        name += '.Ngrid'+str(Ngrid)
-        if n_interp == 2: 
-            name += '.CICintp'
-        else: 
-            name += '.O4intp'
-        name += '.P0'+str(P0)
-        if sys == 'fc': 
-            name += '.fc'
-        if comp != 1: 
-            name += '.comp'
-        name += '.z'+str(zbin)
-    else:
-        raise NotImplementedError
-    return Name
+    if '.dat' in catalog: 
+        pass 
+    name = catalog.split('.dat')[0]
+    name += '.Lbox'+str(Lbox)
+    name += '.Ngrid'+str(Ngrid)
+    if n_interp == 2: 
+        name += '.CICintp'
+    else: 
+        name += '.O4intp'
+    name += '.P0'+str(P0)
+    if sys == 'fc': 
+        name += '.fc'
+    if comp != 1: 
+        name += '.comp'
+    name += '.z'+str(zbin)
+    return name
 
 
 def buildPk(catalog, n_mock, sys=None): 
@@ -65,16 +65,19 @@ def buildPk(catalog, n_mock, sys=None):
     if catalog == 'patchy': # comp flag: 1 for comp = 1
         comp_flag = 1
     # catalog name 
-    file_catalog = catalog(catalog, n_mock)
+    file_catalog = Catalog(catalog, n_mock)
     # zbin:               1 (z1), 2 (z2), 3 (z3)
-    # fft name   
-    file_fft = fft(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
-            sys=sys, comp=comp_flag, zbin=zbin)
-    
-    fft_exe = ''.join([UT.code_dir(), 'exe/FFT_scoccimarro_cmasslowzcomb.exe'])
-    
+    fft_exe = ''.join([UT.code_dir(), 'fort/FFT_scoccimarro_cmasslowzcomb.exe'])
+
     # construct mock FFT for z1, z2, z3 redshift bins 
     for zbin in [1,2,3]: 
+        # fft name   
+        file_fft = FFT(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+                sys=sys, comp=comp_flag, zbin=zbin)
+        print 'Constructing FFT for ...'  
+        print file_catalog 
+        print file_fft
+        print '' 
         cmd_D = ' '.join([fft_exe, 
             str(idata), 
             str(Lbox), 
@@ -87,8 +90,9 @@ def buildPk(catalog, n_mock, sys=None):
             file_catalog, 
             str(zbin), 
             file_fft])
+        print cmd_D
         subprocess.call(cmd_D.split())
-
+    raise ValueError
     # construct random FFTs
     rand_catalog = random(catalog) 
     for zbin in [1,2,3]: 
@@ -107,7 +111,9 @@ def buildPk(catalog, n_mock, sys=None):
                 file_catalog, 
                 str(zbin), 
                 file_fft])
-            subprocess.call(cmd_D.split())
-    
+            subprocess.call(cmd_R.split())
     # construct P(k) 
-    
+    return None
+
+if __name__=="__main__": 
+    buildPk('patchy', 1, sys='fc')
