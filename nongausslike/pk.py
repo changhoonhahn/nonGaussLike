@@ -29,7 +29,26 @@ def FFT(catalog, Lbox=None, Ngrid=None, n_interp=None, P0=None, sys=None, comp=N
     '''
     if '.dat' in catalog: 
         pass 
-    name = catalog.split('.dat')[0]
+    name = '/'.join(catalog.split('/')[:-1])+'/fft.'+catalog.split('/')[-1].split('.dat')[0]
+    name += '.Lbox'+str(Lbox)
+    name += '.Ngrid'+str(Ngrid)
+    if n_interp == 2: 
+        name += '.CICintp'
+    else: 
+        name += '.O4intp'
+    name += '.P0'+str(P0)
+    if sys == 'fc': 
+        name += '.fc'
+    if comp != 1: 
+        name += '.comp'
+    name += '.z'+str(zbin)
+    return name
+
+
+def Plk(catalog, Lbox=None, Ngrid=None, n_interp=None, P0=None, sys=None, comp=None, zbin=None): 
+    ''' P_l(k) for catalog 
+    '''
+    name = '/'.join(catalog.split('/')[:-1])+'/plk.'+catalog.split('/')[-1].split('.dat')[0]
     name += '.Lbox'+str(Lbox)
     name += '.Ngrid'+str(Ngrid)
     if n_interp == 2: 
@@ -92,11 +111,11 @@ def buildPk(catalog, n_mock, sys=None):
             file_fft])
         print cmd_D
         subprocess.call(cmd_D.split())
-    raise ValueError
+
     # construct random FFTs
     rand_catalog = random(catalog) 
     for zbin in [1,2,3]: 
-        file_fft = fft(rand_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+        file_fft = FFT(rand_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
                 sys=sys, comp=comp_flag, zbin=zbin)
         if not os.path.isfile(file_fft): 
             cmd_R = ' '.join([fft_exe, 
@@ -112,8 +131,30 @@ def buildPk(catalog, n_mock, sys=None):
                 str(zbin), 
                 file_fft])
             subprocess.call(cmd_R.split())
-    # construct P(k) 
+
+    # construct P(k) using the catalog FFT and random FFT
+    pk_exe = ''.join([UT.code_dir(), 'fort/power_scoccimarro.exe'])
+    for zbin in [1,2,3]: 
+        fft_D = FFT(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+                sys=sys, comp=comp_flag, zbin=zbin)
+        fft_R = FFT(rand_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+                sys=sys, comp=comp_flag, zbin=zbin)
+
+        file_plk = Plk(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+                sys=sys, comp=comp_flag, zbin=zbin)
+        print 'Constructing ...'
+        print file_plk
+
+        cmd_plk = ' '.join([pk_exe,
+            fft_D, 
+            fft_R, 
+            file_plk, 
+            str(Lbox), 
+            str(int(Ngrid/2))]) # N_bin = Ngrid/2 
+        subprocess.call(cmd_plk.split())
+
     return None
+
 
 if __name__=="__main__": 
     buildPk('patchy', 1, sys='fc')
