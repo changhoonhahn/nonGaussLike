@@ -2,6 +2,7 @@ dat
 *.f
 *pyc
 fig/*
+run/*
 *png
 .ipynb_checkpoints/
 *hdf5
