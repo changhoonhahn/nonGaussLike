@@ -52,11 +52,10 @@ def lnL_sys(mock, ell=0, rebin=None, sys='fc'):
     return None 
 
 
-def lnL_b2017(mock, ell=0): 
+def lnL(mock, ell=0, rebin=None, krange=None): 
     ''' Test the ICA likelihood estimation and pseudo gaussian likelihood 
-    within the k-range of the Beutler et al. (2017) 
     '''
-    Pk = NG.dataX(mock, ell=ell, krange=[0.01, 0.15], rebin='beutler')
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin, krange=krange)
     ica = NG.lnL_ica(Pk, Pk) 
     gauss = NG.lnL_pca_gauss(Pk, Pk)
     
@@ -64,45 +63,23 @@ def lnL_b2017(mock, ell=0):
     fig = plt.figure()
     sub = fig.add_subplot(111)
     nbin = 32
-    sub.hist(gauss, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
+    sub.hist(gauss, bins=nbin, range=[-2.2*Pk.shape[1], -0.8*Pk.shape[1]], 
             normed=True, alpha=0.75, label='Gaussian $\mathcal{L^\mathtt{pseudo}}$')
-    sub.hist(ica, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
+    sub.hist(ica, bins=nbin, range=[-2.2*Pk.shape[1], -0.8*Pk.shape[1]], 
             normed=True, alpha=0.75, label='ICA')
     sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
-    sub.set_xlim([-2.2*Pk.shape[0], -0.5*Pk.shape[0]])
+    sub.set_xlim([-2.2*Pk.shape[1], -0.5*Pk.shape[1]])
     sub.legend(loc='upper left', prop={'size': 20}) 
-    # save fig
-    f = ''.join([UT.fig_dir(), 'tests/test.lnL.b2017.krange.', mock, '.ell', str(ell), '.png'])
-    fig.savefig(f, bbox_inches='tight') 
-    return None 
 
-
-def lnL(mock, ell=0, rebin=None): 
-    ''' Test the ICA likelihood estimation and pseudo gaussian likelihood 
-    '''
-    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
-    ica = NG.lnL_ica(Pk, Pk) 
-    gauss = NG.lnL_pca_gauss(Pk, Pk)
+    str_rebin = ''
+    if rebin is not None: 
+        str_rebin = '.rebin'+str(rebin)
+    str_krange = ''
+    if krange is not None: 
+        str_krange = '.kmin'+str(krange[0])+'.kmax'+str(krange[1])
     
-    prettyplot()
-    fig = plt.figure()
-    sub = fig.add_subplot(111)
-    if Pk.shape[1] < 100: 
-        nbin = 20  
-    else: 
-        nbin = 32
-    sub.hist(gauss, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
-            normed=True, alpha=0.75, label='Gaussian $\mathcal{L^\mathtt{pseudo}}$')
-    sub.hist(ica, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
-            normed=True, alpha=0.75, label='ICA')
-    sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
-    sub.set_xlim([-2.2*Pk.shape[0], -0.5*Pk.shape[0]])
-    sub.legend(loc='upper left', prop={'size': 20}) 
-
-    if rebin is None: # save fig
-        f = ''.join([UT.fig_dir(), 'tests/test.lnL.', mock, '.ell', str(ell), '.png'])
-    else: 
-        f = ''.join([UT.fig_dir(), 'tests/test.lnL.', mock, '.ell', str(ell), '.rebin', str(rebin), '.png'])
+    f = ''.join([UT.fig_dir(), 'tests/test.lnL.', mock, '.ell', str(ell), 
+        str_rebin, str_krange, '.png'])
     fig.savefig(f, bbox_inches='tight') 
     return None 
 
@@ -125,12 +102,12 @@ def lnL_pca_kde(mock, ell=0, rebin=None, krange=None):
     fig = plt.figure()
     sub = fig.add_subplot(111)
     nbin = 32 
-    sub.hist(pca_gauss, bins=nbin, range=[-2.2*Pk.shape[0], -0.5*Pk.shape[0]], 
+    sub.hist(pca_gauss, bins=nbin, range=[-2.2*Pk.shape[1], -0.5*Pk.shape[1]], 
             normed=True, alpha=0.75, label='Gaussian $\mathcal{L^\mathtt{pseudo}}$')
-    sub.hist(pca_kde, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
+    sub.hist(pca_kde, bins=nbin, range=[-2.2*Pk.shape[1], -0.8*Pk.shape[1]], 
             normed=True, alpha=0.75, label='$\mathcal{L^\mathtt{pseudo}}$ KDE estimate')
     sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
-    sub.set_xlim([-2.2*Pk.shape[0], -0.5*Pk.shape[0]])
+    sub.set_xlim([-2.2*Pk.shape[1], -0.5*Pk.shape[1]])
     sub.legend(loc='upper left', prop={'size': 20}) 
 
     if rebin is None: # save fig
@@ -141,58 +118,6 @@ def lnL_pca_kde(mock, ell=0, rebin=None, krange=None):
     return None 
 
 
-def lnL_pca_methods(mock, ell=0, rebin=None, krange=None): 
-    ''' Test whether or not the ln L from manually implemented PCA whitening
-    is consistent with the ln L from scikit learn's PCA
-    '''
-    Pk = NG.dataX(mock, ell=ell, rebin=rebin, krange=krange)
-    pca_gauss0 = NG.lnL_pca_gauss(Pk, Pk, method='whiten')
-    pca_gauss1 = NG.lnL_pca_gauss(Pk, Pk, method='sklearn')
-    print pca_gauss0[:10]
-    print pca_gauss1[:10]
-
-    pca_kde0 = NG.lnL_pca(Pk, Pk, method='whiten') 
-    pca_kde1 = NG.lnL_pca(Pk, Pk, method='sklearn') 
-    print pca_kde0[:10]
-    print pca_kde1[:10]
-
-    prettyplot()
-    fig = plt.figure(figsize=(15,7))
-    sub = fig.add_subplot(121)
-    nbin = 32 
-    sub.hist(pca_gauss0, bins=nbin, range=[-2.2*Pk.shape[0], -0.5*Pk.shape[0]], 
-            normed=True, alpha=0.75, label='Gaussian $\mathcal{L_\mathtt{manual}^\mathtt{pseudo}}$')
-    sub.hist(pca_gauss1, bins=nbin, range=[-2.2*Pk.shape[0], -0.5*Pk.shape[0]], 
-            normed=True, alpha=0.75, label='Gaussian $\mathcal{L_\mathtt{sklearn}^\mathtt{pseudo}}$')
-    sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
-    sub.set_xlim([-2.2*Pk.shape[0], -0.5*Pk.shape[0]])
-    sub.legend(loc='upper left', prop={'size': 20}) 
-
-    sub = fig.add_subplot(122)
-    sub.hist(pca_kde0, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
-            normed=True, alpha=0.75, label='$\mathcal{L_\mathtt{manual}^\mathtt{pseudo}}$ KDE estimate')
-    sub.hist(pca_kde1, bins=nbin, range=[-2.2*Pk.shape[0], -0.8*Pk.shape[0]], 
-            normed=True, alpha=0.75, label='$\mathcal{L_\mathtt{sklearn}^\mathtt{pseudo}}$ KDE estimate')
-    sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
-    sub.set_xlim([-2.2*Pk.shape[0], -0.5*Pk.shape[0]])
-    sub.legend(loc='upper left', prop={'size': 20}) 
-
-    if rebin is None: # save fig
-        f = ''.join([UT.fig_dir(), 'tests/test.lnL_pca_method.', mock, '.ell', str(ell), '.png'])
-    else: 
-        f = ''.join([UT.fig_dir(), 'tests/test.lnL_pca_method.', mock, '.ell', str(ell), '.rebin', str(rebin), '.png'])
-    fig.savefig(f, bbox_inches='tight') 
-    return None 
-
-
-
-def ica_whiten(mock, ell=0, rebin=None): 
-    ''' Test whether the Choletsky whitening produces significantly 
-    different results than the built in ICA whitening  
-    '''
-    pass
-
-
 def ica(mock, ell=0, rebin=None): 
     ''' *** TESTED *** 
     Test that the ICA works!
@@ -200,12 +125,11 @@ def ica(mock, ell=0, rebin=None):
     Pk = NG.dataX(mock, ell=ell, rebin=rebin)
     X, _ = NG.meansub(Pk)
     X_w, W = NG.whiten(X) # whitened data
-
-    X_ica, W = NG.ica(X_w)
+    X_ica, W = NG.Ica(X_w)
     
     # compare covariance? 
-    C_X = np.cov(X)
-    C_Xica = np.cov(X_ica) 
+    C_X = np.cov(X.T)
+    C_Xica = np.cov(X_ica.T) 
 
     prettyplot()
     fig = plt.figure(figsize=(20, 8))
@@ -242,13 +166,13 @@ def p_Xwi_Xwj_outlier(mock, ell=0, rebin=None, krange=None, ica=False, pca=False
     if pca: # PCA components
         X_w, _ = NG.whiten(X, method='pca') # whitened data
     if not ica and not pca: # just whitened 
-        X_w, W = NG.whiten(X, method='choletsky') # whitened data
+        X_w, _ = NG.whiten(X, method='choletsky') # whitened data
     
     x, y = np.linspace(-5., 5., 50), np.linspace(-5., 5., 50)
     xx, yy = np.meshgrid(x,y)
     pos = np.vstack([xx.ravel(), yy.ravel()])
     
-    ij_i, ij_j = np.meshgrid(range(X_w.shape[0]), range(X_w.shape[0]))
+    ij_i, ij_j = np.meshgrid(range(X_w.shape[1]), range(X_w.shape[1]))
     ij = np.vstack([ij_i.ravel(), ij_j.ravel()])
 
     # joint pdfs of X_w^i and X_w^j estimated from mocks  
@@ -256,7 +180,7 @@ def p_Xwi_Xwj_outlier(mock, ell=0, rebin=None, krange=None, ica=False, pca=False
     pdfs_2d = NG.p_Xwi_Xwj(X_w, ij, x=x, y=y)
 
     # p(X_w^i) * p(X_w^j) estimated from mocks
-    pXwi = NG.p_Xw_i(X_w, range(X_w.shape[0]), x=x)
+    pXwi = NG.p_Xw_i(X_w, range(X_w.shape[1]), x=x)
     pXwj = pXwi 
 
     # calculate L2 norm difference betwen joint pdf and 2d gaussian 
@@ -305,19 +229,64 @@ def p_Xwi_Xwj_outlier(mock, ell=0, rebin=None, krange=None, ica=False, pca=False
     return None
 
 
-def Xw_i_outlier(mock, ell=0, rebin=None):
+def p_Xw_i_MISE(mock, ell=0, rebin=None, krange=None, method='choletsky', b=0.1):
     ''' Examine the pdf of X_w^i components that deviate significantly from  
-    N(0,1) 
+    N(0,1) based on MISE 
     '''
-    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin, krange=krange)
     X, _ = NG.meansub(Pk)
-    X_w, W = NG.whiten(X) # whitened data
+    X_w, W = NG.whiten(X, method=method) # whitened data
     
     # calculate the chi-squared values of each p(X_w^i)  
     x = np.arange(-5., 5.1, 0.1)
-    chi2 = np.zeros(X_w.shape[0])
-    for i_bin in range(X_w.shape[0]): 
-        kern = gkde(X_w[i_bin,:]) # gaussian KDE kernel using "rule of thumb" scott's rule. 
+    mise = np.zeros(X_w.shape[1])
+    for i_bin in range(X_w.shape[1]): 
+        mise[i_bin] = NG.MISE(X_w[:,i_bin], b=b) 
+
+    # plot the most discrepant components. 
+    prettyplot()
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    i_sort = np.argsort(mise)
+    print 'outlier bins = ', i_sort[-5:]
+    print 'mise = ', mise[i_sort[-5:]]
+
+    nbin = int(10./b)
+    for i_bin in i_sort[-10:]: 
+        hb_Xi, Xi_edges = np.histogram(X_w[:,i_bin], bins=nbin, range=[-5., 5.], normed=True) 
+        p_X_w_arr = UT.bar_plot(Xi_edges, hb_Xi)
+        sub.plot(p_X_w_arr[0], p_X_w_arr[1])
+
+    sub.plot(x, UT.gauss(x, 1., 0.), c='k', lw=3, label='$\mathcal{N}(0,1)$')
+    sub.set_xlim([-2.5, 2.5])
+    sub.set_xlabel('$\mathtt{X^{i}_{W}}$', fontsize=25) 
+    sub.set_ylim([0., 0.6])
+    sub.set_ylabel('$\mathtt{P(X^{i}_{W})}$', fontsize=25) 
+    sub.legend(loc='upper right') 
+    
+    str_rebin = ''
+    if rebin is not None: 
+        str_rebin = '.rebin'+str(rebin)
+
+    f = ''.join([UT.fig_dir(), 'tests/test.p_Xw_i_outlier.', method, '.', mock, '.ell', str(ell), 
+        str_rebin, '.b', str(b), '.png'])
+    fig.savefig(f, bbox_inches='tight') 
+    return None
+
+
+def p_Xw_i_outlier(mock, ell=0, rebin=None, krange=None, method='choletsky'):
+    ''' Examine the pdf of X_w^i components that deviate significantly from  
+    N(0,1) 
+    '''
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin, krange=krange)
+    X, _ = NG.meansub(Pk)
+    X_w, W = NG.whiten(X, method=method) # whitened data
+    
+    # calculate the chi-squared values of each p(X_w^i)  
+    x = np.arange(-5., 5.1, 0.1)
+    chi2 = np.zeros(X_w.shape[1])
+    for i_bin in range(X_w.shape[1]): 
+        kern = gkde(X_w[:,i_bin]) # gaussian KDE kernel using "rule of thumb" scott's rule. 
         chi2[i_bin] = np.sum((UT.gauss(x, 1., 0.) - kern.evaluate(x))**2)/np.float(len(x))
     
     # plot the most discrepant components. 
@@ -325,9 +294,9 @@ def Xw_i_outlier(mock, ell=0, rebin=None):
     fig = plt.figure()
     sub = fig.add_subplot(111)
     i_sort = np.argsort(chi2)
-    print 'outlier bins = ', i_sort[-10:]
+    print 'outlier bins = ', i_sort[-5:]
     for i_bin in i_sort[-10:]: 
-        kern = gkde(X_w[i_bin,:]) # gaussian KDE kernel using "rule of thumb" scott's rule. 
+        kern = gkde(X_w[:,i_bin]) # gaussian KDE kernel using "rule of thumb" scott's rule. 
         sub.plot(x, kern.evaluate(x))
     sub.plot(x, UT.gauss(x, 1., 0.), c='k', lw=3, label='$\mathcal{N}(0,1)$')
     sub.set_xlim([-2.5, 2.5])
@@ -337,9 +306,9 @@ def Xw_i_outlier(mock, ell=0, rebin=None):
     sub.legend(loc='upper right') 
     
     if rebin is None: 
-        f = ''.join([UT.fig_dir(), 'tests/test.p_Xw_i_outlier.', mock, '.ell', str(ell), '.png'])
+        f = ''.join([UT.fig_dir(), 'tests/test.p_Xw_i_outlier.', method, '.', mock, '.ell', str(ell), '.png'])
     else: 
-        f = ''.join([UT.fig_dir(), 'tests/test.p_Xw_i_outlier.', mock, '.ell', str(ell), '.rebin', str(rebin), '.png'])
+        f = ''.join([UT.fig_dir(), 'tests/test.p_Xw_i_outlier.', method, '.', mock, '.ell', str(ell), '.rebin', str(rebin), '.png'])
     fig.savefig(f, bbox_inches='tight') 
     return None
 
@@ -349,8 +318,9 @@ def p_Xw_i(mock, ell=0, rebin=None, krange=None, ica=False, pca=False):
     component -- p(X_w^i). First compare the histograms of p(X_w^i) 
     with N(0,1). Then compare the gaussian KDE of p(X_w^i).
     '''
-    Pk = NG.dataX(mock, ell=ell, rebin=rebin, krange=None)
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin, krange=krange)
     X, _ = NG.meansub(Pk)
+    str_w = 'W'
     if ica and pca: 
         raise ValueError
     if ica: # ICA components
@@ -359,8 +329,10 @@ def p_Xw_i(mock, ell=0, rebin=None, krange=None, ica=False, pca=False):
         # is to capture the non-Gaussianity...
         X_white, _ = NG.whiten(X) # whitened data
         X_w, _ = NG.Ica(X_white) 
+        str_w = 'ICA'
     if pca: # PCA components
         X_w, _ = NG.whiten(X, method='pca') # whitened data
+        str_w = 'PCA'
     if not ica and not pca: # just whitened 
         X_w, W = NG.whiten(X) # whitened data
     
@@ -368,23 +340,23 @@ def p_Xw_i(mock, ell=0, rebin=None, krange=None, ica=False, pca=False):
     # p(X_w^i) histograms
     fig = plt.figure(figsize=(15,7))
     sub = fig.add_subplot(121)
-    for i_bin in range(X_w.shape[0]): 
-        p_X_w, edges = np.histogram(X_w[i_bin,:], normed=True)
+    for i_bin in range(X_w.shape[1]): 
+        p_X_w, edges = np.histogram(X_w[:,i_bin], normed=True)
         p_X_w_arr = UT.bar_plot(edges, p_X_w)
         sub.plot(p_X_w_arr[0], p_X_w_arr[1])
     x = np.arange(-5., 5.1, 0.1)
     sub.plot(x, UT.gauss(x, 1., 0.), c='k', lw=3, label='$\mathcal{N}(0,1)$')
     sub.set_xlim([-2.5, 2.5])
-    sub.set_xlabel('$\mathtt{X_{W}}$', fontsize=25) 
+    sub.set_xlabel('$\mathtt{X_{'+str_w+'}}$', fontsize=25) 
     sub.set_ylim([0., 0.6])
-    sub.set_ylabel('$\mathtt{P(X_{W})}$', fontsize=25) 
+    sub.set_ylabel('$\mathtt{P(X_{'+str_w+'})}$', fontsize=25) 
     sub.legend(loc='upper right') 
 
     # p(X_w^i) gaussian KDE fits  
-    pdfs = NG.p_Xw_i(X_w, range(X_w.shape[0]), x=x)
+    pdfs = NG.p_Xw_i(X_w, range(X_w.shape[1]), x=x)
 
     sub = fig.add_subplot(122)
-    for i_bin in range(X_w.shape[0]): 
+    for i_bin in range(X_w.shape[1]): 
         sub.plot(x, pdfs[i_bin])
     sub.plot(x, UT.gauss(x, 1., 0.), c='k', lw=3, label='$\mathcal{N}(0,1)$')
     sub.set_xlim([-2.5, 2.5])
@@ -407,20 +379,23 @@ def p_Xw_i(mock, ell=0, rebin=None, krange=None, ica=False, pca=False):
     return None 
 
 
-def whiten_recon(mock, ell=0, rebin=None, method='choletsky'): 
+def whiten_recon(mock, ell=0, rebin=None, krange=None, method='choletsky'): 
     ''' ***TESTED: The whitening matrices reconstruct the P(k)s*** 
     Test whether P(k) can be reconstructed using the whitening matrix  
     '''
-    Pk, k = NG.dataX(mock, ell=ell, rebin=rebin, k_arr=True)
+    Pk, k = NG.dataX(mock, ell=ell, rebin=rebin, krange=krange, k_arr=True)
     X, mu_X = NG.meansub(Pk)
     X_w, W = NG.whiten(X, method=method) # whitened data
     
     prettyplot()
     fig = plt.figure(figsize=(15,7))
     sub = fig.add_subplot(121)
-    for i in range(X.shape[1]): 
-        sub.plot(k, Pk[:,i])
-    sub.set_xlim([1e-3, 0.5])
+    for i in range(X.shape[0]): 
+        sub.plot(k, Pk[i,:])
+    if krange is None: 
+        sub.set_xlim([1e-3, 0.5])
+    else: 
+        sub.set_xlim(krange)
     sub.set_xscale('log')
     sub.set_xlabel('$\mathtt{k}$', fontsize=25)
     sub.set_yscale('log') 
@@ -428,11 +403,14 @@ def whiten_recon(mock, ell=0, rebin=None, method='choletsky'):
     
     np.random.seed(7)
     sub = fig.add_subplot(122)
-    for i in range(X.shape[1]): 
-        X_noise = np.random.normal(size=X_w.shape[0])
-        X_rec = np.linalg.solve(W.T, X_noise)
-        sub.plot(k, X_rec + mu_X)
-    sub.set_xlim([1e-3, 0.5])
+    for i in range(X.shape[0]): 
+        X_noise = np.random.normal(size=X_w.shape[1])
+        X_rec = np.linalg.solve(W.T, X_noise.T)
+        sub.plot(k, X_rec.T + mu_X)
+    if krange is None: 
+        sub.set_xlim([1e-3, 0.5])
+    else: 
+        sub.set_xlim(krange)
     sub.set_xscale('log')
     sub.set_xlabel('$\mathtt{k}$', fontsize=25)
     sub.set_yscale('log') 
@@ -446,12 +424,12 @@ def whiten_recon(mock, ell=0, rebin=None, method='choletsky'):
     return None 
 
 
-def whiten(mock, ell=0, rebin=None, method='choletsky'): 
+def whiten(mock, ell=0, rebin=None, krange=None, method='choletsky'): 
     ''' ***TESTED: Choletsky decomposition fails for full binned Nseries
     P(k) because the precision matrix estimate is not positive definite***
     test the data whitening. 
     '''
-    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin, krange=krange)
     X, _ = NG.meansub(Pk)
     X_w, W = NG.whiten(X, method=method) # whitened data
     
@@ -466,7 +444,7 @@ def whiten(mock, ell=0, rebin=None, method='choletsky'):
     sub.set_ylim([-7., 7.])
     sub.set_ylabel('$\mathtt{W^{T} (P^i_'+str(ell)+'- \overline{P_'+str(ell)+'})}$', fontsize=25)
     
-    C_Xw = np.cov(X_w)
+    C_Xw = np.cov(X_w.T)
     sub = fig.add_subplot(122)
     im = sub.imshow(C_Xw, interpolation='none')
     fig.colorbar(im, ax=sub) 
@@ -479,21 +457,21 @@ def whiten(mock, ell=0, rebin=None, method='choletsky'):
     return None 
 
 
-def dataX(mock, ell=0, rebin=None): 
+def dataX(mock, ell=0, rebin=None, krange=None): 
     ''' ***TESTED***
     Test the data X calculation 
     '''
-    Pk = NG.dataX(mock, ell=ell, rebin=rebin)
+    Pk = NG.dataX(mock, ell=ell, rebin=rebin, krange=krange)
     X, _ = NG.meansub(Pk)
     
     prettyplot()
     fig = plt.figure()
     sub = fig.add_subplot(111)
 
-    for i in range(X.shape[1]): 
-        sub.plot(range(X.shape[0]), X[:,i])
+    for i in range(X.shape[0]): 
+        sub.plot(range(X.shape[1]), X[i,:])
     
-    sub.set_xlim([0, X.shape[0]]) 
+    sub.set_xlim([0, X.shape[1]]) 
     sub.set_xlabel('$\mathtt{k}$ bins', fontsize=25)
     sub.set_ylim([-1e5, 1e5])
     sub.set_ylabel('$\mathtt{P^i_'+str(ell)+'(k) - \overline{P_'+str(ell)+'(k)}}$', fontsize=25)
@@ -521,7 +499,7 @@ def invC(mock, ell=0, rebin=None):
             pks = np.zeros((len(k), n_mock))
         pks[:, i-1] = pk 
 
-    C_pk = np.cov(pks) # covariance matrix 
+    C_pk = np.cov(pks.T) # covariance matrix 
 
     invC_pk = np.linalg.inv(C_pk) 
 
@@ -537,10 +515,5 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    lnL_pca_methods('qpm', ell=0, rebin='beutler', krange=[0.01, 0.15]) 
-    lnL_pca_methods('qpm', ell=2, rebin='beutler', krange=[0.01, 0.15]) 
-    lnL_pca_methods('qpm', ell=4, rebin='beutler', krange=[0.01, 0.15]) 
-    #for ell in [0, 2, 4]: 
-    #    p_Xw_i('qpm', ell=ell, rebin='beutler', krange=[0.01, 0.15])
-    #    p_Xw_i('qpm', ell=ell, rebin='beutler', krange=[0.01, 0.15], pca=True)
-    #    p_Xw_i('qpm', ell=ell, rebin='beutler', krange=[0.01, 0.15], ica=True)
+    for ell in [0,2,4]: 
+        p_Xw_i_MISE('qpm', ell=ell, rebin='beutler', krange=[0.01,0.3], method='pca', b=0.1)
