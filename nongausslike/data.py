@@ -25,19 +25,22 @@ class Pk:
             raise ValueError("ell can only be 0, 2, or 4") 
     
         # compressed file 
-        tar = tarfile.open(self._tarfile(name, ell, sys))
+        tar = tarfile.open(self._tarfile(name))
 
-        fname = self._file_name(name, i, ell, sys) # file name 
-    
+        fname = self._file_name(name, i, sys) # file name 
+        cnt = 0  
         for mem in tar.getmembers(): 
             if mem.name == fname: 
                 member = mem 
+                cnt += 1 
                 continue 
+        if cnt == 0: 
+            print fname 
+            print 'not in ' 
+            print self._tarfile(name)
+            raise ValueError
         f = tar.extractfile(member)
-        if ell == 0: 
-            k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, 1, -1]) # k, p0(k), and number of modes 
-        else: 
-            k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, 1+ell/2, -2]) # k, p0(k), and number of modes 
+        k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, 1+ell/2, -2]) # k, p0(k), and number of modes 
 
         self.k = k
         self.pk = pk
@@ -122,46 +125,44 @@ class Pk:
             n_mock = 84
         elif name == 'qpm': 
             n_mock = 1000 
+        elif 'patchy' in name: 
+            n_mock = 2048
         else: 
             raise ValueError
         return n_mock 
     
-    def _tarfile(self, name, ell, sys): 
+    def _tarfile(self, name): 
+        ''' tar ball that contains all the powerspectrum measurements. 
+        with/without systematics, everything. P(k) files are pretty small 
+        so who cares. 
         '''
-        '''
-        if sys is None: 
-            str_sys = ''
-        elif sys == 'fc':  # fiber collisions 
-            str_sys = '.fibcoll'
-        else: 
-            raise NotImplementedError
+        name_dir = name 
+        if 'patchy' in name: 
+            name_dir = 'patchy'
 
-        if ell == 0: 
-            str_ell = ''
-        else: 
-            str_ell = '_q'
-        return ''.join([UT.dat_dir(), name, '/', 'power', str_ell, '_', name, '.tar'])
+        return ''.join([UT.dat_dir(), name_dir, '/', 'power_', name, '.tar'])
 
-    def _file_name(self, name, i, ell, sys): 
+    def _file_name(self, name, i, sys): 
         ''' Messy code for dealing with all the different file names 
         '''
         if sys is None: 
             str_sys = ''
         elif sys == 'fc':  # fiber collisions 
-            str_sys = '.fibcoll'
+            if 'patchy' in name: 
+                str_sys = '.fc'
+            else: 
+                str_sys = '.fibcoll'
         else: 
             raise NotImplementedError
 
         if name == 'nseries': 
-            if ell == 0: 
-                f = ''.join(['power_CutskyN', str(i), str_sys, '.dat.grid360.P020000.box3600'])
-            else: 
-                f = ''.join(['POWER_Q_CutskyN', str(i), '.fidcosmo', str_sys, '.dat.grid480.P020000.box3600'])
+            f = ''.join(['POWER_Q_CutskyN', str(i), '.fidcosmo', str_sys, '.dat.grid480.P020000.box3600'])
         elif name == 'qpm': 
-            if ell == 0: 
-                f = ''.join(['power_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed', str_sys, '.dat.grid360.P020000.box3600'])
-            else: 
-                f = ''.join(['POWER_Q_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed.fidcosmo', str_sys, '.dat.grid480.P020000.box3600']) 
+            f = ''.join(['POWER_Q_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed.fidcosmo', str_sys, '.dat.grid480.P020000.box3600']) 
+        elif 'patchy.ngc.' in name: 
+            zbin = name.split('.z')[-1]
+            f = ''.join(['plk.Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str(i).zfill(4), 
+                '.Lbox3600.Ngrid480.O4intp.P010000', str_sys, '.z', zbin]) 
         else: 
             raise NotImplementedError
         return f 
