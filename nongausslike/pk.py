@@ -93,9 +93,18 @@ def buildPk(catalog, n_mock, sys=None):
     fft_exe = ''.join([UT.code_dir(), 'fort/FFT_scoccimarro_cmasslowzcomb.exe'])
     pk_exe = ''.join([UT.code_dir(), 'fort/power_scoccimarro.exe'])
     for zbin in [1,2,3]: 
-        # fft name   
+        # data fft name   
         fft_D = FFT(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
                 sys=sys, comp=comp_flag, zbin=zbin)
+        # random fft name   
+        fft_R = FFT(rand_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+                sys=sys, comp=comp_flag, zbin=zbin)
+        # pk name   
+        file_plk = Plk(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+                sys=sys, comp=comp_flag, zbin=zbin)
+        if os.path.isfile(file_plk): 
+            continue 
+
         print 'Constructing FFT for ...'  
         print file_catalog 
         print fft_D 
@@ -115,8 +124,6 @@ def buildPk(catalog, n_mock, sys=None):
         subprocess.call(cmd_D.split())
 
         # construct random FFTs
-        fft_R = FFT(rand_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
-                sys=sys, comp=comp_flag, zbin=zbin)
         if not os.path.isfile(fft_R): 
             cmd_R = ' '.join([fft_exe, 
                 str(idata), 
@@ -141,8 +148,6 @@ def buildPk(catalog, n_mock, sys=None):
             print '' 
 
         # construct P(k) using the catalog FFT and random FFT
-        file_plk = Plk(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
-                sys=sys, comp=comp_flag, zbin=zbin)
         print 'Constructing ...'
         print file_plk
 
