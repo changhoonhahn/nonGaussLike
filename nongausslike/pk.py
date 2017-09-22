@@ -83,8 +83,8 @@ def buildPk(catalog, n_mock, sys=None):
         idata = 2
     else: 
         raise ValueError
-    Lbox = 2450     # Box size 
-    Ngrid = 460     # FFT grid size (480 or 960)
+    Lbox = 3400     # Box size 
+    Ngrid = 650     # FFT grid size (480 or 960)
     Nbin = 120
     n_interp = 4    # interpolation (4 or 2) 
     P0 = 10000      # P0:                 10000
@@ -92,7 +92,7 @@ def buildPk(catalog, n_mock, sys=None):
         fc_flag = 1 
     else: 
         fc_flag = 0 
-    comp_flag = 1
+    comp_flag = 0
     file_catalog = Catalog(catalog, n_mock) # catalog file 
     rand_catalog = Random(catalog) # random file 
 
@@ -234,16 +234,17 @@ def _make_run():
 
 
 if __name__=="__main__": 
-    Nthreads = int(Sys.argv[1])
-    print 'running on ', Nthreads, ' threads'
-    pool = Pewl(processes=Nthreads)
-    mapfn = pool.map
+    buildPk('boss', 0, sys='fc')
+    #Nthreads = int(Sys.argv[1])
+    #print 'running on ', Nthreads, ' threads'
+    #pool = Pewl(processes=Nthreads)
+    #mapfn = pool.map
 
-    nmock0 = int(Sys.argv[2])
-    nmock1 = int(Sys.argv[3])
-    arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
+    #nmock0 = int(Sys.argv[2])
+    #nmock1 = int(Sys.argv[3])
+    #arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
 
-    mapfn(buildPk_wrap, [arg for arg in arglist])
-    pool.close()
-    pool.terminate()
-    pool.join() 
+    #mapfn(buildPk_wrap, [arg for arg in arglist])
+    #pool.close()
+    #pool.terminate()
+    #pool.join() 
