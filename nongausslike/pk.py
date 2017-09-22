@@ -9,11 +9,14 @@ import util as UT
 from interruptible_pool import InterruptiblePool as Pewl
 
 
-def Catalog(catalog, n_mock):
+def Catalog(catalog, n_mock, NorS='ngc'):
     ''' name of the original catalog files. These will be fed into the FFT 
     '''
-    if catalog == 'patchy': 
-        return ''.join([UT.dat_dir(), 'patchy/Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str("%04d" % n_mock), '.dat'])
+    if 'patchy' in catalog: 
+        return ''.join([UT.catalog_dir('patachy'), 'Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str("%04d" % n_mock), '.dat'])
+    elif catalog == 'boss': 
+        if NorS == 'ngc': 
+            return ''.join([UT.catalog_dir('boss'), 'galaxy_DR12v5_CMASSLOWZTOT_North.dat']) 
     else:
         raise NotImplementedError
 
@@ -189,6 +192,7 @@ def _make_run():
         f.write('module load python/2.7-anaconda \n') 
         f.write('\n')
         f.write('srun -n 1 -c 5 python /global/homes/c/chahah/projects/nonGaussLike/nongausslike/pk.py 5 '+str(n0[i])+' '+str(n1[i]))
+    f.close() 
     return None
 
 

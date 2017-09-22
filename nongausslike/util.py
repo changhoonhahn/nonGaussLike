@@ -15,6 +15,15 @@ def code_dir():
     return os.path.dirname(os.path.realpath(__file__))+'/'
 
 
+def catalog_dir(name): 
+    ''' sub directory of dat where the specified catalog is located
+    '''
+    name_dir = name 
+    if 'patchy' in name: 
+        name_dir = 'patchy'
+    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/dat/'+name_dir+'/'
+
+
 def dat_dir(): 
     ''' dat directory is symlinked to a local path where the data files are located
     '''

@@ -4,10 +4,13 @@ code for assessing galaxy clustering data and etc.
 
 
 '''
+import os 
 import numpy as np 
 import tarfile 
 # -- local -- 
 import util as UT
+
+from ChangTools.fitstables import mrdfits
 
 
 class Pk: 
@@ -23,7 +26,21 @@ class Pk:
         '''
         if ell not in [0, 2, 4]: 
             raise ValueError("ell can only be 0, 2, or 4") 
+        
+        #f = self._compressed_read(name, i, ell, sys) 
+        f = ''.join([UT.catalog_dir(name), self._file_name(name, i, sys)]) 
     
+        k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, 1+ell/2, -2]) # k, p0(k), and number of modes 
+
+        self.k = k
+        self.pk = pk
+        self.counts = counts
+        return None
+
+    def _compressed_read(name, i, ell, sys): 
+        ''' Reading from compressed file. I experimented it because
+        it seemed cool, but takes a super long time...
+        '''
         # compressed file 
         tar = tarfile.open(self._tarfile(name))
 
@@ -40,12 +57,7 @@ class Pk:
             print self._tarfile(name)
             raise ValueError
         f = tar.extractfile(member)
-        k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, 1+ell/2, -2]) # k, p0(k), and number of modes 
-
-        self.k = k
-        self.pk = pk
-        self.counts = counts
-        return None
+        return f 
     
     def rebin(self, rebin, pk_arr=None): 
         ''' Rebin the P(k) using the counts 
@@ -136,11 +148,7 @@ class Pk:
         with/without systematics, everything. P(k) files are pretty small 
         so who cares. 
         '''
-        name_dir = name 
-        if 'patchy' in name: 
-            name_dir = 'patchy'
-
-        return ''.join([UT.dat_dir(), name_dir, '/', 'power_', name, '.tar'])
+        return ''.join([UT.catalog_dir(name), 'power_', name, '.tar'])
 
     def _file_name(self, name, i, sys): 
         ''' Messy code for dealing with all the different file names 
@@ -166,3 +174,116 @@ class Pk:
         else: 
             raise NotImplementedError
         return f 
+
+
+def boss_preprocess(NorS='ngc'): 
+    ''' read in and pre-process boss data 
+    '''
+    if NorS == 'ngc': 
+        str_NorS = 'North'
+    elif NorS == 'sgc': 
+        str_NorS = 'South'
+
+    # read in original data in fits file format 
+    f_orig = ''.join([UT.catalog_dir('boss'), 'galaxy_DR12v5_CMASSLOWZTOT_', str_NorS, '.fits']) 
+    data = mrdfits(f_orig)
+    # data columns: ra,dec,az,nbb,wsys,wnoz,wcp,comp
+    data_list = [data.ra, data.dec, data.z, data.nz, data.weight_systot, data.weight_noz, data.weight_cp, data.comp]
+    data_fmt = ['%f', '%f', '%f', '%e', '%f', '%f', '%f', '%f']
+    header_str = "columns: ra,dec,az,nbb,wsys,wnoz,wcp,comp" 
+
+    f_boss = ''.join([UT.catalog_dir('boss'), 'galaxy_DR12v5_CMASSLOWZTOT_North.dat']) 
+    np.savetxt(f_boss,
+            (np.vstack(np.array(data_list))).T, 
+            fmt=data_fmt, 
+            delimiter='\t', 
+            header=header_str) 
+
+    # now random catalog 
+    f_orig = ''.join([UT.catalog_dir('boss'), 'random1_DR12v5_CMASSLOWZTOT_', str_NorS, '.fits.gz']) 
+    #data = mrdfits(f_orig)
+    # data columns: ra,dec,az,nbb,wsys,wnoz,wcp,comp
+    #data_list = [data.ra, data.dec, data.z, data.nz, data.weight_systot, data.weight_noz, data.weight_cp, data.comp]
+
+    return None 
+
+
+def patchyCov(zbin, NorS='ngc', clobber=False): 
+    ''' Construct covariance matrix for patchy mocks measured using Roman's code
+    and compare with Florian's. 
+    '''
+    catalog = 'patchy.'+NorS+'.z'+str(zbin)
+
+    f_cov = ''.join([UT.catalog_dir(catalog), 'Cov_pk.', catalog, '.beutler.dat']) 
+    
+    if os.path.isfile(f_cov) and not clobber:  
+        i_k, j_k, C_ij = np.loadtxt(f_cov, skiprows=4, unpack=True, usecols=[0,1,-1])
+        return C_ij.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+    else: 
+        # calculate my patchy covariance 
+        pkay = Pk() 
+        n_mock = pkay._n_mock(catalog) 
+        
+        for i in range(1,n_mock+1):
+            # read in monopole
+            pkay.Read(catalog, i, ell=0, sys='fc')
+            pkay.krange([0.01,0.15])
+            k0, p0k, _ = pkay.rebin('beutler') 
+            n_kbin = len(k0) 
+            
+            # read in quadrupole 
+            pkay.Read(catalog, i, ell=2, sys='fc')
+            pkay.krange([0.01,0.15])
+            k2, p2k, _ = pkay.rebin('beutler') 
+            n_kbin += len(k2) 
+            
+            # read in hexadecapole 
+            pkay.Read(catalog, i, ell=4, sys='fc')
+            pkay.krange([0.01,0.1])
+            k4, p4k, _ = pkay.rebin('beutler') 
+            n_kbin += len(k4) 
+        
+            if i == 1: 
+                ks = np.zeros((n_mock, n_kbin))
+                pks = np.zeros((n_mock, n_kbin))
+
+            ks_i = np.concatenate([k0, k2, k4])
+            pks_i = np.concatenate([p0k, p2k, p4k]) 
+            ks[i-1,:] = ks_i
+            pks[i-1,:] = pks_i 
+        
+        #Cov_pk = np.cov(pks.T)
+        mu_pk = np.sum(pks, axis=0)/np.float(n_mock)
+        Cov_pk = np.dot((pks-mu_pk).T, pks-mu_pk)/(float(pks.shape[0])-1)
+        f_hartlap = float(pks.shape[0] - pks.shape[1] - 2) / float(pks.shape[0] - 1) 
+        Cov_pk *= 1./f_hartlap 
+        print f_hartlap
+
+        # write to file 
+        f = open(f_cov, 'w')
+        f.write('### header ### \n') 
+        f.write('Covariance matrix for monopole, quadrupole and hexadecapole calculated from the 2045 mocks \n')
+        f.write('5 columns: {measured power spectrum bin index i} {measured power spectrum bin index j} k_i k_j C_ij \n') 
+        f.write('### header ### \n') 
+
+        for i in range(Cov_pk.shape[0]): 
+            for j in range(Cov_pk.shape[1]):
+                f.write('%i \t %i \t %e' % (i, j, Cov_pk[i,j])) 
+                f.write('\n') 
+        f.close() 
+        return Cov_pk 
+
+
+def beutlerCov(zbin, NorS='ngc'): 
+    ''' Read in Florian's covariance matrix
+    '''
+    # read in C_ij from file 
+    if NorS == 'ngc': 
+        f_cov = ''.join([UT.dat_dir(), 'Beutler/public_material_RSD/',
+            'Beutleretal_cov_patchy_z', str(zbin), '_NGC_1_15_1_15_1_10_2045_60.dat']) 
+    else: 
+        f_cov = ''.join([UT.dat_dir(), 'Beutler/public_material_RSD/',
+            'Beutleretal_cov_patchy_z', str(zbin), '_SGC_1_15_1_15_1_10_2048_60.dat']) 
+    i_k, j_k, C_ij = np.loadtxt(f_cov, skiprows=4, unpack=True, usecols=[0,1,4])
+
+    return C_ij.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
