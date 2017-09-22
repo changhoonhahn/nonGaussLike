@@ -176,38 +176,6 @@ class Pk:
         return f 
 
 
-def boss_preprocess(NorS='ngc'): 
-    ''' read in and pre-process boss data 
-    '''
-    if NorS == 'ngc': 
-        str_NorS = 'North'
-    elif NorS == 'sgc': 
-        str_NorS = 'South'
-
-    # read in original data in fits file format 
-    f_orig = ''.join([UT.catalog_dir('boss'), 'galaxy_DR12v5_CMASSLOWZTOT_', str_NorS, '.fits']) 
-    data = mrdfits(f_orig)
-    # data columns: ra,dec,az,nbb,wsys,wnoz,wcp,comp
-    data_list = [data.ra, data.dec, data.z, data.nz, data.weight_systot, data.weight_noz, data.weight_cp, data.comp]
-    data_fmt = ['%f', '%f', '%f', '%e', '%f', '%f', '%f', '%f']
-    header_str = "columns: ra,dec,az,nbb,wsys,wnoz,wcp,comp" 
-
-    f_boss = ''.join([UT.catalog_dir('boss'), 'galaxy_DR12v5_CMASSLOWZTOT_North.dat']) 
-    np.savetxt(f_boss,
-            (np.vstack(np.array(data_list))).T, 
-            fmt=data_fmt, 
-            delimiter='\t', 
-            header=header_str) 
-
-    # now random catalog 
-    f_orig = ''.join([UT.catalog_dir('boss'), 'random1_DR12v5_CMASSLOWZTOT_', str_NorS, '.fits.gz']) 
-    #data = mrdfits(f_orig)
-    # data columns: ra,dec,az,nbb,wsys,wnoz,wcp,comp
-    #data_list = [data.ra, data.dec, data.z, data.nz, data.weight_systot, data.weight_noz, data.weight_cp, data.comp]
-
-    return None 
-
-
 def patchyCov(zbin, NorS='ngc', clobber=False): 
     ''' Construct covariance matrix for patchy mocks measured using Roman's code
     and compare with Florian's. 

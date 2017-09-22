@@ -21,11 +21,14 @@ def Catalog(catalog, n_mock, NorS='ngc'):
         raise NotImplementedError
 
 
-def Random(catalog):
+def Random(catalog, NorS='ngc'):
     ''' name of the original catalog files. These will be fed into the FFT 
     '''
     if catalog == 'patchy': 
         return ''.join([UT.dat_dir(), 'patchy/Patchy-Mocks-Randoms-DR12NGC-COMPSAM_V6C_x50.dat'])
+    elif catalog == 'boss': 
+        if NorS == 'ngc': 
+            return ''.join([UT.catalog_dir('boss'), 'random1_DR12v5_CMASSLOWZTOT_North.dat'])
     else:
         raise NotImplementedError
 
@@ -74,20 +77,22 @@ def buildPk(catalog, n_mock, sys=None):
     ''' Calculate the powerspectrum multipoles for 
     specified catalog 
     '''
-    if catalog == 'patchy': # boss or patchy:     1 or 2 
+    if catalog == 'boss': 
+        idata = 1
+    elif catalog == 'patchy': # boss or patchy:     1 or 2 
         idata = 2
     else: 
         raise ValueError
-    Lbox = 3600     # Box size 
-    Ngrid = 480     # FFT grid size (480 or 960)
+    Lbox = 2450     # Box size 
+    Ngrid = 460     # FFT grid size (480 or 960)
+    Nbin = 120
     n_interp = 4    # interpolation (4 or 2) 
     P0 = 10000      # P0:                 10000
     if sys == 'fc': # fc flag: 1 for fc 0 for no fc  
         fc_flag = 1 
     else: 
         fc_flag = 0 
-    if catalog == 'patchy': # comp flag: 1 for comp = 1
-        comp_flag = 1
+    comp_flag = 1
     file_catalog = Catalog(catalog, n_mock) # catalog file 
     rand_catalog = Random(catalog) # random file 
 
@@ -159,9 +164,41 @@ def buildPk(catalog, n_mock, sys=None):
             fft_R, 
             file_plk, 
             str(Lbox), 
-            str(int(Ngrid/2))]) # N_bin = Ngrid/2 
+            str(Nbin)]) 
         subprocess.call(cmd_plk.split())
     return None
+
+
+def boss_preprocess(NorS='ngc'): 
+    ''' read in and pre-process boss data 
+    '''
+    if NorS == 'ngc': 
+        str_NorS = 'North'
+    elif NorS == 'sgc': 
+        str_NorS = 'South'
+
+    # read in original data in fits file format 
+    f_orig = ''.join([UT.catalog_dir('boss'), 'galaxy_DR12v5_CMASSLOWZTOT_', str_NorS, '.fits']) 
+    data = mrdfits(f_orig)
+    # data columns: ra,dec,az,nbb,wsys,wnoz,wcp,comp
+    data_list = [data.ra, data.dec, data.z, data.nz, data.weight_systot, data.weight_noz, data.weight_cp, data.comp]
+    data_fmt = ['%f', '%f', '%f', '%e', '%f', '%f', '%f', '%f']
+    header_str = "columns: ra,dec,az,nbb,wsys,wnoz,wcp,comp" 
+
+    f_boss = ''.join([UT.catalog_dir('boss'), 'galaxy_DR12v5_CMASSLOWZTOT_North.dat']) 
+    np.savetxt(f_boss,
+            (np.vstack(np.array(data_list))).T, 
+            fmt=data_fmt, 
+            delimiter='\t', 
+            header=header_str) 
+
+    # now random catalog 
+    f_orig = ''.join([UT.catalog_dir('boss'), 'random1_DR12v5_CMASSLOWZTOT_', str_NorS, '.fits.gz']) 
+    #data = mrdfits(f_orig)
+    # data columns: ra,dec,az,nbb,wsys,wnoz,wcp,comp
+    #data_list = [data.ra, data.dec, data.z, data.nz, data.weight_systot, data.weight_noz, data.weight_cp, data.comp]
+
+    return None 
 
 
 def buildPk_wrap(arg): 
