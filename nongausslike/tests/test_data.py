@@ -13,6 +13,71 @@ from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
 
+def Beutler_BOSS_Plk(zbin): 
+    ''' Compare the powerspectrum calculated using Roman's estimator 
+    versus Florian's P(k)s
+    '''
+    if zbin == 1: 
+        f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox2800.Ngrid360.O4intp.P010000.fc.z1']) 
+    elif zbin == 2: 
+        f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox3200.Ngrid410.O4intp.P010000.fc.z2']) 
+    elif zbin == 3: 
+        f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox3800.Ngrid490.O4intp.P010000.fc.z3']) 
+
+    k_boss, p0k, p2k, p4k, counts = np.loadtxt(f_boss, unpack=True, usecols=[0, 5, 2, 3, -2]) # k, p0(k), and number of modes 
+
+    # read in Florian's P(k) 
+    ks, pks = [], [] 
+    for ell in [0, 2, 4]: 
+        if ell == 0: 
+            pole = 'monopole'
+        elif ell == 2: 
+            pole = 'quadrupole'
+        elif ell == 4: 
+            pole = 'hexadecapole'
+        f_beut = ''.join([UT.dat_dir()+'Beutler/public_material_RSD/Beutleretal_pk_', pole, 
+            '_DR12_NGC_z', str(zbin), '_prerecon_120.dat'])
+        k_beut, plk = np.loadtxt(f_beut, skiprows=31, unpack=True, usecols=[1,2]) 
+        pks.append(plk)
+        ks.append(k_beut) 
+
+    prettyplot()
+    fig = plt.figure(figsize=(21, 8))
+    sub = fig.add_subplot(131) # monopole comparison 
+    sub.plot(k_boss, p0k) 
+    sub.plot(ks[0], pks[0], label='Beutler+') 
+    sub.set_xscale('log') 
+    sub.set_yscale('log') 
+    sub.set_xlim([0.01, 0.15]) 
+    sub.set_ylim([5e3, 1.5e5]) 
+    sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
+    sub.set_ylabel('$\mathtt{P_0(k)}$', fontsize=25) 
+    sub.legend(loc='upper right') 
+
+    sub = fig.add_subplot(132) # quadrupole comparison 
+    sub.plot(k_boss, p2k) 
+    sub.plot(ks[1], pks[1]) 
+
+    sub.set_xscale('log') 
+    sub.set_yscale('log') 
+    sub.set_xlim([0.01, 0.15]) 
+    sub.set_ylim([1e3, 5e4]) 
+    sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
+    sub.set_ylabel('$\mathtt{P_2(k)}$', fontsize=25) 
+
+    sub = fig.add_subplot(133) # quadrupole comparison 
+    sub.plot(k_boss, p4k) 
+    sub.plot(ks[2], pks[2]) 
+
+    sub.set_xscale('log') 
+    sub.set_yscale('log') 
+    sub.set_xlim([0.01, 0.15]) 
+    sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
+    sub.set_ylabel('$\mathtt{P_4(k)}$', fontsize=25) 
+    fig.savefig(''.join([UT.fig_dir(), 'plk.boss.z', str(zbin), '.comparison.png']), bbox_inches='tight') 
+    return None 
+
+
 def beutler_patchy_Cov(zbin, NorS='ngc'): 
     ''' compare my patchy covariance to Florian's 
     '''
@@ -65,7 +130,6 @@ def beutler_patchy_Cov_diag(zbin, NorS='ngc'):
             bbox_inches='tight') 
     plt.close()
     return None 
-
 
 
 def patchyCov(zbin, NorS='ngc'): 
@@ -238,8 +302,6 @@ def Pk_i(catalog, i_mock, sys=None, rebin=None):
 
 
 if __name__=="__main__":
-    beutler_patchy_Cov_diag(1, NorS='ngc')
-    beutler_patchy_Cov_diag(2, NorS='ngc')
-    beutler_patchy_Cov_diag(3, NorS='ngc')
-    #Data.boss_preprocess()
-
+    Beutler_BOSS_Plk(1)
+    Beutler_BOSS_Plk(2)
+    Beutler_BOSS_Plk(3)

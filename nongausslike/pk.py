@@ -79,13 +79,16 @@ def buildPk(catalog, n_mock, sys=None):
     '''
     if catalog == 'boss': 
         idata = 1
+        Lboxs = [2800, 3200, 3800]     # Box size 
+        Ngrids = [360, 410, 490]     # FFT grid size (480 or 960)
+        Nbins = [40, 40, 40]
     elif catalog == 'patchy': # boss or patchy:     1 or 2 
         idata = 2
+        Lboxs = [3600, 3600, 3600]     # Box size 
+        Ngrids = [480, 480, 480]     # FFT grid size (480 or 960)
+        Nbins = [40, 40, 40]
     else: 
         raise ValueError
-    Lbox = 3400     # Box size 
-    Ngrid = 650     # FFT grid size (480 or 960)
-    Nbin = 120
     n_interp = 4    # interpolation (4 or 2) 
     P0 = 10000      # P0:                 10000
     if sys == 'fc': # fc flag: 1 for fc 0 for no fc  
@@ -100,7 +103,7 @@ def buildPk(catalog, n_mock, sys=None):
     # for z1, z2, z3 redshift bins 
     fft_exe = ''.join([UT.code_dir(), 'fort/FFT_scoccimarro_cmasslowzcomb.exe'])
     pk_exe = ''.join([UT.code_dir(), 'fort/power_scoccimarro.exe'])
-    for zbin in [1,2,3]: 
+    for iz, zbin in enumerate([1,2,3]): 
         # data fft name   
         fft_D = FFT(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
                 sys=sys, comp=comp_flag, zbin=zbin)
@@ -113,30 +116,31 @@ def buildPk(catalog, n_mock, sys=None):
         if os.path.isfile(file_plk): 
             continue 
 
-        print 'Constructing FFT for ...'  
-        print file_catalog 
-        print fft_D 
-        print '' 
-        cmd_D = ' '.join([fft_exe, 
-            str(idata), 
-            str(Lbox), 
-            str(Ngrid), 
-            str(n_interp), 
-            str(0), # data 
-            str(P0), 
-            str(fc_flag), 
-            str(comp_flag), 
-            file_catalog, 
-            str(zbin), 
-            fft_D])
-        subprocess.call(cmd_D.split())
+        if not os.path.isfile(fft_D): 
+            print 'Constructing FFT for ...'  
+            print file_catalog 
+            print fft_D 
+            print '' 
+            cmd_D = ' '.join([fft_exe, 
+                str(idata), 
+                str(Lboxs[iz]), 
+                str(Ngrids[iz]), 
+                str(n_interp), 
+                str(0), # data 
+                str(P0), 
+                str(fc_flag), 
+                str(comp_flag), 
+                file_catalog, 
+                str(zbin), 
+                fft_D])
+            subprocess.call(cmd_D.split())
 
         # construct random FFTs
         if not os.path.isfile(fft_R): 
             cmd_R = ' '.join([fft_exe, 
                 str(idata), 
-                str(Lbox), 
-                str(Ngrid), 
+                str(Lboxs[iz]), 
+                str(Ngrids[iz]), 
                 str(n_interp), 
                 str(1), # random 
                 str(P0), 
@@ -150,10 +154,6 @@ def buildPk(catalog, n_mock, sys=None):
             print fft_R 
             print '' 
             subprocess.call(cmd_R.split())
-        else: 
-            print 'Random FFT ...'  
-            print fft_R 
-            print '' 
 
         # construct P(k) using the catalog FFT and random FFT
         print 'Constructing ...'
@@ -163,8 +163,8 @@ def buildPk(catalog, n_mock, sys=None):
             fft_D, 
             fft_R, 
             file_plk, 
-            str(Lbox), 
-            str(Nbin)]) 
+            str(Lboxs[iz]), 
+            str(Nbins[iz])]) 
         subprocess.call(cmd_plk.split())
     return None
 
@@ -234,17 +234,16 @@ def _make_run():
 
 
 if __name__=="__main__": 
-    buildPk('boss', 0, sys='fc')
-    #Nthreads = int(Sys.argv[1])
-    #print 'running on ', Nthreads, ' threads'
-    #pool = Pewl(processes=Nthreads)
-    #mapfn = pool.map
+    Nthreads = int(Sys.argv[1])
+    print 'running on ', Nthreads, ' threads'
+    pool = Pewl(processes=Nthreads)
+    mapfn = pool.map
 
-    #nmock0 = int(Sys.argv[2])
-    #nmock1 = int(Sys.argv[3])
-    #arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
+    nmock0 = int(Sys.argv[2])
+    nmock1 = int(Sys.argv[3])
+    arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
 
-    #mapfn(buildPk_wrap, [arg for arg in arglist])
-    #pool.close()
-    #pool.terminate()
-    #pool.join() 
+    mapfn(buildPk_wrap, [arg for arg in arglist])
+    pool.close()
+    pool.terminate()
+    pool.join() 
