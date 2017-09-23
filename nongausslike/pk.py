@@ -13,7 +13,7 @@ def Catalog(catalog, n_mock, NorS='ngc'):
     ''' name of the original catalog files. These will be fed into the FFT 
     '''
     if 'patchy' in catalog: 
-        return ''.join([UT.catalog_dir('patachy'), 'Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str("%04d" % n_mock), '.dat'])
+        return ''.join([UT.catalog_dir('patchy'), 'Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str("%04d" % n_mock), '.dat'])
     elif catalog == 'boss': 
         if NorS == 'ngc': 
             return ''.join([UT.catalog_dir('boss'), 'galaxy_DR12v5_CMASSLOWZTOT_North.dat']) 
@@ -54,12 +54,13 @@ def FFT(catalog, Lbox=None, Ngrid=None, n_interp=None, P0=None, sys=None, comp=N
     return name
 
 
-def Plk(catalog, Lbox=None, Ngrid=None, n_interp=None, P0=None, sys=None, comp=None, zbin=None): 
+def Plk(catalog, Lbox=None, Ngrid=None, n_interp=None, P0=None, sys=None, comp=None, Nbin=None, zbin=None): 
     ''' P_l(k) for catalog 
     '''
     name = '/'.join(catalog.split('/')[:-1])+'/plk.'+catalog.split('/')[-1].split('.dat')[0]
     name += '.Lbox'+str(Lbox)
     name += '.Ngrid'+str(Ngrid)
+    name += '.Nbin'+str(Nbin)
     if n_interp == 2: 
         name += '.CICintp'
     else: 
@@ -82,11 +83,13 @@ def buildPk(catalog, n_mock, sys=None):
         Lboxs = [2800, 3200, 3800]     # Box size 
         Ngrids = [360, 410, 490]     # FFT grid size (480 or 960)
         Nbins = [40, 40, 40]
+        comp_flag = 0
     elif catalog == 'patchy': # boss or patchy:     1 or 2 
         idata = 2
         Lboxs = [3600, 3600, 3600]     # Box size 
         Ngrids = [480, 480, 480]     # FFT grid size (480 or 960)
         Nbins = [40, 40, 40]
+        comp_flag = 1
     else: 
         raise ValueError
     n_interp = 4    # interpolation (4 or 2) 
@@ -95,7 +98,6 @@ def buildPk(catalog, n_mock, sys=None):
         fc_flag = 1 
     else: 
         fc_flag = 0 
-    comp_flag = 0
     file_catalog = Catalog(catalog, n_mock) # catalog file 
     rand_catalog = Random(catalog) # random file 
 
@@ -103,18 +105,16 @@ def buildPk(catalog, n_mock, sys=None):
     # for z1, z2, z3 redshift bins 
     fft_exe = ''.join([UT.code_dir(), 'fort/FFT_scoccimarro_cmasslowzcomb.exe'])
     pk_exe = ''.join([UT.code_dir(), 'fort/power_scoccimarro.exe'])
-    for iz, zbin in enumerate([1,2,3]): 
+    for iz, zbin in enumerate([1]): #,2,3]): only 1 for now 
         # data fft name   
-        fft_D = FFT(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+        fft_D = FFT(file_catalog, Lbox=Lboxs[iz], Ngrid=Ngrids[iz], n_interp=n_interp, P0=P0, 
                 sys=sys, comp=comp_flag, zbin=zbin)
         # random fft name   
-        fft_R = FFT(rand_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+        fft_R = FFT(rand_catalog, Lbox=Lboxs[iz], Ngrid=Ngrids[iz], n_interp=n_interp, P0=P0, 
                 sys=sys, comp=comp_flag, zbin=zbin)
         # pk name   
-        file_plk = Plk(file_catalog, Lbox=Lbox, Ngrid=Ngrid, n_interp=n_interp, P0=P0, 
+        file_plk = Plk(file_catalog, Lbox=Lboxs[iz], Ngrid=Ngrids[iz], Nbin=Nbins[iz], n_interp=n_interp, P0=P0, 
                 sys=sys, comp=comp_flag, zbin=zbin)
-        if os.path.isfile(file_plk): 
-            continue 
 
         if not os.path.isfile(fft_D): 
             print 'Constructing FFT for ...'  
@@ -241,7 +241,9 @@ if __name__=="__main__":
 
     nmock0 = int(Sys.argv[2])
     nmock1 = int(Sys.argv[3])
+    print 'mocks from ', nmock0, ' to ', nmock1 
     arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
+    print arglist 
 
     mapfn(buildPk_wrap, [arg for arg in arglist])
     pool.close()
