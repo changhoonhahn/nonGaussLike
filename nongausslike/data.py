@@ -175,7 +175,7 @@ class Pk:
         elif 'patchy.ngc.' in name: 
             zbin = name.split('.z')[-1]
             f = ''.join(['plk.Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str(i).zfill(4), 
-                '.Lbox3600.Ngrid480.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
+                '.Lbox2800.Ngrid360.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
         else: 
             raise NotImplementedError
         return f 
@@ -199,7 +199,7 @@ def patchyCov(zbin, NorS='ngc', ell=0, clobber=False):
     else: 
         # calculate my patchy covariance 
         pkay = Pk() 
-        n_mock = pkay._n_mock(catalog) 
+        n_mock = 100 # pkay._n_mock(catalog) 
         n_missing = 0 
         for i in range(1,n_mock+1):
             try: 
