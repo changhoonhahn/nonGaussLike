@@ -214,6 +214,8 @@ def patchyCov(zbin, NorS='ngc', ell=0, clobber=False):
                 ks[i-1,:] = ks_i
                 pks[i-1,:] = pks_i 
             except IOError: 
+                if i == 1: 
+                    raise ValueError
                 print 'missing -- ', pkay._file_name(catalog, i, 'fc')
                 n_missing += 1 
 
@@ -235,7 +237,7 @@ def patchyCov(zbin, NorS='ngc', ell=0, clobber=False):
         k_i, k_j = [], [] 
         for i in range(Cov_pk.shape[0]): 
             for j in range(Cov_pk.shape[1]):
-                f.write('%i \t %i \t %f \t %f \t %e' % (i, j, ks_i[i], ks_i[j], Cov_pk[i,j])) 
+                f.write('%i \t %i \t %f \t %f \t %e' % (i+1, j+1, ks_i[i], ks_i[j], Cov_pk[i,j])) 
                 f.write('\n') 
                 k_i.append(ks_i[i])
                 k_j.append(ks_i[j])
