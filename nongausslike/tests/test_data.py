@@ -1,6 +1,7 @@
 '''
 '''
 import numpy as np 
+import scipy as sp 
 
 # --- local ---
 import env
@@ -11,6 +12,93 @@ import data as Data
 import matplotlib.pyplot as plt 
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
+
+
+def Plk_BOSS_Patchy(zbin): 
+    ''' Compare the powerspectrum BOSS P(k) with average P(k)
+    of patchy mocks
+    '''
+    # read in BOSS P(k) using Roman's estimator
+    if zbin == 1: 
+        f_boss = ''.join([UT.catalog_dir('boss'), 
+            'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox2800.Ngrid360.O4intp.P010000.fc.z1']) 
+    else:
+        raise ValueError
+
+    k_boss, p0k, p2k, p4k, counts = np.loadtxt(f_boss, unpack=True, usecols=[0, 5, 2, 3, -2]) # k, p0(k), and number of modes 
+
+    # read in Florian's P(k) 
+    k_beu, pk_beu = [], [] 
+    for ell in [0, 2, 4]: 
+        if ell == 0: 
+            pole = 'monopole'
+        elif ell == 2: 
+            pole = 'quadrupole'
+        elif ell == 4: 
+            pole = 'hexadecapole'
+        f_beut = ''.join([UT.dat_dir()+'Beutler/public_material_RSD/Beutleretal_pk_', pole, 
+            '_DR12_NGC_z', str(zbin), '_prerecon_120.dat'])
+        k_beut, plk = np.loadtxt(f_beut, skiprows=31, unpack=True, usecols=[1,2]) 
+        pk_beu.append(plk)
+        k_beu.append(k_beut) 
+
+    # read in the PATCHY mocks 
+    pkay = Data.Pk() 
+    n_mock = pkay._n_mock('patchy.ngc.z'+str(zbin)) 
+
+    k_patchy, pk_patchy = [], [] 
+    for ell in [0,2,4]: 
+        n_missing, i_mock = 0, 0 
+        for i in range(1,n_mock+1):
+            try: 
+                pkay.Read('patchy.ngc.z'+str(zbin), i, ell=ell, sys='fc')
+                pkay.krange([0.01,0.15])
+                k = pkay.k
+                pk = pkay.pk
+                #k0, p0k, _ = pkay.rebin('beutler') 
+                n_kbin = len(k) 
+                
+                if i == 1: 
+                    pks = np.zeros((n_mock, n_kbin))
+
+                ks_i, pks_i = k, pk 
+                pks[i_mock,:] = pks_i 
+            except IOError: 
+                if i == 1: 
+                    raise ValueError
+                print 'missing -- ', pkay._file_name('patchy.ngc.z'+str(zbin), i, 'fc')
+                n_missing += 1 
+            i_mock += 1
+
+        n_mock -= n_missing
+        if n_missing > 0: # just a way to deal with missing  
+            pks = pks[:n_mock,:]
+        k_patchy.append(ks_i)
+        pk_patchy.append(np.sum(pks, axis=0)/np.float(n_mock))
+
+    prettyplot()
+    fig = plt.figure(figsize=(8, 8))
+    sub = fig.add_subplot(111) 
+    # monopole comparison 
+    sub.scatter(k_boss, k_boss * p0k, c='b', lw=0, marker='^', label='RS est.') 
+    sub.scatter(k_beu[0], k_beu[0]*pk_beu[0], label='Beutler+', c='b', lw=0) 
+    sub.plot(k_patchy[0], k_patchy[0]*pk_patchy[0], label='Patchy', c='b')
+    # quadrupole comparison 
+    sub.scatter(k_boss, k_boss*p2k, c='r', lw=0, marker='^') 
+    sub.scatter(k_beu[1], k_beu[1]*pk_beu[1], c='r', lw=0) 
+    sub.plot(k_patchy[1], k_patchy[1]*pk_patchy[1], c='r')
+    # hexadecapole comparison 
+    sub.scatter(k_boss, k_boss*p4k, c='k', lw=0, marker='^') 
+    sub.scatter(k_beu[2], k_beu[2]*pk_beu[2], c='k', lw=0) 
+    sub.plot(k_patchy[2], k_patchy[2]*pk_patchy[2], c='k')
+
+    sub.set_xlim([0.01, 0.15]) 
+    sub.set_ylim([-750, 2250])
+    sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
+    sub.set_ylabel('$\mathtt{k \, P_{\ell}(k)}$', fontsize=25) 
+    sub.legend(loc='upper right') 
+    fig.savefig(''.join([UT.fig_dir(), 'plk.boss_patchy.z', str(zbin), '.comparison.png']), bbox_inches='tight') 
+    return None 
 
 
 def Beutler_BOSS_Plk(zbin): 
@@ -118,14 +206,22 @@ def beutler_patchy_Cov_diag(zbin, NorS='ngc', ell=0, clobber=False):
     fig = plt.figure(figsize=(10, 8))
     sub = fig.add_subplot(111)
     
-    sub.plot(ki_pat, C_patchy.diagonal(), label='Patchy')
-    sub.plot(ki_beu, C_beutler.diagonal(), c='k', ls='--', label='Beutler')
+    #sub.plot(ki_beu.diagonal(), C_beutler.diagonal(), c='k', ls='--', label='Beutler')
+    #if ell != 4: 
+    #    sub.plot(ki_beu.diagonal(), C_patchy.diagonal(), label='Patchy')
+    #    print ki_beu.diagonal() - ki_pat.diagonal()
+    #else: 
+    #    sub.plot(ki_pat.diagonal(), C_patchy.diagonal(), label='Patchy')
+
+    logcii = sp.interpolate.interp1d(np.log10(ki_pat.diagonal()), np.log10(C_patchy.diagonal()), fill_value='extrapolate')
+    sub.plot(ki_beu.diagonal(), 10**(logcii(np.log10(ki_beu.diagonal())) - np.log10(C_beutler.diagonal())))
+
     sub.set_xscale('log') 
-    sub.set_yscale('log') 
+    #sub.set_yscale('log') 
     sub.set_xlim([0.01, 0.15]) 
-    #sub.set_ylim([5e3, 1.5e5]) 
+    sub.set_ylim([0.6, 1.2]) 
     sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
-    sub.set_ylabel('$C_{i,i}$', fontsize=25) 
+    sub.set_ylabel('$C^{patchy}_{i,i}/C^{beutler}_{i,i}$', fontsize=25) 
     #sub.legend(loc='upper right')
     fig.savefig(''.join([UT.fig_dir(), 'Cov_ii_beutler_patchy.z', str(zbin), '.', NorS, '.ell', str(ell), '.comparison.png']),
         bbox_inches='tight') 
@@ -243,14 +339,21 @@ def patchyPk_outlier(zbin, ell=0):
     pretty_colors = prettycolors()
     fig = plt.figure() 
     sub = fig.add_subplot(111) 
+    n_miss, i_mock = 0, 0 
     for i in range(1,n_mock+1):
-        pkay.Read(catalog, i, ell=ell, sys='fc')
-        k, pk = pkay.k, pkay.pk
-        if i == 1: 
-            pks = np.zeros((n_mock, len(k)))
-        pks[i-1,:] = pk 
+        try:
+            pkay.Read(catalog, i, ell=ell, sys='fc')
+            k, pk = pkay.k, pkay.pk
+            if i == 1: 
+                pks = np.zeros((n_mock, len(k)))
+            pks[i_mock,:] = pk 
+            i_mock += 1 
+        except IOError: 
+            n_miss += 1
+    if n_miss > 1: 
+        pks = pks[:n_mock-n_miss,:]
 
-    mu_pk = np.sum(pks, axis=0)/np.float(n_mock)
+    mu_pk = np.sum(pks, axis=0)/np.float(n_mock-n_miss)
     sig_pk = np.zeros(pks.shape[1])
     for ik in range(pks.shape[1]): 
         sig_pk[ik] = np.std(pks[:,ik]) 
@@ -259,7 +362,7 @@ def patchyPk_outlier(zbin, ell=0):
         if ((pks[i-1,:] - mu_pk)/sig_pk).max() > 3.: 
             print i
             sub.plot(k, pks[i-1,:], lw=1) 
-    sub.set_xlim([1e-3, 0.5])
+    sub.set_xlim([1e-2, 0.5])
     sub.set_xlabel('$\mathtt{k}$', fontsize=25)
     sub.set_xscale('log') 
     sub.set_ylabel('$\mathtt{P(k)}$', fontsize=25)
@@ -303,5 +406,7 @@ def Pk_i(catalog, i_mock, sys=None, rebin=None):
 
 
 if __name__=="__main__":
-    for ell in [0, 2, 4]:
-        beutler_patchy_Cov_diag(1, NorS='ngc', ell=ell, clobber=True)
+    Plk_BOSS_Patchy(1)
+    #for ell in [0, 2, 4]:
+    #    #patchyPk_outlier(1, ell=ell)
+    #    beutler_patchy_Cov_diag(1, NorS='ngc', ell=ell, clobber=True)

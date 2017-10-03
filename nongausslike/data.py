@@ -176,6 +176,7 @@ class Pk:
             zbin = name.split('.z')[-1]
             f = ''.join(['plk.Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str(i).zfill(4), 
                 '.Lbox3600.Ngrid480.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
+                #'.Lbox2800.Ngrid360.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
         else: 
             raise NotImplementedError
         return f 
@@ -201,6 +202,7 @@ def patchyCov(zbin, NorS='ngc', ell=0, clobber=False):
         pkay = Pk() 
         n_mock = pkay._n_mock(catalog) 
         n_missing = 0 
+        i_mock = 0 
         for i in range(1,n_mock+1):
             try: 
                 # read in monopole
@@ -216,19 +218,22 @@ def patchyCov(zbin, NorS='ngc', ell=0, clobber=False):
                     pks = np.zeros((n_mock, n_kbin))
 
                 ks_i, pks_i = k, pk 
-                ks[i-1,:] = ks_i
-                pks[i-1,:] = pks_i 
+                ks[i_mock,:] = ks_i
+                pks[i_mock,:] = pks_i 
+                i_mock += 1
             except IOError: 
                 if i == 1: 
                     raise ValueError
                 print 'missing -- ', pkay._file_name(catalog, i, 'fc')
                 n_missing += 1 
-
+        print n_missing 
         n_mock -= n_missing
         if n_missing > 0: # just a way to deal with missing  
             pks = pks[:n_mock,:]
 
-        Cov_pk = np.cov(pks.T)
+        mu_pk = np.sum(pks, axis=0)/np.float(n_mock)
+        Cov_pk = np.dot((pks-mu_pk).T, pks-mu_pk)/float(n_mock-1)
+        #Cov_pk = np.cov(pks.T)
         #f_hartlap = float(pks.shape[0] - pks.shape[1] - 2) / float(pks.shape[0] - 1) 
         #Cov_pk *= 1./f_hartlap 
 
