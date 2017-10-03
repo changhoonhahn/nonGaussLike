@@ -86,8 +86,8 @@ def buildPk(catalog, n_mock, sys=None):
         comp_flag = 0
     elif catalog == 'patchy': # boss or patchy:     1 or 2 
         idata = 2
-        Lboxs = [3600, 3600, 3600]     # Box size 
-        Ngrids = [480, 480, 480]     # FFT grid size (480 or 960)
+        Lboxs = [2800, 3600, 3600]     # Box size 
+        Ngrids = [360, 480, 480]     # FFT grid size (480 or 960)
         Nbins = [40, 40, 40]
         comp_flag = 1
     else: 
