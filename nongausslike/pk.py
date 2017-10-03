@@ -118,10 +118,10 @@ def buildPk(catalog, n_mock, sys=None):
                 sys=sys, comp=comp_flag, zbin=zbin)
 
         if not os.path.isfile(fft_D): 
-            print 'Constructing FFT for ...'  
+            print ('Constructing FFT for ...')
             print file_catalog 
             print fft_D 
-            print '' 
+            print ('')
             cmd_D = ' '.join([fft_exe, 
                 str(idata), 
                 str(Lboxs[iz]), 
@@ -150,15 +150,15 @@ def buildPk(catalog, n_mock, sys=None):
                 rand_catalog, 
                 str(zbin), 
                 fft_R])
-            print 'Constructing random FFT ...'  
+            print ('Constructing random FFT ...')
             print rand_catalog 
             print fft_R 
-            print '' 
+            print ('')
             subprocess.call(cmd_R.split())
 
         # construct P(k) using the catalog FFT and random FFT
         if not os.path.isfile(file_plk): 
-            print 'Constructing ...'
+            print ('Constructing ...')
             print file_plk
             cmd_plk = ' '.join([pk_exe,
                 fft_D, 
@@ -250,6 +250,58 @@ def nbodykit_bossPk(zbin):
     data['Position'] = transform.SkyToCartesian(data['RA'], data['DEC'], data['Z'], cosmo=cosmo)
     randoms['Position'] = transform.SkyToCartesian(randoms['RA'], randoms['DEC'], randoms['Z'], cosmo=cosmo)
     randoms['WEIGHT'] = 1.0
+    data['WEIGHT'] = data['WEIGHT_SYSTOT'] * (data['WEIGHT_NOZ'] + data['WEIGHT_CP'] - 1.0)
+    
+    if zbin == 1: 
+        ZMIN, ZMAX = 0.2, 0.5
+    elif zbin == 2:
+        ZMIN, ZMAX = 0.4, 0.6
+
+    randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)
+    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)
+
+    # combine the data and randoms into a single catalog
+    fkp = FKPCatalog(data, randoms)
+    mesh = fkp.to_mesh(Nmesh=256, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WEIGHT', window='tsc')
+    # compute the multipoles
+    r = ConvolvedFFTPower(mesh, poles=[0,2,4], dk=0.01, kmin=0.)
+
+    poles = r.poles
+    plk = [] 
+    for ell in [0, 2, 4]: 
+        P = poles['power_%d' %ell].real
+        if ell == 0: P = P - r.attrs['shotnoise'] 
+        plk.append(P)
+
+    f = open(''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']), 'w')
+    f.write("### header ### \n")
+    for key in r.attrs:
+        f.write("%s = %s \n" % (key, str(r.attrs[key])))
+    f.write("columns : k , P0, P2, P4 \n")
+    f.write('### header ### \n') 
+
+    for ik in range(len(poles['k'])): 
+        f.write("%f \t %f \t %f \t %f" % (poles['k'][ik], plk[0][ik], plk[1][ik], plk[2][ik]))
+        f.write("\n") 
+    f.close() 
+    return None
+
+
+def Pk_NBKT_patchy(i_mock, zbin): 
+    ''' calculate Patchy mock P(k) using nbodykit, which uses Nick's estimator 
+    ''' 
+    # first read in data and random catalogs 
+    col_data = ['RA', 'DEC', 'Z', 'DUM', 'NZ', 'BIAS', 'VETO', 'WRED']
+    data = CSVCatalog(Catalog('patchy', i_mock, NorS='ngc'), col_data)
+    col_random = ['RA', 'DEC', 'Z', 'NZ', 'BIAS', 'VETO', 'WRED']
+    randoms = FITSCatalog(Random('patchy', NorS='ngc'), col_random)
+    
+    # impose fiducial BOSS DR12 cosmology
+    cosmo = cosmology.Cosmology(H0=67.6, Om0=0.31, flat=True)
+    # add Cartesian position column
+    data['Position'] = transform.SkyToCartesian(data['RA'], data['DEC'], data['Z'], cosmo=cosmo)
+    randoms['Position'] = transform.SkyToCartesian(randoms['RA'], randoms['DEC'], randoms['Z'], cosmo=cosmo)
+    randoms['WEIGHT'] = random['WRED']
     data['WEIGHT'] = data['WEIGHT_SYSTOT'] * (data['WEIGHT_NOZ'] + data['WEIGHT_CP'] - 1.0)
     
     if zbin == 1: 

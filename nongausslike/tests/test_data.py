@@ -66,7 +66,7 @@ def Plk_BOSS_Patchy(zbin):
             except IOError: 
                 if i == 1: 
                     raise ValueError
-                print 'missing -- ', pkay._file_name('patchy.ngc.z'+str(zbin), i, 'fc')
+                print ('missing -- ', pkay._file_name('patchy.ngc.z'+str(zbin), i, 'fc'))
                 n_missing += 1 
             i_mock += 1
 
@@ -130,19 +130,16 @@ def Beutler_BOSS_Plk(zbin):
         ks.append(k_beut) 
 
     # read in Nbodykit P(k) (using Nick's estimator) 
-    k_nbkt, pk_nbkt = [], [] 
-    for ell in [0, 2, 4]: 
-        f_nbkt = ''.join([UT.catalog_dir('boss'), 'nbodykit.p', str(ell), 'k.dat'])
-        kk, plk = np.loadtxt(f_nbkt, unpack=True, usecols=[0, 1]) 
-        pk_nbkt.append(plk)
-        k_nbkt.append(kk) 
+    f_nbkt = ''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']) 
+    k_nbkt, p0kk, p2kk, p4kk = np.loadtxt(f_nbkt, skiprows=26, unpack=True, usecols=[0, 1, 2, 3]) 
+    pk_nbkt = [p0kk, p2kk, p4kk]
 
     prettyplot()
     fig = plt.figure(figsize=(21, 8))
     sub = fig.add_subplot(131) # monopole comparison 
     sub.plot(k_boss, p0k) 
     sub.plot(ks[0], pks[0], label='Beutler+') 
-    sub.plot(k_nbkt[0], pk_nbkt[0], label='nbodykit') 
+    sub.plot(k_nbkt, pk_nbkt[0], label='nbodykit') 
     sub.set_xscale('log') 
     sub.set_yscale('log') 
     sub.set_xlim([0.01, 0.15]) 
@@ -154,7 +151,7 @@ def Beutler_BOSS_Plk(zbin):
     sub = fig.add_subplot(132) # quadrupole comparison 
     sub.plot(k_boss, p2k) 
     sub.plot(ks[1], pks[1]) 
-    sub.plot(k_nbkt[1], pk_nbkt[1]) 
+    sub.plot(k_nbkt, pk_nbkt[1]) 
     sub.set_xscale('log') 
     sub.set_yscale('log') 
     sub.set_xlim([0.01, 0.15]) 
@@ -165,7 +162,7 @@ def Beutler_BOSS_Plk(zbin):
     sub = fig.add_subplot(133) # quadrupole comparison 
     sub.plot(k_boss, p4k) 
     sub.plot(ks[2], pks[2]) 
-    sub.plot(k_nbkt[2], pk_nbkt[2]) 
+    sub.plot(k_nbkt, pk_nbkt[2]) 
     sub.set_xscale('log') 
     sub.set_yscale('log') 
     sub.set_xlim([0.01, 0.15]) 
@@ -317,13 +314,13 @@ def Pk_rebin(catalog, rebin, ell=0, krange=None, sys=None):
         pkay.Read(catalog, i, ell=ell)
         k, pk = pkay.k, pkay.pk
         sub.plot(k, pk/offset, ls='--', c=pretty_colors[ii]) 
-        print 'initially ', len(k), ' bins' 
+        print ('initially ', len(k), ' bins')
 
         # impose krange and rebin 
         pkay.krange(krange)
         k, pk, cnt = pkay.rebin(rebin) 
         sub.scatter(k, pk/offset, c=pretty_colors[ii]) 
-        print 'to ', len(k), ' bins' 
+        print ('to ', len(k), ' bins')
 
     sub.set_xlim([1e-3, 0.5])
     sub.set_xlabel('$\mathtt{k}$', fontsize=25)
