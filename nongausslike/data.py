@@ -170,79 +170,84 @@ class Pk:
         elif 'patchy.ngc.' in name: 
             zbin = name.split('.z')[-1]
             f = ''.join(['plk.Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str(i).zfill(4), 
-                '.Lbox3600.Ngrid480.O4intp.P010000', str_sys, '.z', zbin]) 
+                '.Lbox3600.Ngrid480.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
         else: 
             raise NotImplementedError
         return f 
 
 
-def patchyCov(zbin, NorS='ngc', clobber=False): 
+def patchyCov(zbin, NorS='ngc', ell=0, clobber=False): 
     ''' Construct covariance matrix for patchy mocks measured using Roman's code
     and compare with Florian's. 
     '''
     catalog = 'patchy.'+NorS+'.z'+str(zbin)
 
-    f_cov = ''.join([UT.catalog_dir(catalog), 'Cov_pk.', catalog, '.beutler.dat']) 
+    f_cov = ''.join([UT.catalog_dir(catalog), 'Cov_pk.', catalog, '.ell', str(ell), '.beutler.dat']) 
     
     if os.path.isfile(f_cov) and not clobber:  
-        i_k, j_k, C_ij = np.loadtxt(f_cov, skiprows=4, unpack=True, usecols=[0,1,-1])
-        return C_ij.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+        i_k, j_k, k_i, k_j, C_ij = np.loadtxt(f_cov, skiprows=4, unpack=True, usecols=[0,1,2,3,-1])
+
+        ki = k_i.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+        kj = k_j.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+        Cij = C_ij.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+        return ki, kj, Cij
     else: 
         # calculate my patchy covariance 
         pkay = Pk() 
         n_mock = pkay._n_mock(catalog) 
-        
+        n_missing = 0 
         for i in range(1,n_mock+1):
-            # read in monopole
-            pkay.Read(catalog, i, ell=0, sys='fc')
-            pkay.krange([0.01,0.15])
-            k0, p0k, _ = pkay.rebin('beutler') 
-            n_kbin = len(k0) 
-            
-            # read in quadrupole 
-            pkay.Read(catalog, i, ell=2, sys='fc')
-            pkay.krange([0.01,0.15])
-            k2, p2k, _ = pkay.rebin('beutler') 
-            n_kbin += len(k2) 
-            
-            # read in hexadecapole 
-            pkay.Read(catalog, i, ell=4, sys='fc')
-            pkay.krange([0.01,0.1])
-            k4, p4k, _ = pkay.rebin('beutler') 
-            n_kbin += len(k4) 
-        
-            if i == 1: 
-                ks = np.zeros((n_mock, n_kbin))
-                pks = np.zeros((n_mock, n_kbin))
+            try: 
+                # read in monopole
+                pkay.Read(catalog, i, ell=ell, sys='fc')
+                pkay.krange([0.01,0.15])
+                k = pkay.k
+                pk = pkay.pk
+                #k0, p0k, _ = pkay.rebin('beutler') 
+                n_kbin = len(k) 
+                
+                if i == 1: 
+                    ks = np.zeros((n_mock, n_kbin))
+                    pks = np.zeros((n_mock, n_kbin))
 
-            ks_i = np.concatenate([k0, k2, k4])
-            pks_i = np.concatenate([p0k, p2k, p4k]) 
-            ks[i-1,:] = ks_i
-            pks[i-1,:] = pks_i 
-        
-        #Cov_pk = np.cov(pks.T)
-        mu_pk = np.sum(pks, axis=0)/np.float(n_mock)
-        Cov_pk = np.dot((pks-mu_pk).T, pks-mu_pk)/(float(pks.shape[0])-1)
-        f_hartlap = float(pks.shape[0] - pks.shape[1] - 2) / float(pks.shape[0] - 1) 
-        Cov_pk *= 1./f_hartlap 
-        print f_hartlap
+                ks_i, pks_i = k, pk 
+                ks[i-1,:] = ks_i
+                pks[i-1,:] = pks_i 
+            except IOError: 
+                print 'missing -- ', pkay._file_name(catalog, i, 'fc')
+                n_missing += 1 
+
+        n_mock -= n_missing
+        if n_missing > 0: # just a way to deal with missing  
+            pks = pks[:n_mock,:]
+
+        Cov_pk = np.cov(pks.T)
+        #f_hartlap = float(pks.shape[0] - pks.shape[1] - 2) / float(pks.shape[0] - 1) 
+        #Cov_pk *= 1./f_hartlap 
 
         # write to file 
         f = open(f_cov, 'w')
         f.write('### header ### \n') 
-        f.write('Covariance matrix for monopole, quadrupole and hexadecapole calculated from the 2045 mocks \n')
+        f.write('Covariance matrix for ell = '+str(ell)+' calculated from the '+str(n_mock)+' mocks \n')
         f.write('5 columns: {measured power spectrum bin index i} {measured power spectrum bin index j} k_i k_j C_ij \n') 
         f.write('### header ### \n') 
-
+    
+        k_i, k_j = [], [] 
         for i in range(Cov_pk.shape[0]): 
             for j in range(Cov_pk.shape[1]):
-                f.write('%i \t %i \t %e' % (i, j, Cov_pk[i,j])) 
+                f.write('%i \t %i \t %f \t %f \t %e' % (i, j, ks_i[i], ks_i[j], Cov_pk[i,j])) 
                 f.write('\n') 
+                k_i.append(ks_i[i])
+                k_j.append(ks_i[j])
         f.close() 
-        return Cov_pk 
+        k_i = np.array(k_i)
+        k_j = np.array(k_j)
+        ki = k_i.reshape(Cov_pk.shape)
+        kj = k_j.reshape(Cov_pk.shape)
+        return ki, kj, Cov_pk 
 
 
-def beutlerCov(zbin, NorS='ngc'): 
+def beutlerCov(zbin, NorS='ngc', ell=0): 
     ''' Read in Florian's covariance matrix
     '''
     # read in C_ij from file 
@@ -252,6 +257,17 @@ def beutlerCov(zbin, NorS='ngc'):
     else: 
         f_cov = ''.join([UT.dat_dir(), 'Beutler/public_material_RSD/',
             'Beutleretal_cov_patchy_z', str(zbin), '_SGC_1_15_1_15_1_10_2048_60.dat']) 
-    i_k, j_k, C_ij = np.loadtxt(f_cov, skiprows=4, unpack=True, usecols=[0,1,4])
+    i_k, j_k, k_i, k_j, C_ij = np.loadtxt(f_cov, skiprows=4, unpack=True, usecols=[0,1,2,3,4])
+    
+    if ell == 0: 
+        i_l0, i_l1 = 0, 14
+    elif ell == 2: 
+        i_l0, i_l1 = 14, 28 
+    elif ell == 4: 
+        i_l0, i_l1 = 28, 37 
 
-    return C_ij.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+    ki = k_i.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+    kj = k_j.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+    Cij = C_ij.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+    #return C_ij.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+    return ki[i_l0:i_l1,i_l0:i_l1], kj[i_l0:i_l1,i_l0:i_l1], Cij[i_l0:i_l1,i_l0:i_l1]

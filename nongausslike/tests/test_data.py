@@ -78,11 +78,11 @@ def Beutler_BOSS_Plk(zbin):
     return None 
 
 
-def beutler_patchy_Cov(zbin, NorS='ngc'): 
+def beutler_patchy_Cov(zbin, ell=0, NorS='ngc'): 
     ''' compare my patchy covariance to Florian's 
     '''
-    C_patchy = Data.patchyCov(zbin, NorS=NorS)
-    C_beutler = Data.beutlerCov(zbin, NorS=NorS)
+    _,_,C_patchy = Data.patchyCov(zbin, NorS=NorS, ell=ell)
+    _,_,C_beutler = Data.beutlerCov(zbin, NorS=NorS, ell=ell)
     
     prettyplot()
     fig = plt.figure(figsize=(21, 8))
@@ -108,26 +108,27 @@ def beutler_patchy_Cov(zbin, NorS='ngc'):
     return None 
 
 
-def beutler_patchy_Cov_diag(zbin, NorS='ngc'): 
+def beutler_patchy_Cov_diag(zbin, NorS='ngc', ell=0, clobber=False): 
     ''' compare the diagonal elements of my patchy covariance to Florian's 
     '''
-    C_patchy = Data.patchyCov(zbin, NorS=NorS, clobber=True)
-    C_beutler = Data.beutlerCov(zbin, NorS=NorS)
-    
+    ki_pat,kj_pat,C_patchy = Data.patchyCov(zbin, NorS=NorS, ell=ell, clobber=clobber)
+    ki_beu,kj_beu,C_beutler = Data.beutlerCov(zbin, NorS=NorS, ell=ell)
+
     prettyplot()
     fig = plt.figure(figsize=(10, 8))
     sub = fig.add_subplot(111)
     
-    sub.plot(range(C_patchy.shape[0]), C_patchy.diagonal()/C_beutler.diagonal())
-    sub.plot(range(C_patchy.shape[0]), np.zeros(C_patchy.shape[0]), c='k', ls='--') 
-    sub.vlines(14, -1, 2, color='k', linestyle='-', linewidth=3)
-    sub.vlines(28, -1, 2, color='k', linestyle='-', linewidth=3)
-    sub.set_xlim([0, C_patchy.shape[0]])
-    sub.set_ylabel('$i$', fontsize=25) 
-    sub.set_ylim([0.6, 1.2])
-    sub.set_ylabel('$C^{patchy}_{i,i}/C^{Beutler}_{i,i}$', fontsize=25) 
-    fig.savefig(''.join([UT.fig_dir(), 'Cov_ii_beutler_patchy..z', str(zbin), '.', NorS, '.comparison.png']),
-            bbox_inches='tight') 
+    sub.plot(ki_pat, C_patchy.diagonal(), label='Patchy')
+    sub.plot(ki_beu, C_beutler.diagonal(), c='k', ls='--', label='Beutler')
+    sub.set_xscale('log') 
+    sub.set_yscale('log') 
+    sub.set_xlim([0.01, 0.15]) 
+    #sub.set_ylim([5e3, 1.5e5]) 
+    sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
+    sub.set_ylabel('$C_{i,i}$', fontsize=25) 
+    #sub.legend(loc='upper right')
+    fig.savefig(''.join([UT.fig_dir(), 'Cov_ii_beutler_patchy.z', str(zbin), '.', NorS, '.ell', str(ell), '.comparison.png']),
+        bbox_inches='tight') 
     plt.close()
     return None 
 
@@ -136,7 +137,7 @@ def patchyCov(zbin, NorS='ngc'):
     '''***TESTED*** 
     Test patchy covariance matrix calcuation 
     '''
-    C_X = Data.patchyCov(zbin, NorS=NorS)
+    _,_,C_X = Data.patchyCov(zbin, NorS=NorS)
     
     prettyplot()
     fig = plt.figure(figsize=(20, 8))
@@ -152,7 +153,7 @@ def beutlerCov(zbin, NorS='ngc'):
     ''' ***TESTED***
     Test reading in Florian's covariance matrix
     '''
-    C_X = Data.beutlerCov(zbin, NorS=NorS)
+    _,_,C_X = Data.beutlerCov(zbin, NorS=NorS)
     
     prettyplot()
     fig = plt.figure(figsize=(20, 8))
@@ -302,6 +303,5 @@ def Pk_i(catalog, i_mock, sys=None, rebin=None):
 
 
 if __name__=="__main__":
-    Beutler_BOSS_Plk(1)
-    Beutler_BOSS_Plk(2)
-    Beutler_BOSS_Plk(3)
+    for ell in [0, 2, 4]:
+        beutler_patchy_Cov_diag(1, NorS='ngc', ell=ell, clobber=True)
