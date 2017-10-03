@@ -241,9 +241,12 @@ if __name__=="__main__":
 
     nmock0 = int(Sys.argv[2])
     nmock1 = int(Sys.argv[3])
-    print 'mocks from ', nmock0, ' to ', nmock1 
-    arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
-    print arglist 
+    if nmock1 > nmock0: 
+        print 'mocks from ', nmock0, ' to ', nmock1 
+        arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
+    elif nmock1 == nmock0: 
+        print 'mock = ', nmock0
+        arglist = [[nmock0]]
 
     mapfn(buildPk_wrap, [arg for arg in arglist])
     pool.close()

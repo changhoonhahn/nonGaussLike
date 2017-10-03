@@ -30,7 +30,12 @@ class Pk:
         #f = self._compressed_read(name, i, ell, sys) 
         f = ''.join([UT.catalog_dir(name), self._file_name(name, i, sys)]) 
     
-        k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, 1+ell/2, -2]) # k, p0(k), and number of modes 
+        if ell == 0: 
+            i_ell = 5
+        else: 
+            i_ell = 1 + ell/2
+    
+        k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, i_ell, -2]) # k, p0(k), and number of modes 
 
         self.k = k
         self.pk = pk
