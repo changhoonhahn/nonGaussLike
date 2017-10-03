@@ -102,8 +102,8 @@ def Plk_BOSS_Patchy(zbin):
 
 
 def Beutler_BOSS_Plk(zbin): 
-    ''' Compare the powerspectrum calculated using Roman's estimator 
-    versus Florian's P(k)s
+    ''' Compare the powerspectrum calculated using Roman's estimator, 
+    Florian's P(k)s, and P(K) from nbodykit
     '''
     if zbin == 1: 
         f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox2800.Ngrid360.O4intp.P010000.fc.z1']) 
@@ -129,11 +129,20 @@ def Beutler_BOSS_Plk(zbin):
         pks.append(plk)
         ks.append(k_beut) 
 
+    # read in Nbodykit P(k) (using Nick's estimator) 
+    k_nbkt, pk_nbkt = [], [] 
+    for ell in [0, 2, 4]: 
+        f_nbkt = ''.join([UT.catalog_dir('boss'), 'nbodykit.p', str(ell), 'k.dat'])
+        k_nbkt, plk = np.loadtxt(f_nbkt, unpack=True, usecols=[0, 1]) 
+        pk_nbkt.append(plk)
+        k_nbkt.append(k_nbkt) 
+
     prettyplot()
     fig = plt.figure(figsize=(21, 8))
     sub = fig.add_subplot(131) # monopole comparison 
     sub.plot(k_boss, p0k) 
     sub.plot(ks[0], pks[0], label='Beutler+') 
+    sub.plot(k_nbkt[0], pk_nbkt[0], label='nbodykit') 
     sub.set_xscale('log') 
     sub.set_yscale('log') 
     sub.set_xlim([0.01, 0.15]) 
@@ -145,7 +154,7 @@ def Beutler_BOSS_Plk(zbin):
     sub = fig.add_subplot(132) # quadrupole comparison 
     sub.plot(k_boss, p2k) 
     sub.plot(ks[1], pks[1]) 
-
+    sub.plot(k_nbkt[1], pk_nbkt[1]) 
     sub.set_xscale('log') 
     sub.set_yscale('log') 
     sub.set_xlim([0.01, 0.15]) 
@@ -156,7 +165,7 @@ def Beutler_BOSS_Plk(zbin):
     sub = fig.add_subplot(133) # quadrupole comparison 
     sub.plot(k_boss, p4k) 
     sub.plot(ks[2], pks[2]) 
-
+    sub.plot(k_nbkt[2], pk_nbkt[2]) 
     sub.set_xscale('log') 
     sub.set_yscale('log') 
     sub.set_xlim([0.01, 0.15]) 
