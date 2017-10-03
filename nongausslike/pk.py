@@ -156,16 +156,16 @@ def buildPk(catalog, n_mock, sys=None):
             subprocess.call(cmd_R.split())
 
         # construct P(k) using the catalog FFT and random FFT
-        print 'Constructing ...'
-        print file_plk
-
-        cmd_plk = ' '.join([pk_exe,
-            fft_D, 
-            fft_R, 
-            file_plk, 
-            str(Lboxs[iz]), 
-            str(Nbins[iz])]) 
-        subprocess.call(cmd_plk.split())
+        if not os.path.isfile(file_plk): 
+            print 'Constructing ...'
+            print file_plk
+            cmd_plk = ' '.join([pk_exe,
+                fft_D, 
+                fft_R, 
+                file_plk, 
+                str(Lboxs[iz]), 
+                str(Nbins[iz])]) 
+            subprocess.call(cmd_plk.split())
     return None
 
 
