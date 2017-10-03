@@ -1,5 +1,6 @@
 ''' Python wrapper for P_l(k) calculation for the nonGaussLike project
 '''
+from nbodykit.lab import *
 import subprocess
 import os.path
 import numpy as np 
@@ -233,22 +234,77 @@ def _make_run():
     return None
 
 
+def nbodykit_bossPk(zbin): 
+    ''' calculate boss P(k) using nbodykit, which uses Nick's estimator 
+    ''' 
+    # first read in data and random catalogs 
+    path_to_catalogs = UT.catalog_dir('boss') 
+    data = FITSCatalog(os.path.join(path_to_catalogs, 
+        'galaxy_DR12v5_CMASSLOWZTOT_North.fits'))
+    randoms = FITSCatalog(os.path.join(path_to_catalogs, 
+        'random1_DR12v5_CMASSLOWZTOT_North.fits'))
+    
+    # impose fiducial BOSS DR12 cosmology
+    cosmo = cosmology.Cosmology(H0=67.6, Om0=0.31, flat=True)
+    # add Cartesian position column
+    data['Position'] = transform.SkyToCartesian(data['RA'], data['DEC'], data['Z'], cosmo=cosmo)
+    randoms['Position'] = transform.SkyToCartesian(randoms['RA'], randoms['DEC'], randoms['Z'], cosmo=cosmo)
+    randoms['WEIGHT'] = 1.0
+    data['WEIGHT'] = data['WEIGHT_SYSTOT'] * (data['WEIGHT_NOZ'] + data['WEIGHT_CP'] - 1.0)
+    
+    if zbin == 1: 
+        ZMIN, ZMAX = 0.2, 0.5
+    elif zbin == 2:
+        ZMIN, ZMAX = 0.4, 0.6
+
+    randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)
+    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)
+
+    # combine the data and randoms into a single catalog
+    fkp = FKPCatalog(data, randoms)
+    mesh = fkp.to_mesh(Nmesh=360, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WEIGHT', 
+            window='tsc')
+    # compute the multipoles
+    r = ConvolvedFFTPower(mesh, poles=[0,2,4], dk=0.01, kmin=0.)
+
+    poles = r.poles
+    plk = [] 
+    for ell in [0, 2, 4]: 
+        P = poles['power_%d' %ell].real
+        if ell == 0: P = P - r.attrs['shotnoise'] 
+        plk.append(P)
+
+    f = open(''.join([UT.catalog_dir('boss'), 'nbodykit.p', str(ell), 'k.zbin', str(zbin), '.dat']), 'w')
+    f.write("### header ### \n")
+    f.write("%s = %s \n" % (key, str(r.attrs[key])))
+    f.write("columns : k , P0, P2, P4 \n")
+    f.write('### header ### \n') 
+
+    for ik in range(len(poles['k'])): 
+        f.write("%f \t %f \t %f \t %f" % (poles['k'][ik], plk[0][ik], plk[1][ik], plk[2][ik]))
+        f.write("\n") 
+    f.close() 
+    return None
+
+
+
 if __name__=="__main__": 
-    Nthreads = int(Sys.argv[1])
-    print 'running on ', Nthreads, ' threads'
-    pool = Pewl(processes=Nthreads)
-    mapfn = pool.map
+    nbodykit_bossPk(1)
+    #Nthreads = int(Sys.argv[1])
+    #print 'running on ', Nthreads, ' threads'
+    #pool = Pewl(processes=Nthreads)
+    #mapfn = pool.map
 
-    nmock0 = int(Sys.argv[2])
-    nmock1 = int(Sys.argv[3])
-    if nmock1 > nmock0: 
-        print 'mocks from ', nmock0, ' to ', nmock1 
-        arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
-    elif nmock1 == nmock0: 
-        print 'mock = ', nmock0
-        arglist = [[nmock0]]
+    #nmock0 = int(Sys.argv[2])
+    #nmock1 = int(Sys.argv[3])
+    #if nmock1 > nmock0: 
+    #    print 'mocks from ', nmock0, ' to ', nmock1 
+    #    arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
+    #elif nmock1 == nmock0: 
+    #    print 'mock = ', nmock0
+    #    arglist = [[nmock0]]
 
-    mapfn(buildPk_wrap, [arg for arg in arglist])
-    pool.close()
-    pool.terminate()
-    pool.join() 
+    #mapfn(buildPk_wrap, [arg for arg in arglist])
+    #pool.close()
+    #pool.terminate()
+    #pool.join() 

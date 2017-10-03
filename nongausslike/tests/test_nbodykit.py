@@ -1,12 +1,12 @@
 from nbodykit.lab import *
-from nbodykit import setup_logging, style
 import numpy as np 
 import os
 
 import env
 import util as UT 
 
-def bosspk(zbin): 
+
+def bossPk(zbin): 
     ''' calculate boss P(k) using nbody kit 
     ''' 
     path_to_catalogs = UT.catalog_dir('boss') 

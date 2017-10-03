@@ -133,9 +133,9 @@ def Beutler_BOSS_Plk(zbin):
     k_nbkt, pk_nbkt = [], [] 
     for ell in [0, 2, 4]: 
         f_nbkt = ''.join([UT.catalog_dir('boss'), 'nbodykit.p', str(ell), 'k.dat'])
-        k_nbkt, plk = np.loadtxt(f_nbkt, unpack=True, usecols=[0, 1]) 
+        kk, plk = np.loadtxt(f_nbkt, unpack=True, usecols=[0, 1]) 
         pk_nbkt.append(plk)
-        k_nbkt.append(k_nbkt) 
+        k_nbkt.append(kk) 
 
     prettyplot()
     fig = plt.figure(figsize=(21, 8))
@@ -415,7 +415,8 @@ def Pk_i(catalog, i_mock, sys=None, rebin=None):
 
 
 if __name__=="__main__":
-    Plk_BOSS_Patchy(1)
+    #Plk_BOSS_Patchy(1)
+    Beutler_BOSS_Plk(1)
     #for ell in [0, 2, 4]:
     #    #patchyPk_outlier(1, ell=ell)
     #    beutler_patchy_Cov_diag(1, NorS='ngc', ell=ell, clobber=True)
