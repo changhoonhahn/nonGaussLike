@@ -274,7 +274,7 @@ def nbodykit_bossPk(zbin):
         if ell == 0: P = P - r.attrs['shotnoise'] 
         plk.append(P)
 
-    f = open(''.join([UT.catalog_dir('boss'), 'nbodykit.p', str(ell), 'k.zbin', str(zbin), '.dat']), 'w')
+    f = open(''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']), 'w')
     f.write("### header ### \n")
     f.write("%s = %s \n" % (key, str(r.attrs[key])))
     f.write("columns : k , P0, P2, P4 \n")
