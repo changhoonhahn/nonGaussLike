@@ -226,7 +226,7 @@ def beutler_patchy_Cov(zbin, ell=0, NorS='ngc'):
 def beutler_patchy_Cov_diag(zbin, NorS='ngc', ell=0, clobber=False): 
     ''' compare the diagonal elements of my patchy covariance to Florian's 
     '''
-    ki_pat,kj_pat,C_patchy = Data.patchyCov_NBKT(zbin, NorS=NorS, ell=ell, clobber=clobber)
+    ki_pat,kj_pat,C_patchy = Data.patchyCov(zbin, NorS=NorS, ell=ell, clobber=clobber)
     ki_beu,kj_beu,C_beutler = Data.beutlerCov(zbin, NorS=NorS, ell=ell)
 
     prettyplot()
@@ -436,7 +436,7 @@ def Pk_i(catalog, i_mock, sys=None, rebin=None):
 
 if __name__=="__main__":
     #Plk_BOSS_Patchy(1)
-    beutler_patchy_Cov_diag(1, NorS='ngc', ell=0, clobber=True)
+    beutler_patchy_Cov(1, ell=0, NorS='ngc')
     #Beutler_BOSS_Plk(1)
     #for ell in [0, 2, 4]:
     #    #patchyPk_outlier(1, ell=ell)

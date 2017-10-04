@@ -362,7 +362,7 @@ def Pk_NBKT_patchy(i_mock, zbin, NorS, randoms=None):
         f.write("%f \t %f \t %f \t %f" % (poles['k'][ik], plk[0][ik], plk[1][ik], plk[2][ik]))
         f.write("\n") 
     f.close() 
-    print('wrote:', f_name)
+    print('wrote:', plk_name)
     return None
 
 

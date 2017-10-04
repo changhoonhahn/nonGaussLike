@@ -194,7 +194,7 @@ class Pk:
         return f 
 
 
-def patchyCov_NBKT(zbin, NorS='ngc', ell=0, clobber=False): 
+def patchyCov(zbin, NorS='ngc', ell=0, clobber=False): 
     ''' Construct covariance matrix for patchy mocks measured using Nbodykit 
     '''
     catalog = 'patchy.'+NorS+'.z'+str(zbin)
@@ -263,7 +263,7 @@ def patchyCov_NBKT(zbin, NorS='ngc', ell=0, clobber=False):
         return ki, kj, Cov_pk 
 
 
-def patchyCov(zbin, NorS='ngc', ell=0, clobber=False): 
+def _patchyCov(zbin, NorS='ngc', ell=0, clobber=False): 
     ''' Construct covariance matrix for patchy mocks measured using Roman's code
     and compare with Florian's. 
     '''
