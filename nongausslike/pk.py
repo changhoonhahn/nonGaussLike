@@ -291,26 +291,30 @@ def Pk_NBKT_patchy(i_mock, zbin):
     ''' calculate Patchy mock P(k) using nbodykit, which uses Nick's estimator 
     ''' 
     # first read in data and random catalogs 
-    col_data = ['RA', 'DEC', 'Z', 'DUM', 'NZ', 'BIAS', 'VETO', 'WRED']
+    col_data = ['RA', 'DEC', 'Z', 'DUM0', 'NZ', 'DUM1', 'VETO', 'WRED']
     data = CSVCatalog(Catalog('patchy', i_mock, NorS='ngc'), col_data)
     col_random = ['RA', 'DEC', 'Z', 'NZ', 'BIAS', 'VETO', 'WRED']
-    randoms = FITSCatalog(Random('patchy', NorS='ngc'), col_random)
+    randoms = CSVCatalog(Random('patchy', NorS='ngc'), col_random)
+    print(randoms['Z'][:100])
+    print(randoms['NZ'][:100])
     
     # impose fiducial BOSS DR12 cosmology
     cosmo = cosmology.Cosmology(H0=67.6, Om0=0.31, flat=True)
     # add Cartesian position column
     data['Position'] = transform.SkyToCartesian(data['RA'], data['DEC'], data['Z'], cosmo=cosmo)
     randoms['Position'] = transform.SkyToCartesian(randoms['RA'], randoms['DEC'], randoms['Z'], cosmo=cosmo)
-    randoms['WEIGHT'] = random['WRED']
-    data['WEIGHT'] = data['WEIGHT_SYSTOT'] * (data['WEIGHT_NOZ'] + data['WEIGHT_CP'] - 1.0)
+    randoms['WEIGHT'] = randoms['WRED']
+    randoms['WEIGHT_FKP'] = 1./(1.+ randoms['NZ'] * 1e4)
+    data['WEIGHT'] = data['WRED']
+    data['WEIGHT_FKP'] = 1./(1.+ data['NZ'] * 1e4)
     
     if zbin == 1: 
         ZMIN, ZMAX = 0.2, 0.5
     elif zbin == 2:
         ZMIN, ZMAX = 0.4, 0.6
 
-    randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)
-    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)
+    randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)*(randoms['VETO'] > 0)
+    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)&(data['VETO'] > 0)
 
     # combine the data and randoms into a single catalog
     fkp = FKPCatalog(data, randoms)
@@ -326,7 +330,8 @@ def Pk_NBKT_patchy(i_mock, zbin):
         if ell == 0: P = P - r.attrs['shotnoise'] 
         plk.append(P)
 
-    f = open(''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']), 'w')
+    f = open(''.join([UT.catalog_dir('patchy'), 
+        'pk.patchy.', str(i_mock), '.nbodykit.zbin', str(zbin), '.dat']), 'w')
     f.write("### header ### \n")
     f.write("%s = %s \n" % (key, str(r.attrs[key])))
     f.write("columns : k , P0, P2, P4 \n")
@@ -341,7 +346,8 @@ def Pk_NBKT_patchy(i_mock, zbin):
 
 
 if __name__=="__main__": 
-    nbodykit_bossPk(1)
+    Pk_NBKT_patchy(1, 1)
+    #nbodykit_bossPk(1)
     #Nthreads = int(Sys.argv[1])
     #print 'running on ', Nthreads, ' threads'
     #pool = Pewl(processes=Nthreads)
