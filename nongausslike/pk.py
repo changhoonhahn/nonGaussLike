@@ -290,6 +290,9 @@ def nbodykit_bossPk(zbin):
 def Pk_NBKT_patchy(i_mock, zbin, randoms=None): 
     ''' calculate Patchy mock P(k) using nbodykit, which uses Nick's estimator 
     ''' 
+    plk_name = ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(i_mock), '.nbodykit.zbin', str(zbin), '.dat'])
+    if os.path.isfile(plk_name):
+        return None 
     print('patchy --',i_mock)
     # first read in data and random catalogs 
     col_data = ['RA', 'DEC', 'Z', 'DUM0', 'NZ', 'DUM1', 'VETO', 'WRED']
@@ -328,8 +331,7 @@ def Pk_NBKT_patchy(i_mock, zbin, randoms=None):
         P = poles['power_%d' %ell].real
         if ell == 0: P = P - r.attrs['shotnoise'] 
         plk.append(P)
-    f_name = ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(i_mock), '.nbodykit.zbin', str(zbin), '.dat'])
-    f = open(f_name, 'w')
+    f = open(plk_name, 'w')
     f.write("### header ### \n")
     for key in r.attrs:
         f.write("%s = %s \n" % (key, str(r.attrs[key])))
