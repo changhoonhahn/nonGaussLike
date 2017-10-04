@@ -29,17 +29,19 @@ class Pk:
         
         #f = self._compressed_read(name, i, ell, sys) 
         f = ''.join([UT.catalog_dir(name), self._file_name(name, i, sys)]) 
-    
-        if ell == 0: 
-            i_ell = 5
-        else: 
-            i_ell = 1 + ell/2
-    
-        k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, i_ell, -2]) # k, p0(k), and number of modes 
 
+        if 'patchy' in name: 
+            k, pk = np.loadtxt(f, skiprows=24, unpack=True, usecols=[0,1+ell/2]) # k, P_l(k) 
+        else: 
+            if ell == 0: 
+                i_ell = 5
+            else: 
+                i_ell = 1 + ell/2
+            k, pk, counts = np.loadtxt(f, unpack=True, usecols=[0, i_ell, -2]) # k, p0(k), and number of modes 
+
+            self.counts = counts
         self.k = k
         self.pk = pk
-        self.counts = counts
         return None
 
     def _compressed_read(name, i, ell, sys): 
@@ -65,7 +67,8 @@ class Pk:
         return f 
     
     def rebin(self, rebin, pk_arr=None): 
-        ''' Rebin the P(k) using the counts 
+        ''' *** Not a great way to re-bin***
+        Rebin the P(k) using the counts 
 
         pk_arr = [k, pk, count] 
         '''
@@ -80,6 +83,8 @@ class Pk:
         else: 
             k = self.k 
             pk = self.pk 
+            if self.counts is None:
+                raise ValueError
             counts = self.counts
 
         N = len(k) # array length 
@@ -128,11 +133,12 @@ class Pk:
         kbin = np.where((self.k >= kmin) & (self.k <= kmax)) 
         k = self.k[kbin]
         pk = self.pk[kbin]
-        counts = self.counts[kbin]
 
         self.k = k
         self.pk = pk
-        self.counts = counts
+        if self.counts is not None:
+            counts = self.counts[kbin]
+            self.counts = counts
         return None 
     
     def _n_mock(self, name): 
@@ -158,28 +164,103 @@ class Pk:
     def _file_name(self, name, i, sys): 
         ''' Messy code for dealing with all the different file names 
         '''
-        if sys is None: 
-            str_sys = ''
-        elif sys == 'fc':  # fiber collisions 
-            if 'patchy' in name: 
-                str_sys = '.fc'
-            else: 
-                str_sys = '.fibcoll'
-        else: 
-            raise NotImplementedError
-
-        if name == 'nseries': 
-            f = ''.join(['POWER_Q_CutskyN', str(i), '.fidcosmo', str_sys, '.dat.grid480.P020000.box3600'])
-        elif name == 'qpm': 
-            f = ''.join(['POWER_Q_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed.fidcosmo', str_sys, '.dat.grid480.P020000.box3600']) 
-        elif 'patchy.ngc.' in name: 
+        if 'patchy' in name: # patchy mocks now are computed using Nbodykit 
+            if sys != 'fc': 
+                raise ValueError
             zbin = name.split('.z')[-1]
-            f = ''.join(['plk.Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str(i).zfill(4), 
-                '.Lbox3600.Ngrid480.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
-                #'.Lbox2800.Ngrid360.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
+            f = ''.join(['pk.patchy.', str(i), '.nbodykit.zbin', str(zbin), '.dat'])
         else: 
-            raise NotImplementedError
+            if sys is None: 
+                str_sys = ''
+            elif sys == 'fc':  # fiber collisions 
+                if 'patchy' in name: 
+                    str_sys = '.fc'
+                else: 
+                    str_sys = '.fibcoll'
+            else: 
+                raise NotImplementedError
+
+            if name == 'nseries': 
+                f = ''.join(['POWER_Q_CutskyN', str(i), '.fidcosmo', str_sys, '.dat.grid480.P020000.box3600'])
+            elif name == 'qpm': 
+                f = ''.join(['POWER_Q_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed.fidcosmo', str_sys, '.dat.grid480.P020000.box3600']) 
+            elif 'patchy.ngc.' in name: 
+                zbin = name.split('.z')[-1]
+                f = ''.join(['plk.Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str(i).zfill(4), 
+                    '.Lbox3600.Ngrid480.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
+                    #'.Lbox2800.Ngrid360.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
+            else: 
+                raise NotImplementedError
         return f 
+
+
+def patchyCov_NBKT(zbin, NorS='ngc', ell=0, clobber=False): 
+    ''' Construct covariance matrix for patchy mocks measured using Nbodykit 
+    '''
+    catalog = 'patchy.'+NorS+'.z'+str(zbin)
+
+    f_cov = ''.join([UT.catalog_dir(catalog), 'Cov_pk.', catalog, '.ell', str(ell), '.NBKT.dat']) 
+    
+    if os.path.isfile(f_cov) and not clobber:  
+        i_k, j_k, k_i, k_j, C_ij = np.loadtxt(f_cov, skiprows=4, unpack=True, usecols=[0,1,2,3,-1])
+
+        ki = k_i.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+        kj = k_j.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+        Cij = C_ij.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
+        return ki, kj, Cij
+    else: 
+        # calculate my patchy covariance 
+        pkay = Pk() 
+        n_mock = pkay._n_mock(catalog) 
+        i_mock, n_missing = 0, 0 
+        for i in range(1,n_mock+1):
+            try: 
+                pkay.Read(catalog, i, ell=ell, sys='fc')
+                pkay.krange([0.01,0.15])
+                k = pkay.k
+                pk = pkay.pk
+                n_kbin = len(k) 
+                
+                if i == 1: 
+                    ks = np.zeros((n_mock, n_kbin))
+                    pks = np.zeros((n_mock, n_kbin))
+                ks[i_mock,:] = k
+                pks[i_mock,:] = pk
+                i_mock += 1
+            except IOError: 
+                if i == 1: 
+                    raise ValueError
+                print('missing -- ', pkay._file_name(catalog, i, 'fc'))
+                n_missing += 1 
+        print(n_missing, "P(k) files missing") 
+        n_mock -= n_missing
+        if n_missing > 0: 
+            pks = pks[:n_mock,:]
+
+        #mu_pk = np.sum(pks, axis=0)/np.float(n_mock)
+        #Cov_pk = np.dot((pks-mu_pk).T, pks-mu_pk)/float(n_mock-1)
+        Cov_pk = np.cov(pks.T)
+
+        # write to file 
+        f = open(f_cov, 'w')
+        f.write('### header ### \n') 
+        f.write('Covariance matrix for ell = '+str(ell)+' calculated from the '+str(n_mock)+' mocks \n')
+        f.write('5 columns: {measured power spectrum bin index i} {measured power spectrum bin index j} k_i k_j C_ij \n') 
+        f.write('### header ### \n') 
+    
+        k_i, k_j = [], [] 
+        for i in range(Cov_pk.shape[0]): 
+            for j in range(Cov_pk.shape[1]):
+                f.write('%i \t %i \t %f \t %f \t %e' % (i+1, j+1, k[i], k[j], Cov_pk[i,j])) 
+                f.write('\n') 
+                k_i.append(k[i])
+                k_j.append(k[j])
+        f.close() 
+        k_i = np.array(k_i)
+        k_j = np.array(k_j)
+        ki = k_i.reshape(Cov_pk.shape)
+        kj = k_j.reshape(Cov_pk.shape)
+        return ki, kj, Cov_pk 
 
 
 def patchyCov(zbin, NorS='ngc', ell=0, clobber=False): 

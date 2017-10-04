@@ -44,10 +44,25 @@ def Plk_BOSS_Patchy(zbin):
 
     # read in the PATCHY mocks 
     f_patchy = lambda ii: ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(ii), '.nbodykit.zbin1.dat'])
-    pk_patchy = [] 
-    for i in range(1, 10): 
-        plk = np.loadtxt(f_patchy(i), skiprows=24, unpack=True, usecols=[0,1,2,3])
-        pk_patchy = [plk[1], plk[2], plk[3]]
+    n_mock = 0 
+    for i in range(1, 2049): 
+        try: 
+            plk = np.loadtxt(f_patchy(i), skiprows=24, unpack=True, usecols=[0,1,2,3])
+            if i == 1: 
+                p0k_nbkt = plk[1]
+                p2k_nbkt = plk[2]
+                p4k_nbkt = plk[3]
+            else: 
+                p0k_nbkt += plk[1]
+                p2k_nbkt += plk[2]
+                p4k_nbkt += plk[3]
+
+            n_mock += 1
+        except IOError: 
+            print(i,'th mock missing') 
+            pass 
+
+    pk_patchy = [p0k_nbkt/float(n_mock), p2k_nbkt/float(n_mock), p4k_nbkt/float(n_mock)]
     k_patchy = plk[0]
 
     #pkay = Data.Pk() 
@@ -211,29 +226,31 @@ def beutler_patchy_Cov(zbin, ell=0, NorS='ngc'):
 def beutler_patchy_Cov_diag(zbin, NorS='ngc', ell=0, clobber=False): 
     ''' compare the diagonal elements of my patchy covariance to Florian's 
     '''
-    ki_pat,kj_pat,C_patchy = Data.patchyCov(zbin, NorS=NorS, ell=ell, clobber=clobber)
+    ki_pat,kj_pat,C_patchy = Data.patchyCov_NBKT(zbin, NorS=NorS, ell=ell, clobber=clobber)
     ki_beu,kj_beu,C_beutler = Data.beutlerCov(zbin, NorS=NorS, ell=ell)
 
     prettyplot()
     fig = plt.figure(figsize=(10, 8))
     sub = fig.add_subplot(111)
     
-    #sub.plot(ki_beu.diagonal(), C_beutler.diagonal(), c='k', ls='--', label='Beutler')
+    sub.plot(ki_pat.diagonal(), C_patchy.diagonal(), label='Patchy')
+    sub.plot(ki_beu.diagonal(), C_beutler.diagonal(), c='k', ls='--', label='Beutler')
     #if ell != 4: 
     #    sub.plot(ki_beu.diagonal(), C_patchy.diagonal(), label='Patchy')
     #    print ki_beu.diagonal() - ki_pat.diagonal()
     #else: 
     #    sub.plot(ki_pat.diagonal(), C_patchy.diagonal(), label='Patchy')
 
-    logcii = sp.interpolate.interp1d(np.log10(ki_pat.diagonal()), np.log10(C_patchy.diagonal()), fill_value='extrapolate')
-    sub.plot(ki_beu.diagonal(), 10**(logcii(np.log10(ki_beu.diagonal())) - np.log10(C_beutler.diagonal())))
+    #logcii = sp.interpolate.interp1d(np.log10(ki_pat.diagonal()), np.log10(C_patchy.diagonal()), fill_value='extrapolate')
+    #sub.plot(ki_beu.diagonal(), 10**(logcii(np.log10(ki_beu.diagonal())) - np.log10(C_beutler.diagonal())))
 
     sub.set_xscale('log') 
-    #sub.set_yscale('log') 
+    sub.set_yscale('log') 
     sub.set_xlim([0.01, 0.15]) 
-    sub.set_ylim([0.6, 1.2]) 
+    #sub.set_ylim([0.6, 1.2]) 
     sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
-    sub.set_ylabel('$C^{patchy}_{i,i}/C^{beutler}_{i,i}$', fontsize=25) 
+    #sub.set_ylabel('$C^{patchy}_{i,i}/C^{beutler}_{i,i}$', fontsize=25) 
+    sub.set_ylabel('$C_{i,i}$', fontsize=25) 
     #sub.legend(loc='upper right')
     fig.savefig(''.join([UT.fig_dir(), 'Cov_ii_beutler_patchy.z', str(zbin), '.', NorS, '.ell', str(ell), '.comparison.png']),
         bbox_inches='tight') 
@@ -418,7 +435,8 @@ def Pk_i(catalog, i_mock, sys=None, rebin=None):
 
 
 if __name__=="__main__":
-    Plk_BOSS_Patchy(1)
+    #Plk_BOSS_Patchy(1)
+    beutler_patchy_Cov_diag(1, NorS='ngc', ell=0, clobber=True)
     #Beutler_BOSS_Plk(1)
     #for ell in [0, 2, 4]:
     #    #patchyPk_outlier(1, ell=ell)

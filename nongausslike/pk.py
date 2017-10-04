@@ -273,6 +273,24 @@ def nbodykit_bossPk(zbin):
         if ell == 0: P = P - r.attrs['shotnoise'] 
         plk.append(P)
 
+    # shot noise comparison 
+    #print(r.attrs['shotnoise'])
+    #alpha = r.attrs['alpha']
+    #sel = mesh['randoms'][mesh.selection]
+    #first = mesh['randoms'][sel]
+    #comp_weight = first[mesh.comp_weight]
+    #fkp_weight = first[mesh.fkp_weight]
+    #S = (comp_weight**2*fkp_weight**2).sum()
+    #print("expected SN")
+    #print((1.+alpha)*alpha*S/r.attrs['randoms.norm'])
+    #sel = mesh['data'][mesh.selection]
+    #first = mesh['data'][sel]
+    #comp_weight = first[mesh.comp_weight]
+    #fkp_weight = first[mesh.fkp_weight]
+    #S_data = (comp_weight**2*fkp_weight**2).sum()
+    #print("true SN")
+    #print((S_data+alpha**2*S)/r.attrs['randoms.norm'])
+
     f = open(''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']), 'w')
     f.write("### header ### \n")
     for key in r.attrs:
@@ -287,10 +305,10 @@ def nbodykit_bossPk(zbin):
     return None
 
 
-def Pk_NBKT_patchy(i_mock, zbin, randoms=None): 
+def Pk_NBKT_patchy(i_mock, zbin, NorS, randoms=None): 
     ''' calculate Patchy mock P(k) using nbodykit, which uses Nick's estimator 
     ''' 
-    plk_name = ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(i_mock), '.nbodykit.zbin', str(zbin), '.dat'])
+    plk_name = ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(i_mock), '.', NorS, '.zbin', str(zbin), '.nbodykit.dat'])
     if os.path.isfile(plk_name):
         return None 
     print('patchy --',i_mock)
@@ -315,6 +333,8 @@ def Pk_NBKT_patchy(i_mock, zbin, randoms=None):
         ZMIN, ZMAX = 0.2, 0.5
     elif zbin == 2:
         ZMIN, ZMAX = 0.4, 0.6
+    elif zbin == 3: 
+        ZMIN, ZMAX = 0.5, 0.75
 
     randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)&(randoms['VETO'] > 0)
     data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)&(data['VETO'] > 0)
@@ -346,13 +366,13 @@ def Pk_NBKT_patchy(i_mock, zbin, randoms=None):
     return None
 
 
-def Pk_NBKT_patchy_wrap(nmock0, nmock1, zbin): 
+def Pk_NBKT_patchy_wrap(nmock0, nmock1, zbin, NorS='ngc'): 
     '''
     '''
     col_random = ['RA', 'DEC', 'Z', 'NZ', 'BIAS', 'VETO', 'WRED']
-    randoms = CSVCatalog(Random('patchy', NorS='ngc'), col_random)
-    for i_mock in range(nmock0, nmock1): 
-        Pk_NBKT_patchy(i_mock, zbin, randoms=randoms)
+    randoms = CSVCatalog(Random('patchy', NorS=NorS), col_random)
+    for i_mock in range(nmock0, nmock1+1): 
+        Pk_NBKT_patchy(i_mock, zbin, NorS, randoms=randoms)
     return None 
 
 
