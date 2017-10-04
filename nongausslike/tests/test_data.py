@@ -43,54 +43,60 @@ def Plk_BOSS_Patchy(zbin):
         k_beu.append(k_beut) 
 
     # read in the PATCHY mocks 
-    pkay = Data.Pk() 
-    n_mock = pkay._n_mock('patchy.ngc.z'+str(zbin)) 
+    f_patchy = lambda ii: ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(ii), '.nbodykit.zbin1.dat'])
+    pk_patchy = [] 
+    for i in range(1, 10): 
+        plk = np.loadtxt(f_patchy(i), skiprows=24, unpack=True, usecols=[0,1,2,3])
+        pk_patchy = [plk[1], plk[2], plk[3]]
+    k_patchy = plk[0]
 
-    k_patchy, pk_patchy = [], [] 
-    for ell in [0,2,4]: 
-        n_missing, i_mock = 0, 0 
-        for i in range(1,n_mock+1):
-            try: 
-                pkay.Read('patchy.ngc.z'+str(zbin), i, ell=ell, sys='fc')
-                pkay.krange([0.01,0.15])
-                k = pkay.k
-                pk = pkay.pk
-                #k0, p0k, _ = pkay.rebin('beutler') 
-                n_kbin = len(k) 
-                
-                if i == 1: 
-                    pks = np.zeros((n_mock, n_kbin))
+    #pkay = Data.Pk() 
+    #n_mock = pkay._n_mock('patchy.ngc.z'+str(zbin)) 
+    #k_patchy, pk_patchy = [], [] 
+    #for ell in [0,2,4]: 
+    #    n_missing, i_mock = 0, 0 
+    #    for i in range(1,n_mock+1):
+    #        try: 
+    #            pkay.Read('patchy.ngc.z'+str(zbin), i, ell=ell, sys='fc')
+    #            pkay.krange([0.01,0.15])
+    #            k = pkay.k
+    #            pk = pkay.pk
+    #            #k0, p0k, _ = pkay.rebin('beutler') 
+    #            n_kbin = len(k) 
+    #            
+    #            if i == 1: 
+    #                pks = np.zeros((n_mock, n_kbin))
 
-                ks_i, pks_i = k, pk 
-                pks[i_mock,:] = pks_i 
-            except IOError: 
-                if i == 1: 
-                    raise ValueError
-                print ('missing -- ', pkay._file_name('patchy.ngc.z'+str(zbin), i, 'fc'))
-                n_missing += 1 
-            i_mock += 1
+    #            ks_i, pks_i = k, pk 
+    #            pks[i_mock,:] = pks_i 
+    #        except IOError: 
+    #            if i == 1: 
+    #                raise ValueError
+    #            print ('missing -- ', pkay._file_name('patchy.ngc.z'+str(zbin), i, 'fc'))
+    #            n_missing += 1 
+    #        i_mock += 1
 
-        n_mock -= n_missing
-        if n_missing > 0: # just a way to deal with missing  
-            pks = pks[:n_mock,:]
-        k_patchy.append(ks_i)
-        pk_patchy.append(np.sum(pks, axis=0)/np.float(n_mock))
+    #    n_mock -= n_missing
+    #    if n_missing > 0: # just a way to deal with missing  
+    #        pks = pks[:n_mock,:]
+    #    k_patchy.append(ks_i)
+    #    pk_patchy.append(np.sum(pks, axis=0)/np.float(n_mock))
 
-    prettyplot()
+    #prettyplot()
     fig = plt.figure(figsize=(8, 8))
     sub = fig.add_subplot(111) 
     # monopole comparison 
     sub.scatter(k_boss, k_boss * p0k, c='b', lw=0, marker='^', label='RS est.') 
     sub.scatter(k_beu[0], k_beu[0]*pk_beu[0], label='Beutler+', c='b', lw=0) 
-    sub.plot(k_patchy[0], k_patchy[0]*pk_patchy[0], label='Patchy', c='b')
+    sub.plot(k_patchy, k_patchy*pk_patchy[0], label='Patchy', c='b')
     # quadrupole comparison 
     sub.scatter(k_boss, k_boss*p2k, c='r', lw=0, marker='^') 
     sub.scatter(k_beu[1], k_beu[1]*pk_beu[1], c='r', lw=0) 
-    sub.plot(k_patchy[1], k_patchy[1]*pk_patchy[1], c='r')
+    sub.plot(k_patchy, k_patchy*pk_patchy[1], c='r')
     # hexadecapole comparison 
     sub.scatter(k_boss, k_boss*p4k, c='k', lw=0, marker='^') 
     sub.scatter(k_beu[2], k_beu[2]*pk_beu[2], c='k', lw=0) 
-    sub.plot(k_patchy[2], k_patchy[2]*pk_patchy[2], c='k')
+    sub.plot(k_patchy, k_patchy*pk_patchy[2], c='k')
 
     sub.set_xlim([0.01, 0.15]) 
     sub.set_ylim([-750, 2250])
@@ -412,8 +418,8 @@ def Pk_i(catalog, i_mock, sys=None, rebin=None):
 
 
 if __name__=="__main__":
-    #Plk_BOSS_Patchy(1)
-    Beutler_BOSS_Plk(1)
+    Plk_BOSS_Patchy(1)
+    #Beutler_BOSS_Plk(1)
     #for ell in [0, 2, 4]:
     #    #patchyPk_outlier(1, ell=ell)
     #    beutler_patchy_Cov_diag(1, NorS='ngc', ell=ell, clobber=True)

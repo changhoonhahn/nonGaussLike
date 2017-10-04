@@ -287,14 +287,16 @@ def nbodykit_bossPk(zbin):
     return None
 
 
-def Pk_NBKT_patchy(i_mock, zbin): 
+def Pk_NBKT_patchy(i_mock, zbin, randoms=None): 
     ''' calculate Patchy mock P(k) using nbodykit, which uses Nick's estimator 
     ''' 
+    print('patchy --',i_mock)
     # first read in data and random catalogs 
     col_data = ['RA', 'DEC', 'Z', 'DUM0', 'NZ', 'DUM1', 'VETO', 'WRED']
     data = CSVCatalog(Catalog('patchy', i_mock, NorS='ngc'), col_data)
-    col_random = ['RA', 'DEC', 'Z', 'NZ', 'BIAS', 'VETO', 'WRED']
-    randoms = CSVCatalog(Random('patchy', NorS='ngc'), col_random)
+    if randoms is None: 
+        col_random = ['RA', 'DEC', 'Z', 'NZ', 'BIAS', 'VETO', 'WRED']
+        randoms = CSVCatalog(Random('patchy', NorS='ngc'), col_random)
     
     # impose fiducial BOSS DR12 cosmology
     cosmo = cosmology.Cosmology(H0=67.6, Om0=0.31, flat=True)
@@ -311,12 +313,12 @@ def Pk_NBKT_patchy(i_mock, zbin):
     elif zbin == 2:
         ZMIN, ZMAX = 0.4, 0.6
 
-    #randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)#&(randoms['VETO'] > 0)
-    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)#&(data['VETO'] > 0)
+    randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)&(randoms['VETO'] > 0)
+    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)&(data['VETO'] > 0)
 
     # combine the data and randoms into a single catalog
     fkp = FKPCatalog(data, randoms)
-    mesh = fkp.to_mesh(Nmesh=256, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WRED', window='tsc')
+    mesh = fkp.to_mesh(Nmesh=360, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WRED', window='tsc')
     # compute the multipoles
     r = ConvolvedFFTPower(mesh, poles=[0,2,4], dk=0.01, kmin=0.)
 
@@ -326,11 +328,11 @@ def Pk_NBKT_patchy(i_mock, zbin):
         P = poles['power_%d' %ell].real
         if ell == 0: P = P - r.attrs['shotnoise'] 
         plk.append(P)
-
-    f = open(''.join([UT.catalog_dir('patchy'), 
-        'pk.patchy.', str(i_mock), '.nbodykit.zbin', str(zbin), '.dat']), 'w')
+    f_name = ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(i_mock), '.nbodykit.zbin', str(zbin), '.dat'])
+    f = open(f_name, 'w')
     f.write("### header ### \n")
-    f.write("%s = %s \n" % (key, str(r.attrs[key])))
+    for key in r.attrs:
+        f.write("%s = %s \n" % (key, str(r.attrs[key])))
     f.write("columns : k , P0, P2, P4 \n")
     f.write('### header ### \n') 
 
@@ -338,27 +340,37 @@ def Pk_NBKT_patchy(i_mock, zbin):
         f.write("%f \t %f \t %f \t %f" % (poles['k'][ik], plk[0][ik], plk[1][ik], plk[2][ik]))
         f.write("\n") 
     f.close() 
+    print('wrote:', f_name)
     return None
 
 
+def Pk_NBKT_patchy_wrap(nmock0, nmock1, zbin): 
+    '''
+    '''
+    col_random = ['RA', 'DEC', 'Z', 'NZ', 'BIAS', 'VETO', 'WRED']
+    randoms = CSVCatalog(Random('patchy', NorS='ngc'), col_random)
+    for i_mock in range(nmock0, nmock1): 
+        Pk_NBKT_patchy(i_mock, zbin, randoms=randoms)
+    return None 
+
 
 if __name__=="__main__": 
-    Pk_NBKT_patchy(1, 1)
+    #Pk_NBKT_patchy(1, 1)
     #nbodykit_bossPk(1)
-    #Nthreads = int(Sys.argv[1])
-    #print 'running on ', Nthreads, ' threads'
-    #pool = Pewl(processes=Nthreads)
-    #mapfn = pool.map
+    Nthreads = int(Sys.argv[1])
+    print('running on ', Nthreads, ' threads')
+    pool = Pewl(processes=Nthreads)
+    mapfn = pool.map
 
-    #nmock0 = int(Sys.argv[2])
-    #nmock1 = int(Sys.argv[3])
+    nmock0 = int(Sys.argv[2])
+    nmock1 = int(Sys.argv[3])
+    Pk_NBKT_patchy_wrap(nmock0, nmock1, 1)
     #if nmock1 > nmock0: 
-    #    print 'mocks from ', nmock0, ' to ', nmock1 
-    #    arglist = [[i_mock] for i_mock in range(nmock0, nmock1+1)]
+    #    print('mocks from ', nmock0, ' to ', nmock1)
+    #    arglist = [[i_mock, 1] for i_mock in range(nmock0, nmock1+1)]
     #elif nmock1 == nmock0: 
-    #    print 'mock = ', nmock0
-    #    arglist = [[nmock0]]
-
+    #    print('mock = ', nmock0)
+    #    arglist = [[nmock0, 1]]
     #mapfn(buildPk_wrap, [arg for arg in arglist])
     #pool.close()
     #pool.terminate()
