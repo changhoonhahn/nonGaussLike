@@ -118,10 +118,10 @@ def buildPk(catalog, n_mock, sys=None):
                 sys=sys, comp=comp_flag, zbin=zbin)
 
         if not os.path.isfile(fft_D): 
-            print ('Constructing FFT for ...')
-            print file_catalog 
-            print fft_D 
-            print ('')
+            print('Constructing FFT for ...')
+            print(file_catalog)
+            print(fft_D)
+            print('')
             cmd_D = ' '.join([fft_exe, 
                 str(idata), 
                 str(Lboxs[iz]), 
@@ -150,16 +150,16 @@ def buildPk(catalog, n_mock, sys=None):
                 rand_catalog, 
                 str(zbin), 
                 fft_R])
-            print ('Constructing random FFT ...')
-            print rand_catalog 
-            print fft_R 
-            print ('')
+            print('Constructing random FFT ...')
+            print(rand_catalog)
+            print(fft_R)
+            print('')
             subprocess.call(cmd_R.split())
 
         # construct P(k) using the catalog FFT and random FFT
         if not os.path.isfile(file_plk): 
-            print ('Constructing ...')
-            print file_plk
+            print('Constructing ...')
+            print(file_plk)
             cmd_plk = ' '.join([pk_exe,
                 fft_D, 
                 fft_R, 
@@ -262,7 +262,7 @@ def nbodykit_bossPk(zbin):
 
     # combine the data and randoms into a single catalog
     fkp = FKPCatalog(data, randoms)
-    mesh = fkp.to_mesh(Nmesh=256, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WEIGHT', window='tsc')
+    mesh = fkp.to_mesh(Nmesh=360, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WEIGHT', window='tsc')
     # compute the multipoles
     r = ConvolvedFFTPower(mesh, poles=[0,2,4], dk=0.01, kmin=0.)
 
