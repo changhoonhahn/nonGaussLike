@@ -295,8 +295,6 @@ def Pk_NBKT_patchy(i_mock, zbin):
     data = CSVCatalog(Catalog('patchy', i_mock, NorS='ngc'), col_data)
     col_random = ['RA', 'DEC', 'Z', 'NZ', 'BIAS', 'VETO', 'WRED']
     randoms = CSVCatalog(Random('patchy', NorS='ngc'), col_random)
-    print(randoms['Z'][:100])
-    print(randoms['NZ'][:100])
     
     # impose fiducial BOSS DR12 cosmology
     cosmo = cosmology.Cosmology(H0=67.6, Om0=0.31, flat=True)
@@ -313,13 +311,12 @@ def Pk_NBKT_patchy(i_mock, zbin):
     elif zbin == 2:
         ZMIN, ZMAX = 0.4, 0.6
 
-    randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)*(randoms['VETO'] > 0)
-    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)&(data['VETO'] > 0)
+    #randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)#&(randoms['VETO'] > 0)
+    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)#&(data['VETO'] > 0)
 
     # combine the data and randoms into a single catalog
     fkp = FKPCatalog(data, randoms)
-    mesh = fkp.to_mesh(Nmesh=360, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WEIGHT', 
-            window='tsc')
+    mesh = fkp.to_mesh(Nmesh=256, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WRED', window='tsc')
     # compute the multipoles
     r = ConvolvedFFTPower(mesh, poles=[0,2,4], dk=0.01, kmin=0.)
 
