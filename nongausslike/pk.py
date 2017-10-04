@@ -354,17 +354,43 @@ def Pk_NBKT_patchy_wrap(nmock0, nmock1, zbin):
     return None 
 
 
+def _make_run_nbkt(): 
+    '''
+    '''
+    n0 = np.arange(100, 2100, 100)+1
+    #n0[0] = 2
+    n1 = np.arange(200, 2148, 100)
+    n1[-1] = 2048
+    for i in range(len(n0)): 
+        run_file = ''.join([UT.run_dir(), 'patchy_nbkt_pk_', str(n0[i]), '_', str(n1[i]), '.slurm'])
+        f = open(run_file, 'w')
+
+        f.write('#!/bin/bash -l \n')
+        f.write('#SBATCH -p regular \n') 
+        f.write('#SBATCH -N 1 \n') 
+        f.write('#SBATCH -t 06:00:00 \n')
+        f.write('#SBATCH -J patchy_nbkt_pk_'+str(n0[i])+'_'+str(n1[i])+' \n')
+        f.write('#SBATCH -o patchy_nbkt_pk_'+str(n0[i])+'_'+str(n1[i])+'.o%j \n')
+        f.write('#SBATCH -L SCRATCH,project \n')
+        f.write('\n')
+        f.write('source /usr/common/contrib/bccp/conda-activate.sh 3.6 \n') 
+        f.write('\n')
+        f.write('srun -n 1 -c 1 python /global/homes/c/chahah/projects/nonGaussLike/nongausslike/pk.py 1 '+str(n0[i])+' '+str(n1[i]))
+    f.close() 
+    return None
+
+
 if __name__=="__main__": 
-    #Pk_NBKT_patchy(1, 1)
-    #nbodykit_bossPk(1)
+    #_make_run_nbkt()
     Nthreads = int(Sys.argv[1])
     print('running on ', Nthreads, ' threads')
-    pool = Pewl(processes=Nthreads)
-    mapfn = pool.map
 
     nmock0 = int(Sys.argv[2])
     nmock1 = int(Sys.argv[3])
     Pk_NBKT_patchy_wrap(nmock0, nmock1, 1)
+
+    #pool = Pewl(processes=Nthreads)
+    #mapfn = pool.map
     #if nmock1 > nmock0: 
     #    print('mocks from ', nmock0, ' to ', nmock1)
     #    arglist = [[i_mock, 1] for i_mock in range(nmock0, nmock1+1)]
