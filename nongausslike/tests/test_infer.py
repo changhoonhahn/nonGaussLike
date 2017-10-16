@@ -53,7 +53,7 @@ def model():
     model_sgc = modelX[1]
 
     # read in pre-window convlution 
-    k_nw, p0k_ngc_nw, p2k_ngc_nw, p4k_ngc_nw, p0k_sgc_nw, p2k_sgc_nw, p4k_sgc_nw = np.loadtxt(''.join([UT.code_dir(), 'test.nowindow.dat']), unpack=True) 
+    k_nw, p0k_ngc_nw, p2k_ngc_nw, p4k_ngc_nw, p0k_sgc_nw, p2k_sgc_nw, p4k_sgc_nw = np.loadtxt(''.join([UT.dat_dir(), 'boss/test.nowindow.dat']), unpack=True) 
 
     # now plot 
     pretty_colors = prettycolors()

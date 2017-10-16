@@ -1,5 +1,6 @@
 import numpy as np 
 import emcee
+from emcee.utils import MPIPool
 
 # --- local ---
 import util as UT
@@ -102,26 +103,50 @@ def lnPost(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
 
 def mcmc(zbin=1, nwalkers=48, Nchains=4): 
     '''
-    '''
-    # read in BOSS P(k) 
+    
+    Parameters
+    ---------- 
 
-    pos=[]
-    sampler=[]
-    rstate = np.random.get_state()
-    temperature = 2.e-3
+    Nchains : int 
+        Number of independent chains to run for the gelman rubin convergence test
+    
+    '''
+    temperature = 2.e-3 # temperature
+
+    # read in BOSS P(k) NGC
+    k0, p0k_ngc = Inf.data(0, zbin, 'ngc')
+    k2, p2k_ngc = Inf.data(2, zbin, 'ngc')
+    k4, p4k_ngc = Inf.data(4, zbin, 'ngc')
+    pk_ngc_list = [p0k_ngc, p2k_ngc, p4k_ngc]
+    k_list = [k0, k2, k4]
+    # read in BOSS P(k) SGC
+    k0, p0k_sgc = Inf.data(0, zbin, 'sgc')
+    k2, p2k_sgc = Inf.data(2, zbin, 'sgc')
+    k4, p4k_sgc = Inf.data(4, zbin, 'sgc')
+    pk_sgc_list = [p0k_sgc, p2k_sgc, p4k_sgc]
+
+    # read in Covariance matrix 
     
     if zbin == 1: # 0.2 < z < 0.5 
+        # maximum likelihood value 
         start = [1.008, 1.001, 0.478, 1.339, 1.337, 1.16, 0.32, -1580., -930., 6.1, 6.8] 
+    ndim = len(start) 
 
-    print("ndim = ", ndim, len(start))
-    print("Nchains = ", Nchains)
+    # initialize MPI pool
+    #pool = MPIPool()
+    #if not pool.is_master():
+    #    pool.wait()
+    #    sys.exit(0)
 
-    for jj in range(0, Nchains):
-        f = open("%s/RSDfit_chain_COMPnbar_%d_%d_%d_%d_%d_%d_%s_%d_chain%d.dat" % (outpath, minbin1/binsize, maxbin1/binsize, minbin2/binsize, maxbin2/binsize, minbin3/binsize, maxbin3/binsize, tag, rank, jj) , "w")
-        f.close()
-        pos.append([free_ml + temperature*(2.*np.random.random_sample((ndim,))-1.)*start for i in range(nwalkers)])
-        sampler.append(emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(x, y, y_SGC, binrange1/binsize, binrange2/binsize, binrange3/binsize, maxbin1/binsize, Cinv, Cinv_SGC, free_para, fix_para)))
-        #print("start pos ",pos[jj])
+    # args for lnProb function 
+    lnpost_args = (k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc)
+    
+    print(Nchain, " independent emcee chains running")
+    pos, samplers =[], []
+    for ichain in range(Nchains):
+        pos.append([start + temperature*start*(2.*np.random.random_sample(ndim)-1.)
+            for i in range(nwalkers)])
+        samplers.append(emcee.EnsembleSampler(nwalkers, ndim, lnPost, args=lnpost_args, pool=pool)) 
 
     # Start MCMC
     print("Running MCMC...")
@@ -170,6 +195,5 @@ def mcmc(zbin=1, nwalkers=48, Nchains=4):
 
     print("Done.")
 
-
 if __name__=="__main__":
-    pass
+    mcmc(zbin=1, nwalkers=4, Nchains=4)
