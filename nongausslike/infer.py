@@ -4,6 +4,7 @@ from emcee.utils import MPIPool
 
 # --- local ---
 import util as UT
+import data as Dat 
 import model as Mod
 
 
@@ -96,12 +97,12 @@ def lnPost(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
     '''
     lp = lnPrior(theta)
     if np.isfinite(lp):
-        return lp + lnlike(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc)
+        return lp + lnLike(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc)
     else:
         return -np.inf
 
 
-def mcmc(zbin=1, nwalkers=48, Nchains=4): 
+def mcmc(tag=None, zbin=1, nwalkers=48, Nchains=4, minlength=600): 
     '''
     
     Parameters
@@ -111,37 +112,59 @@ def mcmc(zbin=1, nwalkers=48, Nchains=4):
         Number of independent chains to run for the gelman rubin convergence test
     
     '''
+    if tag is None: 
+        raise ValueError("specify a tag, otherwise it's confusing") 
     temperature = 2.e-3 # temperature
 
     # read in BOSS P(k) NGC
-    k0, p0k_ngc = Inf.data(0, zbin, 'ngc')
-    k2, p2k_ngc = Inf.data(2, zbin, 'ngc')
-    k4, p4k_ngc = Inf.data(4, zbin, 'ngc')
+    k0, p0k_ngc = data(0, zbin, 'ngc')
+    k2, p2k_ngc = data(2, zbin, 'ngc')
+    k4, p4k_ngc = data(4, zbin, 'ngc')
     pk_ngc_list = [p0k_ngc, p2k_ngc, p4k_ngc]
     k_list = [k0, k2, k4]
     # read in BOSS P(k) SGC
-    k0, p0k_sgc = Inf.data(0, zbin, 'sgc')
-    k2, p2k_sgc = Inf.data(2, zbin, 'sgc')
-    k4, p4k_sgc = Inf.data(4, zbin, 'sgc')
+    k0, p0k_sgc = data(0, zbin, 'sgc')
+    k2, p2k_sgc = data(2, zbin, 'sgc')
+    k4, p4k_sgc = data(4, zbin, 'sgc')
     pk_sgc_list = [p0k_sgc, p2k_sgc, p4k_sgc]
 
     # read in Covariance matrix 
+    # currently for testing purposes, 
+    # implemented to read in Florian's covariance matrix  
+    _, _, C_pk_ngc = Dat.beutlerCov(zbin, NorS='ngc', ell='all')
+    _, _, C_pk_sgc = Dat.beutlerCov(zbin, NorS='sgc', ell='all')
+
+    # calculate precision matrices (including the hartlap factor) 
+    n_mocks_ngc = 2045
+    n_mocks_sgc = 2048
+    f_hartlap_ngc = (n_mocks_ngc - len(np.concatenate(pk_ngc_list)) - 2)/(n_mocks_ngc - 1)
+    f_hartlap_sgc = (n_mocks_sgc - len(np.concatenate(pk_sgc_list)) - 2)/(n_mocks_sgc - 1)
+
+    Cinv_ngc = np.linalg.inv(C_pk_ngc)
+    Cinv_sgc = np.linalg.inv(C_pk_sgc)
     
+    Cinv_ngc *= f_hartlap_ngc 
+    Cinv_sgc *= f_hartlap_sgc
+        
     if zbin == 1: # 0.2 < z < 0.5 
         # maximum likelihood value 
-        start = [1.008, 1.001, 0.478, 1.339, 1.337, 1.16, 0.32, -1580., -930., 6.1, 6.8] 
+        start = np.array([1.008, 1.001, 0.478, 1.339, 1.337, 1.16, 0.32, -1580., -930., 6.1, 6.8] )
     ndim = len(start) 
 
     # initialize MPI pool
-    #pool = MPIPool()
-    #if not pool.is_master():
-    #    pool.wait()
-    #    sys.exit(0)
+    try: 
+        pool = MPIPool()
+        if not pool.is_master():
+            pool.wait()
+            sys.exit(0)
+    except ValueError: 
+        pool = None 
 
     # args for lnProb function 
+    # data ks, BOSS NGC P_l(k), BOSS SGC P_l(k), NGC precision matrix, SGC precision matrix 
     lnpost_args = (k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc)
     
-    print(Nchain, " independent emcee chains running")
+    print("initializing ", Nchains, " independent emcee chains")
     pos, samplers =[], []
     for ichain in range(Nchains):
         pos.append([start + temperature*start*(2.*np.random.random_sample(ndim)-1.)
@@ -150,50 +173,78 @@ def mcmc(zbin=1, nwalkers=48, Nchains=4):
 
     # Start MCMC
     print("Running MCMC...")
-
-    withinchainvar = np.zeros((Nchains,ndim))
-    meanchain = np.zeros((Nchains,ndim))
-    scalereduction = np.arange(ndim,dtype=np.float)
-    for jj in range(0, ndim):
-        scalereduction[jj] = 2.
-
+    withinchainvar = np.zeros((Nchains, ndim))
+    meanchain = np.zeros((Nchains, ndim))
+    scalereduction = np.repeat(2., ndim)
+    
+    # bunch of numbers for the mcmc run 
     itercounter = 0
     chainstep = minlength
-    loopcriteria = 1
-    while loopcriteria:
-        
-        itercounter = itercounter + chainstep
-        print("chain length =",itercounter," minlength =",minlength)
-        
-        for jj in range(0, Nchains):
-            # Since we write the chain to a file we could put storechain=False, but in that case
-            # the function sampler.get_autocorr_time() below will give an error
-            for result in sampler[jj].sample(pos[jj], iterations=chainstep, rstate0=rstate, storechain=True, thin=ithin):
+    loop = 1
+    epsilon = 0.02 #0.02
+    ichaincheck = 100
+    rstate = np.random.get_state()
+
+    while loop:
+
+        itercounter += chainstep
+        print("chain length =",itercounter)
+
+        for jj in range(Nchains):
+            for result in samplers[jj].sample(pos[jj], iterations=chainstep, 
+                    rstate0=rstate, storechain=True):
                 pos[jj] = result[0]
                 chainchi2 = -2.*result[1]
                 rstate = result[2]
-                out = open("%s/RSDfit_chain_COMPnbar_%d_%d_%d_%d_%d_%d_%s_%d_chain%d.dat" % (outpath, minbin1/binsize, maxbin1/binsize, minbin2/binsize, maxbin2/binsize, minbin3/binsize, maxbin3/binsize, tag, rank, jj), "a")
-                for k in range(pos[jj].shape[0]):
-                    out.write("{0:4d} {1:s} {2:0.6f}\n".format(k, " ".join(map(str,pos[jj][k])), chainchi2[k]))
-                out.close()
-    
+
+                # append chain outputs to chain file  
+                chain_file = ''.join([UT.dat_dir(), 'mcmc/', tag, '.chain', str(jj), 
+                    '.zbin', str(zbin), '.dat']) 
+                f = open(chain_file, 'a')
+                for k in range(pos[jj].shape[0]): 
+                    output_str = '\t'.join(pos[jj][k].astype('str')) + '\n'
+                    f.write(output_str)
+                f.close()
+
             # we do the convergence test on the second half of the current chain (itercounter/2)
-            chainsamples = sampler[jj].chain[:, itercounter/2:, :].reshape((-1, ndim))
-            #print("len chain = ", chainsamples.shape)
+            chainsamples = samplers[jj].chain[:, itercounter/2:, :].reshape((-1, ndim))
             withinchainvar[jj] = np.var(chainsamples, axis=0)
             meanchain[jj] = np.mean(chainsamples, axis=0)
     
         scalereduction = gelman_rubin_convergence(withinchainvar, meanchain, itercounter/2, Nchains, ndim)
         print("scalereduction = ", scalereduction)
         
-        loopcriteria = 0
-        for jj in range(0, ndim):
-            if np.absolute(1-scalereduction[jj]) > epsilon:
+        loop = 0
+        for jj in range(ndim):
+            if np.abs(1-scalereduction[jj]) > epsilon:
                 loopcriteria = 1
 
         chainstep = ichaincheck
 
-    print("Done.")
+    if pool is not None: 
+        pool.close() 
+    return None 
+
+
+def gelman_rubin_convergence(withinchainvar, meanchain, n, Nchains, ndim):
+    '''Calculate Gelman & Rubin diagnostic
+     1. Remove the first half of the current chains
+     2. Calculate the within chain and between chain variances
+     3. estimate your variance from the within chain and between chain variance
+     4. Calculate the potential scale reduction parameter
+    '''
+    meanall = np.mean(meanchain, axis=0)
+    W = np.mean(withinchainvar, axis=0)
+    B = np.arange(ndim,dtype=np.float)
+    for jj in range(0, ndim):
+        B[jj] = 0.
+    for jj in range(0, Nchains):
+        B = B + n*(meanall - meanchain[jj])**2/(Nchains-1.)
+    estvar = (1. - 1./n)*W + B/n
+    scalereduction = np.sqrt(estvar/W)
+
+    return scalereduction
+
 
 if __name__=="__main__":
-    mcmc(zbin=1, nwalkers=4, Nchains=4)
+    mcmc(tag='testing', zbin=1, nwalkers=48, Nchains=2, minlength=600)

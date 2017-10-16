@@ -358,6 +358,8 @@ def beutlerCov(zbin, NorS='ngc', ell=0):
         i_l0, i_l1 = 14, 28 
     elif ell == 4: 
         i_l0, i_l1 = 28, 37 
+    elif ell == 'all': 
+        i_l0, i_l1 = 0, 37 
 
     ki = k_i.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
     kj = k_j.reshape((int(np.sqrt(len(i_k))), int(np.sqrt(len(i_k)))))
