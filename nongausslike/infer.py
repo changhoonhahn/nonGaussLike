@@ -61,10 +61,8 @@ def lnLike(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
         list of k values for the mono, quadru, and hexadecaopoles -- [k0, k2, k4]
 
     pk_ngc_list : list 
-        
-
     '''
-    if theta[0] > 0.8 and theta[0] < 1.4 and theta[1] > 0.8 and theta[1] < 1.4:
+    if 0.8 < theta[0] < 1.4 and 0.8 < theta[1] < 1.4:
         binrange1, binrange2, binrange3 = len(k_list[0]), len(k_list[1]), len(k_list[2])
         maxbin1 = len(k_list[0])+1
 
@@ -79,9 +77,6 @@ def lnLike(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
     
         model_ngc = modelX[0]
         model_sgc = modelX[1]
-        #print("dummy_model_NGC = ", dummy_model_NGC, len(x))
-        #for i in range(0, 37):
-        #    print("k = ", x[i], dummy_model_NGC[i], dummy_model_SGC[i])
 
         diff_ngc = model_ngc - pk_ngc
         diff_sgc = model_sgc - pk_sgc 
@@ -135,15 +130,14 @@ def mcmc(tag=None, zbin=1, nwalkers=48, Nchains=4, minlength=600):
     _, _, C_pk_sgc = Dat.beutlerCov(zbin, NorS='sgc', ell='all')
 
     # calculate precision matrices (including the hartlap factor) 
-    n_mocks_ngc = 2045
-    n_mocks_sgc = 2048
-    f_hartlap_ngc = (n_mocks_ngc - len(np.concatenate(pk_ngc_list)) - 2)/(n_mocks_ngc - 1)
-    f_hartlap_sgc = (n_mocks_sgc - len(np.concatenate(pk_sgc_list)) - 2)/(n_mocks_sgc - 1)
-
     Cinv_ngc = np.linalg.inv(C_pk_ngc)
     Cinv_sgc = np.linalg.inv(C_pk_sgc)
-    
-    Cinv_ngc *= f_hartlap_ngc 
+    # hartlap factor 
+    n_mocks_ngc = 2045
+    n_mocks_sgc = 2048
+    f_hartlap_ngc = (float(n_mocks_ngc) - float(len(np.concatenate(pk_ngc_list))) - 2.)/(float(n_mocks_ngc) - 1.)
+    f_hartlap_sgc = (float(n_mocks_sgc) - float(len(np.concatenate(pk_sgc_list))) - 2.)/(float(n_mocks_sgc) - 1.)
+    Cinv_ngc *= f_hartlap_ngc  
     Cinv_sgc *= f_hartlap_sgc
         
     if zbin == 1: # 0.2 < z < 0.5 
@@ -247,4 +241,5 @@ def gelman_rubin_convergence(withinchainvar, meanchain, n, Nchains, ndim):
 
 
 if __name__=="__main__":
-    mcmc(tag='testing', zbin=1, nwalkers=48, Nchains=2, minlength=600)
+    pass 
+    #mcmc(tag='testing', zbin=1, nwalkers=48, Nchains=2, minlength=600)
