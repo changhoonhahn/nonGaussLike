@@ -371,6 +371,7 @@ def Pk_NBKT_patchy_wrap(nmock0, nmock1, zbin, NorS='ngc'):
     '''
     col_random = ['RA', 'DEC', 'Z', 'NZ', 'BIAS', 'VETO', 'WRED']
     randoms = CSVCatalog(Random('patchy', NorS=NorS), col_random)
+
     for i_mock in range(nmock0, nmock1+1): 
         Pk_NBKT_patchy(i_mock, zbin, NorS, randoms=randoms)
     return None 
