@@ -14,7 +14,7 @@ def Catalog(catalog, n_mock, NorS='ngc'):
     ''' name of the original catalog files. These will be fed into the FFT 
     '''
     if 'patchy' in catalog: 
-        return ''.join([UT.catalog_dir('patchy'), 'Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str("%04d" % n_mock), '.dat'])
+        return ''.join([UT.catalog_dir('patchy'), 'Patchy-Mocks-DR12', NorS.upper(), '-COMPSAM_V6C_', str("%04d" % n_mock), '.dat'])
     elif catalog == 'boss': 
         if NorS == 'ngc': 
             return ''.join([UT.catalog_dir('boss'), 'galaxy_DR12v5_CMASSLOWZTOT_North.dat']) 
@@ -26,7 +26,7 @@ def Random(catalog, NorS='ngc'):
     ''' name of the original catalog files. These will be fed into the FFT 
     '''
     if catalog == 'patchy': 
-        return ''.join([UT.dat_dir(), 'patchy/Patchy-Mocks-Randoms-DR12NGC-COMPSAM_V6C_x50.dat'])
+        return ''.join([UT.dat_dir(), 'patchy/Patchy-Mocks-Randoms-DR12', NorS.upper(), '-COMPSAM_V6C_x50.dat'])
     elif catalog == 'boss': 
         if NorS == 'ngc': 
             return ''.join([UT.catalog_dir('boss'), 'random1_DR12v5_CMASSLOWZTOT_North.dat'])
@@ -314,10 +314,10 @@ def Pk_NBKT_patchy(i_mock, zbin, NorS, randoms=None):
     print('patchy --',i_mock)
     # first read in data and random catalogs 
     col_data = ['RA', 'DEC', 'Z', 'DUM0', 'NZ', 'DUM1', 'VETO', 'WRED']
-    data = CSVCatalog(Catalog('patchy', i_mock, NorS='ngc'), col_data)
+    data = CSVCatalog(Catalog('patchy', i_mock, NorS=NorS), col_data)
     if randoms is None: 
         col_random = ['RA', 'DEC', 'Z', 'NZ', 'BIAS', 'VETO', 'WRED']
-        randoms = CSVCatalog(Random('patchy', NorS='ngc'), col_random)
+        randoms = CSVCatalog(Random('patchy', NorS=NorS), col_random)
     
     # impose fiducial BOSS DR12 cosmology
     cosmo = cosmology.Cosmology(H0=67.6, Om0=0.31, flat=True)
