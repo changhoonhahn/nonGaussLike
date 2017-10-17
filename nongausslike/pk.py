@@ -404,12 +404,14 @@ def _make_run_nbkt():
 
 if __name__=="__main__": 
     #_make_run_nbkt()
-    Nthreads = int(Sys.argv[1])
-    print('running on ', Nthreads, ' threads')
+    #Nthreads = int(Sys.argv[1])
+    #print('running on ', Nthreads, ' threads')
 
-    nmock0 = int(Sys.argv[2])
-    nmock1 = int(Sys.argv[3])
-    Pk_NBKT_patchy_wrap(nmock0, nmock1, 1)
+    nmock0 = int(Sys.argv[1])
+    nmock1 = int(Sys.argv[2])
+    NorS = Sys.argv[3]
+
+    Pk_NBKT_patchy_wrap(nmock0, nmock1, 1, NorS=NorS)
 
     #pool = Pewl(processes=Nthreads)
     #mapfn = pool.map
