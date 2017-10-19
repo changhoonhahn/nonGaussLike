@@ -199,6 +199,14 @@ def whiten(X, method='choletsky', hartlap=False):
         V = pca.components_.T / np.sqrt(pca.explained_variance_)
         return X_w, V
 
+    elif method == 'stddev_scale':  
+        # simplest whitening where each X k-bin is scaled by the 
+        # standard deviation of that k-bin. 
+        X_w = X 
+        for i in range(X.shape[0]): 
+            X_w[i,:] /= np.std(X[i,:])
+        return X_w, None
+
 
 def meansub(X): 
     ''' Given data matrix X (dimensions N_mock x N_k), subtract out the mean 
