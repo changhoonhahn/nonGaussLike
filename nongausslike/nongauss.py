@@ -14,25 +14,26 @@ import util as UT
 import data as Data
 
 
-def lnL_ica(pk_obv, Pk):
-    ''' Given 'observed' P(k) and mock P(k) data, calculate the ICA log likelihood estimate.
+def lnL_ica(delta_pk, Pk):
+    ''' Given 'observed' delta P(k) (a.k.a. P(k) observed - model P(k)) 
+    and mock P(k) data, calculate the ICA log likelihood estimate.
     '''
     X, mu_X = meansub(Pk) # mean subtract
     X_w, W = whiten(X) # whitened data
     
     X_ica, W_ica = Ica(X_w) # get ICA transformation 
     
-    if len(pk_obv.shape) == 1: 
-        x_obv = np.dot(np.dot(pk_obv - mu_X, W), W_ica) # mean subtract, whiten, and ica transform observd pk
+    if len(delta_pk.shape) == 1: 
+        x_obv = np.dot(np.dot(delta_pk, W), W_ica) # mean subtract, whiten, and ica transform observd pk
         p_Xica = 0. 
     else: 
-        x_obv = np.zeros(pk_obv.shape)
-        for i_obv in range(pk_obv.shape[0]):
-            x_obv[i_obv,:] = np.dot(np.dot(pk_obv[i_obv,:] - mu_X, W), W_ica)
+        x_obv = np.zeros(delta_pk.shape)
+        for i_obv in range(delta_pk.shape[0]):
+            x_obv[i_obv,:] = np.dot(np.dot(delta_pk[i_obv,:], W), W_ica)
         p_Xica = np.zeros(pk_obv.shape[0]) 
 
     for i in range(X_ica.shape[1]):
-        if len(pk_obv.shape) == 1: 
+        if len(delta_pk.shape) == 1: 
             x_obv_i = x_obv[i]
         else: 
             x_obv_i = x_obv[:,i]
@@ -40,12 +41,16 @@ def lnL_ica(pk_obv, Pk):
     return p_Xica
 
 
-def lnL_pca_gauss(pk_obv, Pk): 
-    ''' Gaussian pseudo-likelihood calculated using PCA decomposition for 
-    convenience. i.e. the data vector is decomposed in PCA components so that
+def lnL_pca_gauss(delta_pk, Pk): 
+    ''' Gaussian pseudo-likelihood calculated using PCA decomposition. 
+    i.e. the data vector is decomposed in PCA components so that
     L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated using 
-    N(0, sig_pca,i). *Note by construction this gives the same likelihood 
-    as the Gaussian functional pseudo-likelihood.*
+    N(0, sig_pca,i). 
+    
+    Notes
+    -----
+    - By construction this evaluates the same likelihood as the 
+    Gaussian functional pseudo-likelihood. It was implemented by convenience.
     '''
     X, mu_X = meansub(Pk) # mean subtract
     X_pca, W_pca = whiten(X, method='pca') # whitened data
@@ -56,36 +61,41 @@ def lnL_pca_gauss(pk_obv, Pk):
     cov = np.diag(var_pca)
     ggg = multinorm(np.zeros(len(mu_X)), cov) 
     
-    if len(pk_obv.shape) == 1: 
-        x_obv = np.dot(pk_obv - mu_X, W_pca) 
+    if len(delta_pk.shape) == 1: 
+        x_obv = np.dot(delta_pk, W_pca) 
     else: 
         x_obv = np.zeros(pk_obv.shape)
-        for i_obv in range(pk_obv.shape[0]):
-            x_obv[i_obv, :] = np.dot(pk_obv[i_obv,:] - mu_X, W_pca)
+        for i_obv in range(delta_pk.shape[0]):
+            x_obv[i_obv, :] = np.dot(delta_pk[i_obv,:], W_pca)
     return np.log(ggg.pdf(x_obv))
 
 
-def lnL_pca(pk_obv, Pk): 
+def lnL_pca(delta_pk, Pk): 
     ''' Gaussian pseudo-likelihood calculated using PCA decomposition for 
     convenience. i.e. the data vector is decomposed in PCA components so that
     L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated by 
     gaussian KDE of the PCA transformed mock data. 
+    
+    Notes
+    -----
+    - This estimates the Gaussian functional pseudo-likelihood. Its main 
+    use is to quantify the impact of the KDE.  
     '''
     X, mu_X = meansub(Pk) # mean subtract
     X_pca, W_pca = whiten(X, method='pca') # whitened data
     
-    if len(pk_obv.shape) == 1: 
-        # PCA transform pk_obv
-        x_obv = np.dot(pk_obv - mu_X, W_pca) 
+    if len(dleta_pk.shape) == 1: 
+        # PCA transform delta_pk 
+        x_obv = np.dot(delta_pk, W_pca) 
         p_Xpca = 0. 
     else: 
-        x_obv = np.zeros(pk_obv.shape)
-        for i_obv in range(pk_obv.shape[0]):
-            x_obv[i_obv,:] = np.dot(pk_obv[i_obv,:] - mu_X, W_pca)
-        p_Xpca = np.zeros(pk_obv.shape[0]) 
+        x_obv = np.zeros(delta_pk.shape)
+        for i_obv in range(delta_pk.shape[0]):
+            x_obv[i_obv,:] = np.dot(delta_pk[i_obv,:], W_pca)
+        p_Xpca = np.zeros(delta_pk.shape[0]) 
 
     for i in range(X_pca.shape[1]):
-        if len(pk_obv.shape) == 1: 
+        if len(delta_pk.shape) == 1: 
             x_obv_i = x_obv[i]
         else: 
             x_obv_i = x_obv[:,i]

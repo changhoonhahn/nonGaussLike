@@ -97,6 +97,15 @@ def lnPost(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
         return -np.inf
 
 
+#def importance_sampling():
+#    ''' Use importance sampling in order to estimate the new posterior 
+#    distribution. The mcmc chain is read in then weighted by the likelihood
+#    ratio. 
+#    '''
+#    # read in MCMC chain 
+
+
+
 def mcmc(tag=None, zbin=1, nwalkers=48, Nchains=4, minlength=600): 
     '''
     
