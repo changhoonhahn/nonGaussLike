@@ -6,3 +6,4 @@ run/*
 *png
 .ipynb_checkpoints/
 *hdf5
+*.o7*

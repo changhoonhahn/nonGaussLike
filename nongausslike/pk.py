@@ -4,7 +4,6 @@ from nbodykit.lab import *
 import subprocess
 import os.path
 import numpy as np 
-import sys as Sys
 
 import util as UT
 from interruptible_pool import InterruptiblePool as Pewl
@@ -377,7 +376,7 @@ def Pk_NBKT_patchy_wrap(nmock0, nmock1, zbin, NorS='ngc'):
     return None 
 
 
-def _make_run_nbkt(): 
+def _make_run_nbkt(NorS): 
     '''
     '''
     n0 = np.arange(100, 2100, 100)+1
@@ -385,44 +384,23 @@ def _make_run_nbkt():
     n1 = np.arange(200, 2148, 100)
     n1[-1] = 2048
     for i in range(len(n0)): 
-        run_file = ''.join([UT.run_dir(), 'patchy_nbkt_pk_', str(n0[i]), '_', str(n1[i]), '.slurm'])
+        run_file = ''.join([UT.run_dir(), 'patchy_nbkt_pk_', NorS, '_', str(n0[i]), '_', str(n1[i]), '.slurm'])
         f = open(run_file, 'w')
 
         f.write('#!/bin/bash -l \n')
         f.write('#SBATCH -p regular \n') 
         f.write('#SBATCH -N 1 \n') 
         f.write('#SBATCH -t 06:00:00 \n')
-        f.write('#SBATCH -J patchy_nbkt_pk_'+str(n0[i])+'_'+str(n1[i])+' \n')
-        f.write('#SBATCH -o patchy_nbkt_pk_'+str(n0[i])+'_'+str(n1[i])+'.o%j \n')
+        f.write('#SBATCH -J patchy_nbkt_pk_'+NorS+'_'+str(n0[i])+'_'+str(n1[i])+' \n')
+        f.write('#SBATCH -o patchy_nbkt_pk_'+NorS+'_'+str(n0[i])+'_'+str(n1[i])+'.o%j \n')
         f.write('#SBATCH -L SCRATCH,project \n')
         f.write('\n')
-        f.write('source /usr/common/contrib/bccp/conda-activate.sh 3.6 \n') 
+        f.write('source /usr/common/contrib/bccp/conda-activate.sh 2.7 \n') 
         f.write('\n')
-        f.write('srun -n 1 -c 1 python /global/homes/c/chahah/projects/nonGaussLike/nongausslike/pk.py 1 '+str(n0[i])+' '+str(n1[i]))
+        f.write('srun -n 1 -c 1 python /global/homes/c/chahah/projects/nonGaussLike/nongausslike/run/run_pk.py '+str(n0[i])+' '+str(n1[i])+' '+NorS)
     f.close() 
     return None
 
 
 if __name__=="__main__": 
-    #_make_run_nbkt()
-    #Nthreads = int(Sys.argv[1])
-    #print('running on ', Nthreads, ' threads')
-
-    nmock0 = int(Sys.argv[1])
-    nmock1 = int(Sys.argv[2])
-    NorS = Sys.argv[3]
-
-    Pk_NBKT_patchy_wrap(nmock0, nmock1, 1, NorS=NorS)
-
-    #pool = Pewl(processes=Nthreads)
-    #mapfn = pool.map
-    #if nmock1 > nmock0: 
-    #    print('mocks from ', nmock0, ' to ', nmock1)
-    #    arglist = [[i_mock, 1] for i_mock in range(nmock0, nmock1+1)]
-    #elif nmock1 == nmock0: 
-    #    print('mock = ', nmock0)
-    #    arglist = [[nmock0, 1]]
-    #mapfn(buildPk_wrap, [arg for arg in arglist])
-    #pool.close()
-    #pool.terminate()
-    #pool.join() 
+    _make_run_nbkt('sgc')
