@@ -10,13 +10,27 @@ import data as Data
 
 # --- plotting --- 
 import matplotlib.pyplot as plt 
-from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
+
+import matplotlib as mpl 
+import matplotlib.pyplot as plt 
+mpl.rcParams['text.usetex'] = True
+mpl.rcParams['font.family'] = 'serif'
+mpl.rcParams['axes.linewidth'] = 1.5
+mpl.rcParams['axes.xmargin'] = 1
+mpl.rcParams['xtick.labelsize'] = 'x-large'
+mpl.rcParams['xtick.major.size'] = 5
+mpl.rcParams['xtick.major.width'] = 1.5
+mpl.rcParams['ytick.labelsize'] = 'x-large'
+mpl.rcParams['ytick.major.size'] = 5
+mpl.rcParams['ytick.major.width'] = 1.5
+mpl.rcParams['legend.frameon'] = False
 
 
 def Plk_BOSS_Patchy(zbin): 
-    ''' Compare the powerspectrum BOSS P(k) with average P(k)
-    of patchy mocks
+    ''' Compare the BOSS powerspectrum P_BOSS(k) calculated using Roman's estimator, 
+    Florian's estimator, and nbodykit (Nick's estimator) to the average P(k) of patchy 
+    mocks calculated using nbodykit
     '''
     # read in BOSS P(k) using Roman's estimator
     if zbin == 1: 
@@ -24,7 +38,6 @@ def Plk_BOSS_Patchy(zbin):
             'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox2800.Ngrid360.O4intp.P010000.fc.z1']) 
     else:
         raise ValueError
-
     k_boss, p0k, p2k, p4k, counts = np.loadtxt(f_boss, unpack=True, usecols=[0, 5, 2, 3, -2]) # k, p0(k), and number of modes 
 
     # read in Florian's P(k) 
@@ -41,28 +54,29 @@ def Plk_BOSS_Patchy(zbin):
         k_beut, plk = np.loadtxt(f_beut, skiprows=31, unpack=True, usecols=[1,2]) 
         pk_beu.append(plk)
         k_beu.append(k_beut) 
+    
+    # read in Nbodykit P(k) (using Nick's estimator) 
+    f_nbkt = ''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']) 
+    k_nbkt, p0kk, p2kk, p4kk = np.loadtxt(f_nbkt, skiprows=26, unpack=True, usecols=[0, 1, 2, 3]) 
+    pk_nbkt = [p0kk, p2kk, p4kk]
 
-    # read in the PATCHY mocks 
-    f_patchy = lambda ii: ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(ii), '.nbodykit.zbin1.dat'])
+    # read in the PATCHY mocks (Nbodykit)  
+    f_patchy = lambda ii: ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(ii), '.nbodykit.zbin', str(zbin), '.dat'])
     n_mock = 0 
     for i in range(1, 2049): 
         try: 
             plk = np.loadtxt(f_patchy(i), skiprows=24, unpack=True, usecols=[0,1,2,3])
             if i == 1: 
-                p0k_nbkt = plk[1]
-                p2k_nbkt = plk[2]
-                p4k_nbkt = plk[3]
-            else: 
-                p0k_nbkt += plk[1]
-                p2k_nbkt += plk[2]
-                p4k_nbkt += plk[3]
-
+                p0k_nbkt, p2k_nbkt, p4k_nbkt = [], [], [] #plk[1], plk[2], plk[3]
+            p0k_nbkt.append(plk[1])
+            p2k_nbkt.append(plk[2])
+            p4k_nbkt.append(plk[3])
             n_mock += 1
         except IOError: 
             print(i,'th mock missing') 
             pass 
-
-    pk_patchy = [p0k_nbkt/float(n_mock), p2k_nbkt/float(n_mock), p4k_nbkt/float(n_mock)]
+    pk_patchy = [np.sum(p0k_nbkt, axis=0)/float(n_mock), np.sum(p2k_nbkt, axis=0)/float(n_mock), np.sum(p4k_nbkt, axis=0)/float(n_mock)]
+    var_patchy = [np.var(p0k_nbkt, axis=0), np.var(p2k_nbkt, axis=0), np.var(p4k_nbkt, axis=0)]
     k_patchy = plk[0]
 
     #pkay = Data.Pk() 
@@ -90,7 +104,6 @@ def Plk_BOSS_Patchy(zbin):
     #            print ('missing -- ', pkay._file_name('patchy.ngc.z'+str(zbin), i, 'fc'))
     #            n_missing += 1 
     #        i_mock += 1
-
     #    n_mock -= n_missing
     #    if n_missing > 0: # just a way to deal with missing  
     #        pks = pks[:n_mock,:]
@@ -101,17 +114,26 @@ def Plk_BOSS_Patchy(zbin):
     fig = plt.figure(figsize=(8, 8))
     sub = fig.add_subplot(111) 
     # monopole comparison 
+    sub.scatter(k_nbkt, k_nbkt * pk_nbkt[0], c='b', lw=0, marker='s', label='nbodykit') 
     sub.scatter(k_boss, k_boss * p0k, c='b', lw=0, marker='^', label='RS est.') 
     sub.scatter(k_beu[0], k_beu[0]*pk_beu[0], label='Beutler+', c='b', lw=0) 
     sub.plot(k_patchy, k_patchy*pk_patchy[0], label='Patchy', c='b')
+    sub.fill_between(k_patchy, k_patchy*(pk_patchy[0]-np.sqrt(var_patchy[0])), k_patchy*(pk_patchy[0]+np.sqrt(var_patchy[0])), 
+            color='b', alpha=0.25, linewidth=0)
     # quadrupole comparison 
+    sub.scatter(k_nbkt, k_nbkt*pk_nbkt[1], c='r', lw=0, marker='s') 
     sub.scatter(k_boss, k_boss*p2k, c='r', lw=0, marker='^') 
     sub.scatter(k_beu[1], k_beu[1]*pk_beu[1], c='r', lw=0) 
     sub.plot(k_patchy, k_patchy*pk_patchy[1], c='r')
+    sub.fill_between(k_patchy, k_patchy*(pk_patchy[1]-np.sqrt(var_patchy[1])), k_patchy*(pk_patchy[1]+np.sqrt(var_patchy[1])), 
+            color='r', alpha=0.25, linewidth=0)
     # hexadecapole comparison 
+    sub.scatter(k_nbkt, k_nbkt*pk_nbkt[2], c='k', lw=0, marker='s') 
     sub.scatter(k_boss, k_boss*p4k, c='k', lw=0, marker='^') 
     sub.scatter(k_beu[2], k_beu[2]*pk_beu[2], c='k', lw=0) 
     sub.plot(k_patchy, k_patchy*pk_patchy[2], c='k')
+    sub.fill_between(k_patchy, k_patchy*(pk_patchy[2]-np.sqrt(var_patchy[2])), k_patchy*(pk_patchy[2]+np.sqrt(var_patchy[2])), 
+            color='k', alpha=0.25, linewidth=0)
 
     sub.set_xlim([0.01, 0.15]) 
     sub.set_ylim([-750, 2250])
@@ -435,8 +457,8 @@ def Pk_i(catalog, i_mock, sys=None, rebin=None):
 
 
 if __name__=="__main__":
-    #Plk_BOSS_Patchy(1)
-    beutler_patchy_Cov(1, ell=0, NorS='ngc')
+    Plk_BOSS_Patchy(1)
+    #beutler_patchy_Cov(1, ell=0, NorS='ngc')
     #Beutler_BOSS_Plk(1)
     #for ell in [0, 2, 4]:
     #    #patchyPk_outlier(1, ell=ell)
