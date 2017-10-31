@@ -60,57 +60,36 @@ def Plk_BOSS_Patchy(zbin):
     k_nbkt, p0kk, p2kk, p4kk = np.loadtxt(f_nbkt, skiprows=26, unpack=True, usecols=[0, 1, 2, 3]) 
     pk_nbkt = [p0kk, p2kk, p4kk]
 
-    # read in the PATCHY mocks (Nbodykit)  
-    f_patchy = lambda ii: ''.join([UT.catalog_dir('patchy'), 'pk.patchy.', str(ii), '.nbodykit.zbin', str(zbin), '.dat'])
-    n_mock = 0 
-    for i in range(1, 2049): 
-        try: 
-            plk = np.loadtxt(f_patchy(i), skiprows=24, unpack=True, usecols=[0,1,2,3])
-            if i == 1: 
-                p0k_nbkt, p2k_nbkt, p4k_nbkt = [], [], [] #plk[1], plk[2], plk[3]
-            p0k_nbkt.append(plk[1])
-            p2k_nbkt.append(plk[2])
-            p4k_nbkt.append(plk[3])
-            n_mock += 1
-        except IOError: 
-            print(i,'th mock missing') 
-            pass 
-    pk_patchy = [np.sum(p0k_nbkt, axis=0)/float(n_mock), np.sum(p2k_nbkt, axis=0)/float(n_mock), np.sum(p4k_nbkt, axis=0)/float(n_mock)]
-    var_patchy = [np.var(p0k_nbkt, axis=0), np.var(p2k_nbkt, axis=0), np.var(p4k_nbkt, axis=0)]
-    k_patchy = plk[0]
+    # read in the PATCHY mocks
+    pkay = Data.Pk() 
+    n_mock = pkay._n_mock('patchy.ngc.z'+str(zbin)) 
+    k_patchy, pk_patchy, var_patchy = [], [], []
 
-    #pkay = Data.Pk() 
-    #n_mock = pkay._n_mock('patchy.ngc.z'+str(zbin)) 
-    #k_patchy, pk_patchy = [], [] 
-    #for ell in [0,2,4]: 
-    #    n_missing, i_mock = 0, 0 
-    #    for i in range(1,n_mock+1):
-    #        try: 
-    #            pkay.Read('patchy.ngc.z'+str(zbin), i, ell=ell, sys='fc')
-    #            pkay.krange([0.01,0.15])
-    #            k = pkay.k
-    #            pk = pkay.pk
-    #            #k0, p0k, _ = pkay.rebin('beutler') 
-    #            n_kbin = len(k) 
-    #            
-    #            if i == 1: 
-    #                pks = np.zeros((n_mock, n_kbin))
+    for ell in [0,2,4]: 
+        n_missing, i_mock = 0, 0 
+        for i in range(1,n_mock+1):
+            try: 
+                pkay.Read('patchy.ngc.z'+str(zbin), i, ell=ell, sys='fc')
+                k = pkay.k
+                pk = pkay.pk
+                n_kbin = len(k) 
 
-    #            ks_i, pks_i = k, pk 
-    #            pks[i_mock,:] = pks_i 
-    #        except IOError: 
-    #            if i == 1: 
-    #                raise ValueError
-    #            print ('missing -- ', pkay._file_name('patchy.ngc.z'+str(zbin), i, 'fc'))
-    #            n_missing += 1 
-    #        i_mock += 1
-    #    n_mock -= n_missing
-    #    if n_missing > 0: # just a way to deal with missing  
-    #        pks = pks[:n_mock,:]
-    #    k_patchy.append(ks_i)
-    #    pk_patchy.append(np.sum(pks, axis=0)/np.float(n_mock))
+                if i == 1: pks = np.zeros((n_mock, n_kbin))
+                ks_i, pks_i = k, pk 
+                pks[i_mock,:] = pks_i 
+            except IOError: 
+                if i == 1: 
+                    raise ValueError
+                print ('missing -- ', pkay._file_name('patchy.ngc.z'+str(zbin), i, 'fc'))
+                n_missing += 1 
+            i_mock += 1
+        n_mock -= n_missing
+        if n_missing > 0: # deal with missing realizatoins 
+            pks = pks[:n_mock,:]
+        pk_patchy.append(np.sum(pks, axis=0)/np.float(n_mock))
+        var_patchy.append(np.var(pks, axis=0))
+    k_patchy = ks_i
 
-    #prettyplot()
     fig = plt.figure(figsize=(8, 8))
     sub = fig.add_subplot(111) 
     # monopole comparison 

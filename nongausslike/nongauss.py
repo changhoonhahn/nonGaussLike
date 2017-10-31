@@ -224,14 +224,13 @@ def meansub(X):
     # calculate < P(k) > from the mock. This will serve as m(theta)
     n_mock = X.shape[0]
     mu_X = np.sum(X, axis=0)/np.float(n_mock)
-
     return X - mu_X, mu_X
 
 
 def dataX(mock, ell=0, krange=None, rebin=None, sys=None, k_arr=False): 
     ''' Construct data matrix X from P(k) measures of mock catalogs.
-
-    X_i = P_i - < P > 
+    
+    X_i = P(k)_i 
 
     X has N_mock x N_k dimensions. 
     '''
