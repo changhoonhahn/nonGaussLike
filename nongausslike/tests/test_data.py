@@ -27,6 +27,34 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
+def Gmf_i(name): 
+    ''' ***TESTED -- Oct 31 2017***
+    test of reading in GMF
+    '''
+    # mocks
+    geemf = Data.Gmf() 
+    n_mock = geemf._n_mock(name) 
+    i_sample = np.random.choice(range(1,n_mock+1), 5, replace=False) 
+    
+    fig = plt.figure(figsize=(8,8)) 
+    sub = fig.add_subplot(111) 
+    for i in i_sample: 
+        ibox = i % 4
+        ireal = int((i - ibox)/4)+1
+        print i, ibox, ireal 
+        geemf.Read(name, ireal, ibox) 
+        xx, yy = UT.bar_plot(geemf.nbins, geemf.gmf)
+        sub.plot(xx, yy) 
+    
+    sub.set_xlim([0, np.max(geemf.nbins)])
+    sub.set_xlabel('$N$', fontsize=25)
+    sub.set_ylabel('$\zeta (N)$', fontsize=25)
+    sub.set_yscale('log') 
+    
+    plt.show()
+    return None
+
+
 def Plk_BOSS_Patchy(zbin): 
     ''' Compare the BOSS powerspectrum P_BOSS(k) calculated using Roman's estimator, 
     Florian's estimator, and nbodykit (Nick's estimator) to the average P(k) of patchy 
@@ -356,8 +384,42 @@ def Pk_rebin(catalog, rebin, ell=0, krange=None, sys=None):
     return None
 
 
-def patchyPk_outlier(zbin, ell=0):
-    ''' According to Florian there are 3 mocks with strange 
+def Pk_i(catalog, i_mock, sys=None, rebin=None): 
+    ''' test of reading in P(k). 
+    '''
+    # mocks
+    pkay = Data.Pk() 
+    n_mock = pkay._n_mock(catalog) 
+    i_sample = np.random.choice(range(1,n_mock+1), 5, replace=False) 
+    
+    prettyplot() 
+    fig = plt.figure(figsize=(21,8)) 
+    for i_ell in range(3): 
+        sub = fig.add_subplot(1,3,i_ell+1) 
+
+        for i in i_sample: 
+            pkay.Read(catalog, i, ell=2*i_ell, sys=sys)
+            k, pk, _ = pkay.rebin(rebin)
+            
+            sub.plot(k, pk) 
+
+        pkay.Read(catalog, i_mock, ell=2*i_ell, sys=sys)
+        k, pk, _ = pkay.rebin(rebin)
+        sub.plot(k, pk, lw=2, c='k') 
+        
+        sub.set_xlim([1e-3, 0.5])
+        sub.set_xlabel('$\mathtt{k}$', fontsize=25)
+        sub.set_xscale('log') 
+        sub.set_ylabel('$\mathtt{P(k)}$', fontsize=25)
+        sub.set_yscale('log') 
+    
+    plt.show()
+    return None
+
+
+def _patchyPk_outlier(zbin, ell=0):
+    ''' *** No Outlier Found***
+    According to Florian there are 3 mocks with strange 
     P(k)s. Find them by examine P(k) that deviate significantly 
     from the mean. 
     '''
@@ -402,41 +464,8 @@ def patchyPk_outlier(zbin, ell=0):
     return None 
 
 
-def Pk_i(catalog, i_mock, sys=None, rebin=None): 
-    ''' test of reading in P(k). 
-    '''
-    # mocks
-    pkay = Data.Pk() 
-    n_mock = pkay._n_mock(catalog) 
-    i_sample = np.random.choice(range(1,n_mock+1), 5, replace=False) 
-    
-    prettyplot() 
-    fig = plt.figure(figsize=(21,8)) 
-    for i_ell in range(3): 
-        sub = fig.add_subplot(1,3,i_ell+1) 
-
-        for i in i_sample: 
-            pkay.Read(catalog, i, ell=2*i_ell, sys=sys)
-            k, pk, _ = pkay.rebin(rebin)
-            
-            sub.plot(k, pk) 
-
-        pkay.Read(catalog, i_mock, ell=2*i_ell, sys=sys)
-        k, pk, _ = pkay.rebin(rebin)
-        sub.plot(k, pk, lw=2, c='k') 
-        
-        sub.set_xlim([1e-3, 0.5])
-        sub.set_xlabel('$\mathtt{k}$', fontsize=25)
-        sub.set_xscale('log') 
-        sub.set_ylabel('$\mathtt{P(k)}$', fontsize=25)
-        sub.set_yscale('log') 
-    
-    plt.show()
-    return None
-
-
 if __name__=="__main__":
-    Plk_BOSS_Patchy(1)
+    Gmf_i('manodeep.run2')
     #beutler_patchy_Cov(1, ell=0, NorS='ngc')
     #Beutler_BOSS_Plk(1)
     #for ell in [0, 2, 4]:

@@ -21,6 +21,8 @@ def catalog_dir(name):
     name_dir = name 
     if 'patchy' in name: 
         name_dir = 'patchy'
+    elif 'manodeep' in name: 
+        name_dir = ''.join([name.split('.run')[0], '/run_', name.split('.run')[-1].zfill(4)])
     return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/dat/'+name_dir+'/'
 
 

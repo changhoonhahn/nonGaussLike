@@ -9,9 +9,39 @@ import numpy as np
 from scipy.stats import gaussian_kde as gkde
 from scipy.stats import multivariate_normal as multinorm
 from sklearn.decomposition import FastICA, PCA
+# -- kNN divergence ---
+from skl_groups.features import Features
+from skl_groups.divergences import KNNDivergenceEstimator
 # -- local -- 
 import util as UT
 import data as Data
+
+
+def kNNdiv_gauss(X_white, cov_X, Knn=3, div_func='renyi:.5', gauss=None, Nref=None): 
+    ''' `div_func` kNN divergence estimate between X_white and a 
+    reference Gaussian with covariance matrix cov_X.
+    '''
+    if gauss is None: 
+        if Nref is None: 
+            raise ValueError
+        gauss = np.random.multivariate_normal(np.zeros(X_white.shape[1]), cov_X, size=Nref) # Gaussian reference distribution
+    if gauss.shape[1] != X_white.shape[1]:
+        raise ValueError('dimension between X_white and Gaussian reference distribution do not match') 
+    
+    if isinstance(Knn, int): 
+        Knns = [Knn]
+    elif isinstance(Knn, list): 
+        Knns = Knn
+
+    kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', clamp=False)
+    feat = Features([X_white, gauss])
+    div_knn = kNN.fit_transform(feat)
+    if len(Knns) ==1: 
+        return div_knn[0][0][0][1]
+    div_knns = np.zeros(len(Knns))
+    for i in range(len(Knns)): 
+        div_knns[i] = div_knn[0][i][0][1]
+    return div_knns
 
 
 def lnL_ica(delta_pk, Pk):
@@ -225,6 +255,26 @@ def meansub(X):
     n_mock = X.shape[0]
     mu_X = np.sum(X, axis=0)/np.float(n_mock)
     return X - mu_X, mu_X
+
+
+def X_gmf(name, n_arr=False): 
+    ''' Construct data matrix X from mock GMFs 
+    
+    X_i = gmf(N)_i      X has N_mock x N_n dimensions. 
+    '''
+    geemf = Data.Gmf() # read in GMF mocks 
+    n_mock = pkay._n_mock(mock) 
+    for i in range(n_mock):  
+        ibox = i % 4
+        ireal = int((i - ibox)/4)+1
+        geemf.Read(name, ireal, ibox)
+
+        if i == 1: gmfs = np.zeros((n_mock, len(k)))
+        gmfs[i-1,:] = geemf.gmf 
+
+    if n_arr:
+        return gmfs, geemf.nbins
+    return gmfs 
 
 
 def dataX(mock, ell=0, krange=None, rebin=None, sys=None, k_arr=False): 

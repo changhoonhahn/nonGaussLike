@@ -13,6 +13,49 @@ import util as UT
 from ChangTools.fitstables import mrdfits
 
 
+class Gmf: 
+    def __init__(self):
+        ''' GMF object
+        '''
+        self.nbin_low = None 
+        self.nbin_high = None 
+        self.nbins = None 
+        self.gmf = None 
+
+    def Read(self, name, ireal, ibox): 
+        ''' Read in ireal-th realization and ibox-th box mock catalog 
+        from run-th run. 
+        '''
+        f = ''.join([UT.catalog_dir(name), self._file_name(name, ireal, ibox)]) 
+        gmf, nbin_low, nbin_high = np.loadtxt(f, unpack=True, usecols=[0,1,2])
+
+        self.gmf = gmf
+        self.nbin_low = nbin_low 
+        self.nbin_high = nbin_high 
+        self.nbins = np.concatenate([nbin_low, [nbin_high[-1]]])
+        return None
+
+    def _n_mock(self, name): 
+        ''' Given name of mock return n_mock. 
+        '''
+        if 'manodeep' in name:
+            n_mock = 200 
+        else: 
+            raise ValueError
+        return n_mock 
+    
+    def _file_name(self, name, ireal, ibox): 
+        ''' Messy code for dealing with all the different file names 
+        '''
+        if 'manodeep' not in name: # patchy mocks now are computed using Nbodykit 
+            raise NotImplementedError 
+        if ireal < 1 or ireal > 50: 
+            raise ValueError('only realization between 1-50')
+        f = ''.join(['out2_40', str(ireal).zfill(2), '_irot_', str(ibox), 
+            '_gmf_geometry_binned.dat']) 
+        return f 
+
+
 class Pk: 
     def __init__(self):
         ''' Pk object
