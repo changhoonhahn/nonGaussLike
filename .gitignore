@@ -7,3 +7,4 @@ run/*
 .ipynb_checkpoints/
 *hdf5
 *.o7*
+*.o

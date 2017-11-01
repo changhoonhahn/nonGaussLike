@@ -1,11 +1,11 @@
 #!/bin/bash -l 
 #SBATCH -p regular 
 #SBATCH -N 1 
-#SBATCH -t 06:00:00 
+#SBATCH -t 02:00:00 
 #SBATCH -J patchy_nbkt_pk_sgc_501_600 
-#SBATCH -o patchy_nbkt_pk_sgc_501_600.o%j 
+#SBATCH -o patchy_nbkt_pk_sgc_501_600.o 
 #SBATCH -L SCRATCH,project 
 
-source /usr/common/contrib/bccp/conda-activate.sh 2.7 
+source /usr/common/contrib/bccp/conda-activate.sh 3.6 
 
 srun -n 1 -c 1 python /global/homes/c/chahah/projects/nonGaussLike/nongausslike/run/run_pk.py 501 600 sgc
