@@ -60,7 +60,7 @@ def lnL_ica(delta_pk, Pk):
         x_obv = np.zeros(delta_pk.shape)
         for i_obv in range(delta_pk.shape[0]):
             x_obv[i_obv,:] = np.dot(np.dot(delta_pk[i_obv,:], W), W_ica)
-        p_Xica = np.zeros(pk_obv.shape[0]) 
+        p_Xica = np.zeros(delta_pk.shape[0]) 
 
     for i in range(X_ica.shape[1]):
         if len(delta_pk.shape) == 1: 
@@ -94,7 +94,7 @@ def lnL_pca_gauss(delta_pk, Pk):
     if len(delta_pk.shape) == 1: 
         x_obv = np.dot(delta_pk, W_pca) 
     else: 
-        x_obv = np.zeros(pk_obv.shape)
+        x_obv = np.zeros(delta_pk.shape)
         for i_obv in range(delta_pk.shape[0]):
             x_obv[i_obv, :] = np.dot(delta_pk[i_obv,:], W_pca)
     return np.log(ggg.pdf(x_obv))
@@ -114,7 +114,7 @@ def lnL_pca(delta_pk, Pk):
     X, mu_X = meansub(Pk) # mean subtract
     X_pca, W_pca = whiten(X, method='pca') # whitened data
     
-    if len(dleta_pk.shape) == 1: 
+    if len(delta_pk.shape) == 1: 
         # PCA transform delta_pk 
         x_obv = np.dot(delta_pk, W_pca) 
         p_Xpca = 0. 
@@ -275,6 +275,31 @@ def X_gmf(name, n_arr=False):
     if n_arr:
         return gmfs, geemf.nbins
     return gmfs 
+
+
+def X_pk(mock, ell=0, krange=None, rebin=None, sys=None, k_arr=False): 
+    ''' Construct data matrix X from P(k) measures of mock catalogs.
+    
+    X_i = P(k)_i 
+
+    X has N_mock x N_k dimensions. 
+    '''
+    pkay = Data.Pk() # read in P(k) data 
+    n_mock = pkay._n_mock(mock) 
+    for i in range(1, n_mock+1):  
+        pkay.Read(mock, i, ell=ell, sys=sys) 
+        pkay.krange(krange)
+        if rebin is None: 
+            k, pk = pkay.k, pkay.pk
+        else: 
+            k, pk, _ = pkay.rebin(rebin)
+
+        if i == 1: 
+            pks = np.zeros((n_mock, len(k)))
+        pks[i-1,:] = pk 
+    if k_arr:
+        return pks, k
+    return pks
 
 
 def dataX(mock, ell=0, krange=None, rebin=None, sys=None, k_arr=False): 

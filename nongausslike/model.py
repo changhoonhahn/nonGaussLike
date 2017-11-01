@@ -2,7 +2,7 @@
 '''
 import ctypes
 import numpy as np
-
+import util as UT 
 
 lib_z1 = ctypes.CDLL("Ccode/library_combined_win_local_z1.so")
     

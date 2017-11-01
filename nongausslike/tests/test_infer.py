@@ -8,6 +8,7 @@ import util as UT
 import data as Dat
 import model as Mod
 import infer as Inf
+import nongauss as NG
 
 from ChangTools.plotting import prettycolors
 import matplotlib as mpl 
@@ -23,6 +24,49 @@ mpl.rcParams['ytick.labelsize'] = 'x-large'
 mpl.rcParams['ytick.major.size'] = 5
 mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
+
+
+def importance_weight():  
+    '''
+    '''
+    # read in BOSS P(k) (read in data D) 
+    k_list, pk_ngc_data = [], []
+    for ell in [0,2,4]: 
+        k, plk_ngc = Inf.data(ell, 1, 'ngc')
+        k_list.append(k)
+        pk_ngc_data.append(plk_ngc)
+    binrange1, binrange2, binrange3 = len(k_list[0]), len(k_list[1]), len(k_list[2])
+    maxbin1 = len(k_list[0])+1
+    k = np.concatenate(k_list)
+    
+    chain = Inf.mcmc_chains('beutler_z1')
+    
+    # calculate D - m(theta) for all the mcmc chain
+    delta_ngc = []
+    for i in range(10):#len(chain['chi2'])): 
+        model_i = Mod.taruya_model(100, binrange1, binrange2, binrange3, maxbin1, k, 
+                chain['alpha_perp'][i], chain['alpha_para'][i], 
+                chain['fsig8'][i], 
+                chain['b1sig8_NGC'][i], chain['b1sig8_SGC'][i], 
+                chain['b2sig8_NGC'][i], chain['b2sig8_SGC'][i], 
+                chain['N_NGC'][i], chain['N_SGC'][i], 
+                chain['sigmav_NGC'][i], chain['sigmav_SGC'][i])
+        delta_ngc.append(model_i[0] - np.concatenate(pk_ngc_data))
+        
+    # import PATCHY mocks 
+    pk_ngc_list = [] 
+    for ell in [0, 2, 4]:
+        if ell == 4: kmax = 0.1 
+        else: kmax = 0.15
+        pk_ngc_list.append(NG.X_pk('patchy.ngc.z1', krange=[0.01,kmax], ell=ell, sys='fc'))
+    pk_ngc_mock = np.concatenate(pk_ngc_list, axis=1) 
+
+    lnP_ica_ngc = NG.lnL_ica(np.array(delta_ngc), pk_ngc_mock) 
+    lnP_pca_ngc = NG.lnL_pca(np.array(delta_ngc), pk_ngc_mock) 
+    
+    lnw_ngc = lnP_ica_ngc - lnP_pca_ngc
+    print  np.exp(lnw_ngc)
+    return None
 
 
 def model():
@@ -235,5 +279,6 @@ def plot_mcmc(tag=None, zbin=1, nwalkers=48, nchains_burn=200):
 
 
 if __name__=="__main__":
-    lnPost()
+    importance_weight()
+    #lnPost()
     #plot_mcmc(tag='beutler', zbin=1, nwalkers=48, nchains_burn=200) #tag=testing, zbin=1)
