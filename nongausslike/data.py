@@ -22,6 +22,19 @@ class Gmf:
         self.nbins = None 
         self.gmf = None 
 
+    def Observation(self): 
+        ''' Read in gmf(N) measurements of SDSS Mr < -19 from Manodeep  
+        '''
+        f = ''.join([UT.dat_dir(), 'manodeep/sdss_Mr19_fib0_gmf_northonly.dat'])
+        nbin_low, nbin_high, gmf = np.loadtxt(f, unpack=True, usecols=[0,1,2])
+        nbins = np.concatenate([nbin_low, [nbin_high[-1]]])
+
+        self.nbin_low_obv = nbin_low
+        self.nbin_high_obv = nbin_high
+        self.nbin_obv = nbins
+        self.gmf_obv = gmf
+        return nbins, gmf 
+
     def Read(self, name, ireal, ibox): 
         ''' Read in ireal-th realization and ibox-th box mock catalog 
         from run-th run. 
@@ -63,6 +76,27 @@ class Pk:
         self.k = None 
         self.pk = None 
         self.counts = None 
+
+    def Observation(self, ell, zbin, nors):
+        ''' Read in P(k) measurements of BOSS from Florian
+        '''
+        if ell == 0:
+            str_pole = 'mono'
+        elif ell == 2:
+            str_pole = 'quadru'
+        elif ell == 4:
+            str_pole = 'hexadeca'
+        str_pole += 'pole'
+
+        f = ''.join([UT.dat_dir(), 'Beutler/public_material_RSD/',
+            'Beutleretal_pk_', str_pole, '_DR12_', nors.upper(), '_z', str(zbin), 
+            '_prerecon_120.dat'])
+        k_central, k_mean, pk = np.loadtxt(f, skiprows=31, unpack=True, usecols=[0,1,2])
+        self.k_obv = k_central 
+        self.k_mean_obv = k_mean 
+        self.k_central_obv = k_central 
+        self.pk_obv = pk
+        return k_central, pk 
 
     def Read(self, name, i, ell=0, sys=None): 
         ''' Read in the i th mock catalog P(k) 

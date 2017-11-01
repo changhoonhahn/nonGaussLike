@@ -18,9 +18,10 @@ def importance_weight(tag, chain, **kwargs):
 
         # read in BOSS P(k) (read in data D) 
         k_list, pk_ngc_data, pk_sgc_data = [], [], []
+        pkay = Dat.Pk()
         for ell in [0,2,4]: 
-            k, plk_ngc = data(ell, kwargs['zbin'], 'ngc')
-            _, plk_sgc = data(ell, kwargs['zbin'], 'sgc')
+            k, plk_ngc = pkay.Observation(ell, kwargs['zbin'], 'ngc')
+            _, plk_sgc = pkay.Observation(ell, kwargs['zbin'], 'sgc')
             k_list.append(k)
             pk_ngc_data.append(plk_ngc)
             pk_sgc_data.append(plk_sgc)
@@ -103,24 +104,6 @@ def mcmc_chains(tag):
     else: 
         raise ValueError
     return chain_dict 
-
-
-def data(ell, zbin, nors): 
-    ''' Read in P(k) measurements of BOSS from Florian  
-    '''
-    if ell == 0:
-        str_pole = 'mono'
-    elif ell == 2:
-        str_pole = 'quadru'
-    elif ell == 4:
-        str_pole = 'hexadeca'
-    str_pole += 'pole'
-
-    fname = ''.join([UT.dat_dir(), 'Beutler/public_material_RSD/',
-        'Beutleretal_pk_', str_pole, '_DR12_', nors.upper(), '_z', str(zbin), 
-        '_prerecon_120.dat'])
-    k_central, k_mean, pk = np.loadtxt(fname, skiprows=31, unpack=True, usecols=[0,1,2])
-    return k_central, pk 
 
 
 def lnPrior(theta):
@@ -209,15 +192,16 @@ def mcmc(tag=None, zbin=1, nwalkers=48, Nchains=4, minlength=600):
     temperature = 2.e-3 # temperature
 
     # read in BOSS P(k) NGC
-    k0, p0k_ngc = data(0, zbin, 'ngc')
-    k2, p2k_ngc = data(2, zbin, 'ngc')
-    k4, p4k_ngc = data(4, zbin, 'ngc')
+    pkay = Dat.Pk()
+    k0, p0k_ngc = pkay.Observation(0, zbin, 'ngc')
+    k2, p2k_ngc = pkay.Observation(2, zbin, 'ngc')
+    k4, p4k_ngc = pkay.Observation(4, zbin, 'ngc')
     pk_ngc_list = [p0k_ngc, p2k_ngc, p4k_ngc]
     k_list = [k0, k2, k4]
     # read in BOSS P(k) SGC
-    k0, p0k_sgc = data(0, zbin, 'sgc')
-    k2, p2k_sgc = data(2, zbin, 'sgc')
-    k4, p4k_sgc = data(4, zbin, 'sgc')
+    k0, p0k_sgc = pkay.Observation(0, zbin, 'sgc')
+    k2, p2k_sgc = pkay.Observation(2, zbin, 'sgc')
+    k4, p4k_sgc = pkay.Observation(4, zbin, 'sgc')
     pk_sgc_list = [p0k_sgc, p2k_sgc, p4k_sgc]
 
     # read in Covariance matrix 

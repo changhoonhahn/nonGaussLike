@@ -27,32 +27,32 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
-def Gmf_i(name): 
-    ''' ***TESTED -- Oct 31 2017***
-    test of reading in GMF
+def Gmf_SDSS_mock(name): 
+    ''' ***TESTED -- Oct 31, 2017***
+    Compare mock GMFs with the measured SDSS GMF 
     '''
     # mocks
     geemf = Data.Gmf() 
     n_mock = geemf._n_mock(name) 
-    i_sample = np.random.choice(range(1,n_mock+1), 5, replace=False) 
+    i_sample = np.random.choice(range(1,n_mock+1), 10, replace=False) 
     
     fig = plt.figure(figsize=(8,8)) 
     sub = fig.add_subplot(111) 
     for i in i_sample: 
         ibox = i % 4
         ireal = int((i - ibox)/4)+1
-        print i, ibox, ireal 
         geemf.Read(name, ireal, ibox) 
         xx, yy = UT.bar_plot(geemf.nbins, geemf.gmf)
         sub.plot(xx, yy) 
+    nbins, gmf = geemf.Observation() 
+    sub.scatter(0.5*(nbins[1:]+nbins[:-1]), gmf, lw=0, c='k', s=40) 
     
     sub.set_xlim([0, np.max(geemf.nbins)])
     sub.set_xlabel('$N$', fontsize=25)
     sub.set_ylabel('$\zeta (N)$', fontsize=25)
     sub.set_yscale('log') 
-    
-    plt.show()
-    return None
+    fig.savefig(''.join([UT.fig_dir(), 'tests/gmf_SDSS_mock.png']), bbox_inches='tight') 
+    return None 
 
 
 def Plk_BOSS_Patchy(zbin): 
@@ -465,7 +465,7 @@ def _patchyPk_outlier(zbin, ell=0):
 
 
 if __name__=="__main__":
-    Gmf_i('manodeep.run2')
+    Gmf_SDSS_mock('manodeep.run1')
     #beutler_patchy_Cov(1, ell=0, NorS='ngc')
     #Beutler_BOSS_Plk(1)
     #for ell in [0, 2, 4]:

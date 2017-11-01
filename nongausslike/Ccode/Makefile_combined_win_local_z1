@@ -1,0 +1,8 @@
+CC=g++
+
+library_combined_win_local_z1.so: taruya_model_combined_win_local_z1.o
+	$(CC) -shared -o library_combined_win_local_z1.so taruya_model_combined_win_local_z1.o
+	rm -f *.o
+
+taruya_model_combined_win_local_z1.o: taruya_model_combined_win_local_z1.cpp
+	$(CC) -shared -c -fPIC taruya_model_combined_win_local_z1.cpp -o taruya_model_combined_win_local_z1.o

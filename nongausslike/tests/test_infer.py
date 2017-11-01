@@ -1,5 +1,6 @@
 '''
 '''
+import time
 import numpy as np 
 import corner as DFM
 
@@ -30,9 +31,10 @@ def importance_weight():
     '''
     '''
     # read in BOSS P(k) (read in data D) 
+    pkay = Dat.Pk() 
     k_list, pk_ngc_data = [], []
     for ell in [0,2,4]: 
-        k, plk_ngc = Inf.data(ell, 1, 'ngc')
+        k, plk_ngc = pkay.Observation(ell, 1, 'ngc')
         k_list.append(k)
         pk_ngc_data.append(plk_ngc)
     binrange1, binrange2, binrange3 = len(k_list[0]), len(k_list[1]), len(k_list[2])
@@ -82,19 +84,22 @@ def model():
     binrange2 = int(0.5*(maxbin2-minbin2))
     binrange3 = int(0.5*(maxbin3-minbin3))
     totbinrange = binrange1+binrange2+binrange3
-
-    k0, p0k = Inf.data(0, 1, 'ngc')
-    k2, p2k = Inf.data(2, 1, 'ngc')
-    k4, p4k = Inf.data(4, 1, 'ngc')
+    
+    pkay = Dat.Pk() 
+    k0, p0k = pkay.Observation(0, 1, 'ngc')
+    k2, p2k = pkay.Observation(2, 1, 'ngc')
+    k4, p4k = pkay.Observation(4, 1, 'ngc')
     k = np.concatenate([k0, k2, k4])
 
     # alpha_perp, alpha_para, fsig8, b1NGCsig8, b1SGCsig8, b2NGCsig8, b2SGCsig8, NNGC, NSGC, sigmavNGC, sigmavSGC
     #value_array = [1.008, 1.001, 0.478, 1.339, 1.337, 1.16, 1.16, -1580., -1580., 6.1, 6.1]
     value_array = [1.008, 1.001, 0.478, 1.339, 1.337, 1.16, 0.32, -1580., -930., 6.1, 6.8]
     #value_array = [1.00830111426, 1.0007368972, 0.478098423689, 1.33908539185, 1.33663505549, 1.15627984704, 0.31657562682, -1580.01689181, -928.488535962, 6.14815801563, 6.79551199595] #z1 max likelihood
-    modelX = Mod.taruya_model_module_combined_win_local(100, binrange1, binrange2, binrange3, maxbin1/binsize, 
+    t_start = time.time() 
+    modelX = Mod.taruya_model(100, binrange1, binrange2, binrange3, maxbin1/binsize, 
             k, value_array[0], value_array[1], value_array[2], value_array[3], value_array[4], value_array[5], 
             value_array[6], value_array[7], value_array[8], value_array[9], value_array[10])
+    print time.time() - t_start, ' seconds'
     model_ngc = modelX[0]
     model_sgc = modelX[1]
 
@@ -121,10 +126,10 @@ def model():
     sub.set_ylim([-750, 2250])
     sub.set_xlabel('$k$', fontsize=25) 
     sub.set_ylabel('$k \, P_{\ell}(k)$', fontsize=25) 
-
-    k0, p0k = Inf.data(0, 1, 'sgc')
-    k2, p2k = Inf.data(2, 1, 'sgc')
-    k4, p4k = Inf.data(4, 1, 'sgc')
+    
+    k0, p0k = pkay.Observation(0, 1, 'sgc')
+    k2, p2k = pkay.Observation(2, 1, 'sgc')
+    k4, p4k = pkay.Observation(4, 1, 'sgc')
     k = np.concatenate([k0, k2, k4])
     
     sub = fig.add_subplot(122)
@@ -171,12 +176,13 @@ def lnPost(zbin=1):
     sample = sample[:,1:-1]
 
     # read in BOSS P(k) NGC + SGC
-    k0, p0k_ngc = Inf.data(0, zbin, 'ngc')
-    k2, p2k_ngc = Inf.data(2, zbin, 'ngc')
-    k4, p4k_ngc = Inf.data(4, zbin, 'ngc')
-    k0, p0k_sgc = Inf.data(0, zbin, 'sgc')
-    k2, p2k_sgc = Inf.data(2, zbin, 'sgc')
-    k4, p4k_sgc = Inf.data(4, zbin, 'sgc')
+    pkay = Dat.Pk() 
+    k0, p0k_ngc = pkay.Observation(0, zbin, 'ngc')
+    k2, p2k_ngc = pkay.Observation(2, zbin, 'ngc')
+    k4, p4k_ngc = pkay.Observation(4, zbin, 'ngc')
+    k0, p0k_sgc = pkay.Observation(0, zbin, 'sgc')
+    k2, p2k_sgc = pkay.Observation(2, zbin, 'sgc')
+    k4, p4k_sgc = pkay.Observation(4, zbin, 'sgc')
     k_list = [k0, k2, k4]
     pk_ngc_list = [p0k_ngc, p2k_ngc, p4k_ngc]
     pk_sgc_list = [p0k_sgc, p2k_sgc, p4k_sgc]
@@ -279,6 +285,7 @@ def plot_mcmc(tag=None, zbin=1, nwalkers=48, nchains_burn=200):
 
 
 if __name__=="__main__":
-    importance_weight()
+    model() 
+    #importance_weight()
     #lnPost()
     #plot_mcmc(tag='beutler', zbin=1, nwalkers=48, nchains_burn=200) #tag=testing, zbin=1)
