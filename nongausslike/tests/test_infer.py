@@ -67,7 +67,7 @@ def importance_weight():
     lnP_pca_ngc = NG.lnL_pca(np.array(delta_ngc), pk_ngc_mock) 
     
     lnw_ngc = lnP_ica_ngc - lnP_pca_ngc
-    print  np.exp(lnw_ngc)
+    print(np.exp(lnw_ngc))
     return None
 
 
@@ -99,7 +99,7 @@ def model():
     modelX = Mod.taruya_model(100, binrange1, binrange2, binrange3, maxbin1/binsize, 
             k, value_array[0], value_array[1], value_array[2], value_array[3], value_array[4], value_array[5], 
             value_array[6], value_array[7], value_array[8], value_array[9], value_array[10])
-    print time.time() - t_start, ' seconds'
+    print(time.time() - t_start, ' seconds')
     model_ngc = modelX[0]
     model_sgc = modelX[1]
 
@@ -207,9 +207,9 @@ def lnPost(zbin=1):
     lnpost_args = (k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc)
     
     for i in range(10): 
-        print 'Like', -2.*Inf.lnLike(sample[i,:], *lnpost_args)
-        print 'Post', -2.*Inf.lnPost(sample[i,:], *lnpost_args)
-        print 'chi2', chi2s[i]
+        print('Like', -2.*Inf.lnLike(sample[i,:], *lnpost_args))
+        print('Post', -2.*Inf.lnPost(sample[i,:], *lnpost_args))
+        print('chi2', chi2s[i])
     return None
 
 
@@ -238,8 +238,8 @@ def plot_mcmc(tag=None, zbin=1, nwalkers=48, nchains_burn=200):
         chain_file = ''.join([UT.dat_dir(), 'mcmc/', tag, '.chain', str(0), 
             '.zbin', str(zbin), '.dat']) 
         sample = np.loadtxt(chain_file)
-    print len(labels)
-    print sample.shape
+    print(len(labels))
+    print(sample.shape)
     
     # Posterior Likelihood Corner Plot
     fig = DFM.corner(

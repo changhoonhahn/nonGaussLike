@@ -10,8 +10,6 @@ import tarfile
 # -- local -- 
 import util as UT
 
-from ChangTools.fitstables import mrdfits
-
 
 class Gmf: 
     def __init__(self):
@@ -136,9 +134,9 @@ class Pk:
                 cnt += 1 
                 continue 
         if cnt == 0: 
-            print fname 
-            print 'not in ' 
-            print self._tarfile(name)
+            print(fname)
+            print('not in ')
+            print(self._tarfile(name))
             raise ValueError
         f = tar.extractfile(member)
         return f 
@@ -153,7 +151,7 @@ class Pk:
             raise ValueError("what am I rebinning") 
         if pk_arr is not None: 
             if self.k is not None: 
-                print "Pk object already has k, Pk, and count. They will be ignored."
+                print("Pk object already has k, Pk, and count. They will be ignored.")
             k = pk_arr[0] 
             pk = pk_arr[1] 
             counts = pk_arr[2]
@@ -382,9 +380,9 @@ def _patchyCov(zbin, NorS='ngc', ell=0, clobber=False):
             except IOError: 
                 if i == 1: 
                     raise ValueError
-                print 'missing -- ', pkay._file_name(catalog, i, 'fc')
+                print('missing -- ', pkay._file_name(catalog, i, 'fc'))
                 n_missing += 1 
-        print n_missing 
+        print(n_missing)
         n_mock -= n_missing
         if n_missing > 0: # just a way to deal with missing  
             pks = pks[:n_mock,:]
