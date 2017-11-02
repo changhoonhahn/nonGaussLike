@@ -255,7 +255,6 @@ def Pk_NBKT_boss(zbin, NorS='ngc'):
     randoms = randoms[randoms['Selection']]
     data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)
     data = data[data['Selection']]
-    print(np.min(np.array(data['Z'])), np.max(np.array(data['Z'])))
     
     # impose fiducial BOSS DR12 cosmology
     cosmo = cosmology.Cosmology(H0=67.6, Om0=0.31, flat=True)

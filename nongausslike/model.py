@@ -1,10 +1,11 @@
 '''
 '''
+import os 
 import ctypes
 import numpy as np
 import util as UT 
-
-lib_z1 = ctypes.CDLL("Ccode/library_combined_win_local_z1.so")
+dir = os.path.dirname(os.path.abspath(__file__))
+lib_z1 = ctypes.CDLL(dir+"/Ccode/library_combined_win_local_z1.so")
     
 
 def taruya_model(mubins, binrange1, binrange2, binrange3, maxbin1, x, alpha_perp, alpha_para, fsig8, b1NGCsig8, b1SGCsig8, b2NGCsig8, b2SGCsig8, NNGC, NSGC, sigmavNGC, sigmavSGC):

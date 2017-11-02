@@ -76,20 +76,20 @@ def Plk_BOSS_Patchy(zbin, NorS):
         k_beu.append(k_beut) 
     
     # read in Nbodykit P(k) (using Nick's estimator) 
-    f_nbkt = ''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']) 
+    f_nbkt = ''.join([UT.catalog_dir('boss'), 'pk.nbodykit.', NorS, '.zbin', str(zbin), '.dat']) 
     k_nbkt, p0kk, p2kk, p4kk = np.loadtxt(f_nbkt, skiprows=26, unpack=True, usecols=[0, 1, 2, 3]) 
     pk_nbkt = [p0kk, p2kk, p4kk]
 
     # read in the PATCHY mocks
     pkay = Data.Pk() 
-    n_mock = pkay._n_mock('patchy.ngc.z'+str(zbin)) 
+    n_mock = pkay._n_mock('patchy.z'+str(zbin)) 
     k_patchy, pk_patchy, var_patchy = [], [], []
 
     for ell in [0,2,4]: 
         n_missing, i_mock = 0, 0 
         for i in range(1,n_mock+1):
             try: 
-                pkay.Read('patchy.ngc.z'+str(zbin), i, ell=ell, NorS='ngc', sys='fc')
+                pkay.Read('patchy.z'+str(zbin), i, ell=ell, NorS=NorS, sys='fc')
                 k = pkay.k
                 pk = pkay.pk
                 n_kbin = len(k) 
@@ -100,7 +100,7 @@ def Plk_BOSS_Patchy(zbin, NorS):
             except IOError: 
                 if i == 1: 
                     raise ValueError
-                print ('missing -- ', pkay._file_name('patchy.ngc.z'+str(zbin), i, 'fc'))
+                print ('missing -- ', pkay._file_name('patchy.', NorS, '.z'+str(zbin), i, 'fc'))
                 n_missing += 1 
             i_mock += 1
         n_mock -= n_missing
@@ -136,78 +136,8 @@ def Plk_BOSS_Patchy(zbin, NorS):
     sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
     sub.set_ylabel('$\mathtt{k \, P_{\ell}(k)}$', fontsize=25) 
     sub.legend(loc='upper right') 
-    fig.savefig(''.join([UT.fig_dir(), 'plk.boss_patchy.z', str(zbin), '.comparison.png']), bbox_inches='tight') 
-    return None 
-
-
-def Beutler_BOSS_Plk(zbin): 
-    ''' Compare the powerspectrum calculated using Roman's estimator, 
-    Florian's P(k)s, and P(K) from nbodykit
-    '''
-    if zbin == 1: 
-        f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox2800.Ngrid360.O4intp.P010000.fc.z1']) 
-    elif zbin == 2: 
-        f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox3200.Ngrid410.O4intp.P010000.fc.z2']) 
-    elif zbin == 3: 
-        f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox3800.Ngrid490.O4intp.P010000.fc.z3']) 
-
-    k_boss, p0k, p2k, p4k, counts = np.loadtxt(f_boss, unpack=True, usecols=[0, 5, 2, 3, -2]) # k, p0(k), and number of modes 
-
-    # read in Florian's P(k) 
-    ks, pks = [], [] 
-    for ell in [0, 2, 4]: 
-        if ell == 0: 
-            pole = 'monopole'
-        elif ell == 2: 
-            pole = 'quadrupole'
-        elif ell == 4: 
-            pole = 'hexadecapole'
-        f_beut = ''.join([UT.dat_dir()+'Beutler/public_material_RSD/Beutleretal_pk_', pole, 
-            '_DR12_NGC_z', str(zbin), '_prerecon_120.dat'])
-        k_beut, plk = np.loadtxt(f_beut, skiprows=31, unpack=True, usecols=[1,2]) 
-        pks.append(plk)
-        ks.append(k_beut) 
-
-    # read in Nbodykit P(k) (using Nick's estimator) 
-    f_nbkt = ''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']) 
-    k_nbkt, p0kk, p2kk, p4kk = np.loadtxt(f_nbkt, skiprows=26, unpack=True, usecols=[0, 1, 2, 3]) 
-    pk_nbkt = [p0kk, p2kk, p4kk]
-
-    prettyplot()
-    fig = plt.figure(figsize=(21, 8))
-    sub = fig.add_subplot(131) # monopole comparison 
-    sub.plot(k_boss, p0k) 
-    sub.plot(ks[0], pks[0], label='Beutler+') 
-    sub.plot(k_nbkt, pk_nbkt[0], label='nbodykit') 
-    sub.set_xscale('log') 
-    sub.set_yscale('log') 
-    sub.set_xlim([0.01, 0.15]) 
-    sub.set_ylim([5e3, 1.5e5]) 
-    sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
-    sub.set_ylabel('$\mathtt{P_0(k)}$', fontsize=25) 
-    sub.legend(loc='upper right') 
-
-    sub = fig.add_subplot(132) # quadrupole comparison 
-    sub.plot(k_boss, p2k) 
-    sub.plot(ks[1], pks[1]) 
-    sub.plot(k_nbkt, pk_nbkt[1]) 
-    sub.set_xscale('log') 
-    sub.set_yscale('log') 
-    sub.set_xlim([0.01, 0.15]) 
-    sub.set_ylim([1e3, 5e4]) 
-    sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
-    sub.set_ylabel('$\mathtt{P_2(k)}$', fontsize=25) 
-
-    sub = fig.add_subplot(133) # quadrupole comparison 
-    sub.plot(k_boss, p4k) 
-    sub.plot(ks[2], pks[2]) 
-    sub.plot(k_nbkt, pk_nbkt[2]) 
-    sub.set_xscale('log') 
-    sub.set_yscale('log') 
-    sub.set_xlim([0.01, 0.15]) 
-    sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
-    sub.set_ylabel('$\mathtt{P_4(k)}$', fontsize=25) 
-    fig.savefig(''.join([UT.fig_dir(), 'plk.boss.z', str(zbin), '.comparison.png']), bbox_inches='tight') 
+    fig.savefig(''.join([UT.fig_dir(), 
+        'plk.boss_patchy.', NorS, '.z', str(zbin), '.comparison.png']), bbox_inches='tight') 
     return None 
 
 
@@ -217,7 +147,6 @@ def beutler_patchy_Cov(zbin, ell=0, NorS='ngc'):
     _,_,C_patchy = Data.patchyCov(zbin, NorS=NorS, ell=ell)
     _,_,C_beutler = Data.beutlerCov(zbin, NorS=NorS, ell=ell)
     
-    prettyplot()
     fig = plt.figure(figsize=(21, 8))
     sub = fig.add_subplot(131)
     im = sub.imshow(np.log10(C_patchy), interpolation='none')
@@ -247,7 +176,6 @@ def beutler_patchy_Cov_diag(zbin, NorS='ngc', ell=0, clobber=False):
     ki_pat,kj_pat,C_patchy = Data.patchyCov(zbin, NorS=NorS, ell=ell, clobber=clobber)
     ki_beu,kj_beu,C_beutler = Data.beutlerCov(zbin, NorS=NorS, ell=ell)
 
-    prettyplot()
     fig = plt.figure(figsize=(10, 8))
     sub = fig.add_subplot(111)
     
@@ -453,8 +381,84 @@ def _patchyPk_outlier(zbin, ell=0):
     return None 
 
 
+"""
+    def Beutler_BOSS_Plk(zbin): 
+        ''' Compare the powerspectrum calculated using Roman's estimator, 
+        Florian's P(k)s, and P(K) from nbodykit
+        '''
+        if zbin == 1: 
+            f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox2800.Ngrid360.O4intp.P010000.fc.z1']) 
+        elif zbin == 2: 
+            f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox3200.Ngrid410.O4intp.P010000.fc.z2']) 
+        elif zbin == 3: 
+            f_boss = ''.join([UT.catalog_dir('boss'), 'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox3800.Ngrid490.O4intp.P010000.fc.z3']) 
+
+        k_boss, p0k, p2k, p4k, counts = np.loadtxt(f_boss, unpack=True, usecols=[0, 5, 2, 3, -2]) # k, p0(k), and number of modes 
+
+        # read in Florian's P(k) 
+        ks, pks = [], [] 
+        for ell in [0, 2, 4]: 
+            if ell == 0: 
+                pole = 'monopole'
+            elif ell == 2: 
+                pole = 'quadrupole'
+            elif ell == 4: 
+                pole = 'hexadecapole'
+            f_beut = ''.join([UT.dat_dir()+'Beutler/public_material_RSD/Beutleretal_pk_', pole, 
+                '_DR12_NGC_z', str(zbin), '_prerecon_120.dat'])
+            k_beut, plk = np.loadtxt(f_beut, skiprows=31, unpack=True, usecols=[1,2]) 
+            pks.append(plk)
+            ks.append(k_beut) 
+
+        # read in Nbodykit P(k) (using Nick's estimator) 
+        f_nbkt = ''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']) 
+        k_nbkt, p0kk, p2kk, p4kk = np.loadtxt(f_nbkt, skiprows=26, unpack=True, usecols=[0, 1, 2, 3]) 
+        pk_nbkt = [p0kk, p2kk, p4kk]
+
+        prettyplot()
+        fig = plt.figure(figsize=(21, 8))
+        sub = fig.add_subplot(131) # monopole comparison 
+        sub.plot(k_boss, p0k) 
+        sub.plot(ks[0], pks[0], label='Beutler+') 
+        sub.plot(k_nbkt, pk_nbkt[0], label='nbodykit') 
+        sub.set_xscale('log') 
+        sub.set_yscale('log') 
+        sub.set_xlim([0.01, 0.15]) 
+        sub.set_ylim([5e3, 1.5e5]) 
+        sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
+        sub.set_ylabel('$\mathtt{P_0(k)}$', fontsize=25) 
+        sub.legend(loc='upper right') 
+
+        sub = fig.add_subplot(132) # quadrupole comparison 
+        sub.plot(k_boss, p2k) 
+        sub.plot(ks[1], pks[1]) 
+        sub.plot(k_nbkt, pk_nbkt[1]) 
+        sub.set_xscale('log') 
+        sub.set_yscale('log') 
+        sub.set_xlim([0.01, 0.15]) 
+        sub.set_ylim([1e3, 5e4]) 
+        sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
+        sub.set_ylabel('$\mathtt{P_2(k)}$', fontsize=25) 
+
+        sub = fig.add_subplot(133) # quadrupole comparison 
+        sub.plot(k_boss, p4k) 
+        sub.plot(ks[2], pks[2]) 
+        sub.plot(k_nbkt, pk_nbkt[2]) 
+        sub.set_xscale('log') 
+        sub.set_yscale('log') 
+        sub.set_xlim([0.01, 0.15]) 
+        sub.set_xlabel('$\mathtt{k}$', fontsize=25) 
+        sub.set_ylabel('$\mathtt{P_4(k)}$', fontsize=25) 
+        fig.savefig(''.join([UT.fig_dir(), 'plk.boss.z', str(zbin), '.comparison.png']), bbox_inches='tight') 
+        return None 
+"""
+
+
 if __name__=="__main__":
-    Gmf_SDSS_mock('manodeep.run1')
+    for ell in [0,2,4]: 
+        beutler_patchy_Cov_diag(1, NorS='ngc', ell=ell)
+        beutler_patchy_Cov_diag(1, NorS='sgc', ell=ell)
+    #Gmf_SDSS_mock('manodeep.run1')
     #beutler_patchy_Cov(1, ell=0, NorS='ngc')
     #Beutler_BOSS_Plk(1)
     #for ell in [0, 2, 4]:

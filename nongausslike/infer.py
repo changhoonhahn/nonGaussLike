@@ -16,7 +16,7 @@ def importance_weight(tag, chain, **kwargs):
         if 'zbin' not in kwargs.keys(): 
             raise ValueError('specify zbin in kwargs') 
 
-        # read in BOSS P(k) (read in data D) 
+        # read in BOSS P(k) (data D) 
         k_list, pk_ngc_data, pk_sgc_data = [], [], []
         pkay = Dat.Pk()
         for ell in [0,2,4]: 
@@ -25,35 +25,35 @@ def importance_weight(tag, chain, **kwargs):
             k_list.append(k)
             pk_ngc_data.append(plk_ngc)
             pk_sgc_data.append(plk_sgc)
+        pk_ngc_data = np.concatenate(pk_ngc_data)
+        pk_sgc_data = np.concatenate(pk_sgc_data)
 
         binrange1, binrange2, binrange3 = len(k_list[0]), len(k_list[1]), len(k_list[2])
         maxbin1 = len(k_list[0])+1
         k = np.concatenate(k_list)
         
         # calculate D - m(theta) for all the mcmc chain
-        delta_ngc, delta_sgc = [], [] 
-        for i in range(len(chain['chi2'])): 
-            delta_ngc.append(chain['pk_ngc'][i,:] - np.concatenate(pk_ngc_data))
-            delta_sgc.append(chain['pk_sgc'][i,:] - np.concatenate(pk_sgc_data))
+        delta_ngc = chain['pk_ngc'] = pk_ngc_data
+        delta_sgc = chain['pk_sgc'] = pk_sgc_data
 
         # import PATCHY mocks 
         pk_ngc_list, pk_sgc_list = [], [] 
         for ell in [0, 2, 4]:
             if ell == 4: kmax = 0.1 
             else: kmax = 0.15
-            pk_ngc_list.append(NG.X_pk('patchy.ngc.z'+str(zbin), 
+            pk_ngc_list.append(NG.X_pk('patchy.ngc.z'+str(kwargs['zbin']), 
                 krange=[0.01,kmax], ell=ell, sys='fc'))
-            pk_sgc_list.append(NG.X_pk('patchy.sgc.z'+str(zbin), 
+            pk_sgc_list.append(NG.X_pk('patchy.sgc.z'+str(kwargs['zbin']), 
                 krange=[0.01,kmax], ell=ell, sys='fc'))
         pk_ngc_mock = np.concatenate(pk_ngc_list, axis=1) 
         pk_sgc_mock = np.concatenate(pk_sgc_list, axis=1) 
 
     if tag == 'RSD_ica_pca': # P_ICA(D - m(theta)) / P_PCA(D - m(theta))
-        lnP_ica_ngc = NG.lnL_ica(np.array(delta_ngc), pk_ngc_mock) 
-        lnP_pca_ngc = NG.lnL_pca(np.array(delta_ngc), pk_ngc_mock) 
+        lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
+        lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock) 
         
-        lnP_ica_sgc = NG.lnL_ica(np.array(delta_sgc), pk_sgc_mock) 
-        lnP_pca_sgc = NG.lnL_pca(np.array(delta_sgc), pk_sgc_mock) 
+        lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
+        lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
 
         lnw_ngc = lnP_ica_ngc - lnP_pca_ngc
         lnw_sgc = lnP_ica_sgc - lnP_pca_sgc
@@ -61,11 +61,11 @@ def importance_weight(tag, chain, **kwargs):
         return np.exp(lnw_ngc + lnw_sgc)
 
     elif tag == 'RSD_ica_pca_gauss': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
-        lnP_ica_ngc = NG.lnL_ica(np.array(delta_ngc), pk_ngc_mock) 
-        lnP_pca_ngc = NG.lnL_pca_gauss(np.array(delta_ngc), pk_ngc_mock) 
+        lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
+        lnP_pca_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
         
-        lnP_ica_sgc = NG.lnL_ica(np.array(delta_sgc), pk_sgc_mock) 
-        lnP_pca_sgc = NG.lnL_pca_gauss(np.array(delta_sgc), pk_sgc_mock) 
+        lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
+        lnP_pca_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
 
         lnw_ngc = lnP_ica_ngc - lnP_pca_ngc
         lnw_sgc = lnP_ica_sgc - lnP_pca_sgc
@@ -76,18 +76,15 @@ def importance_weight(tag, chain, **kwargs):
         raise ValueError
 
 
-def mcmc_chains(tag): 
+def mcmc_chains(tag, ichain): 
     ''' Given some tag string return mcmc chain in a dictionary 
     '''
     if tag == 'beutler_z1': 
         # read in Florian's RSD MCMC chains  
-        chain_list = []
-        for ichain in range(4): # read in the 4 chains
-            chain_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
-                'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), '.dat']) 
-            sample = np.loadtxt(chain_file, skiprows=1)
-            chain_list.append(sample[:,1:])
-        chain = np.concatenate(chain_list, axis=0)
+        chain_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
+            'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), '.dat']) 
+        chain = np.loadtxt(chain_file, skiprows=1)
+
         labels = ['alpha_perp', 'alpha_para', 'fsig8', 'b1sig8_NGC', 'b1sig8_SGC', 'b2sig8_NGC', 'b2sig8_SGC', 
                 'N_NGC', 'N_SGC', 'sigmav_NGC', 'sigmav_SGC', 'chi2'] 
         chain_dict = {} 
@@ -97,10 +94,12 @@ def mcmc_chains(tag):
         # read in mock evaluations for the chains 
         chain_model_ngc_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
             'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), '.model.ngc.dat']) 
-        chain_model_ngc_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
+        chain_model_sgc_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
             'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), '.model.sgc.dat']) 
-        chain['pk_ngc'] = np.loadtxt(chain_model_ngc_file) 
-        chain['pk_sgc'] = np.loadtxt(chain_model_sgc_file) 
+        pk_ngc = np.loadtxt(chain_model_ngc_file) 
+        pk_sgc = np.loadtxt(chain_model_sgc_file) 
+        chain_dict['pk_ngc'] = pk_ngc[:,1:]
+        chain_dict['pk_sgc'] = pk_sgc[:,1:]
     else: 
         raise ValueError
     return chain_dict 
@@ -319,7 +318,3 @@ def gelman_rubin_convergence(withinchainvar, meanchain, n, Nchains, ndim):
     scalereduction = np.sqrt(estvar/W)
 
     return scalereduction
-
-
-if __name__=="__main__": 
-    mcmc_chains('beutler_z1')

@@ -273,7 +273,7 @@ class Pk:
 def patchyCov(zbin, NorS='ngc', ell=0, clobber=False): 
     ''' Construct covariance matrix for patchy mocks measured using Nbodykit 
     '''
-    catalog = 'patchy.'+NorS+'.z'+str(zbin)
+    catalog = 'patchy.z'+str(zbin)
 
     f_cov = ''.join([UT.catalog_dir(catalog), 'Cov_pk.', catalog, '.ell', str(ell), '.', NorS, '.NBKT.dat']) 
     
