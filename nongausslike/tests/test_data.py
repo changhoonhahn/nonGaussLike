@@ -55,19 +55,11 @@ def Gmf_SDSS_mock(name):
     return None 
 
 
-def Plk_BOSS_Patchy(zbin): 
-    ''' Compare the BOSS powerspectrum P_BOSS(k) calculated using Roman's estimator, 
-    Florian's estimator, and nbodykit (Nick's estimator) to the average P(k) of patchy 
-    mocks calculated using nbodykit
+def Plk_BOSS_Patchy(zbin, NorS): 
+    ''' Compare the BOSS powerspectrum P_BOSS(k) calculated using Florian's estimator
+    and nbodykit (Nick's estimator) to the average P(k) of patchy mocks calculated 
+    using nbodykit
     '''
-    # read in BOSS P(k) using Roman's estimator
-    if zbin == 1: 
-        f_boss = ''.join([UT.catalog_dir('boss'), 
-            'plk.galaxy_DR12v5_CMASSLOWZTOT_North.Lbox2800.Ngrid360.O4intp.P010000.fc.z1']) 
-    else:
-        raise ValueError
-    k_boss, p0k, p2k, p4k, counts = np.loadtxt(f_boss, unpack=True, usecols=[0, 5, 2, 3, -2]) # k, p0(k), and number of modes 
-
     # read in Florian's P(k) 
     k_beu, pk_beu = [], [] 
     for ell in [0, 2, 4]: 
@@ -78,7 +70,7 @@ def Plk_BOSS_Patchy(zbin):
         elif ell == 4: 
             pole = 'hexadecapole'
         f_beut = ''.join([UT.dat_dir()+'Beutler/public_material_RSD/Beutleretal_pk_', pole, 
-            '_DR12_NGC_z', str(zbin), '_prerecon_120.dat'])
+            '_DR12_', NorS.upper(), '_z', str(zbin), '_prerecon_120.dat'])
         k_beut, plk = np.loadtxt(f_beut, skiprows=31, unpack=True, usecols=[1,2]) 
         pk_beu.append(plk)
         k_beu.append(k_beut) 
@@ -122,21 +114,18 @@ def Plk_BOSS_Patchy(zbin):
     sub = fig.add_subplot(111) 
     # monopole comparison 
     sub.scatter(k_nbkt, k_nbkt * pk_nbkt[0], c='b', lw=0, marker='s', label='nbodykit') 
-    sub.scatter(k_boss, k_boss * p0k, c='b', lw=0, marker='^', label='RS est.') 
     sub.scatter(k_beu[0], k_beu[0]*pk_beu[0], label='Beutler+', c='b', lw=0) 
     sub.plot(k_patchy, k_patchy*pk_patchy[0], label='Patchy', c='b')
     sub.fill_between(k_patchy, k_patchy*(pk_patchy[0]-np.sqrt(var_patchy[0])), k_patchy*(pk_patchy[0]+np.sqrt(var_patchy[0])), 
             color='b', alpha=0.25, linewidth=0)
     # quadrupole comparison 
     sub.scatter(k_nbkt, k_nbkt*pk_nbkt[1], c='r', lw=0, marker='s') 
-    sub.scatter(k_boss, k_boss*p2k, c='r', lw=0, marker='^') 
     sub.scatter(k_beu[1], k_beu[1]*pk_beu[1], c='r', lw=0) 
     sub.plot(k_patchy, k_patchy*pk_patchy[1], c='r')
     sub.fill_between(k_patchy, k_patchy*(pk_patchy[1]-np.sqrt(var_patchy[1])), k_patchy*(pk_patchy[1]+np.sqrt(var_patchy[1])), 
             color='r', alpha=0.25, linewidth=0)
     # hexadecapole comparison 
     sub.scatter(k_nbkt, k_nbkt*pk_nbkt[2], c='k', lw=0, marker='s') 
-    sub.scatter(k_boss, k_boss*p4k, c='k', lw=0, marker='^') 
     sub.scatter(k_beu[2], k_beu[2]*pk_beu[2], c='k', lw=0) 
     sub.plot(k_patchy, k_patchy*pk_patchy[2], c='k')
     sub.fill_between(k_patchy, k_patchy*(pk_patchy[2]-np.sqrt(var_patchy[2])), k_patchy*(pk_patchy[2]+np.sqrt(var_patchy[2])), 

@@ -233,15 +233,17 @@ def _make_run():
     return None
 
 
-def nbodykit_bossPk(zbin): 
+def Pk_NBKT_boss(zbin, NorS='ngc'): 
     ''' calculate boss P(k) using nbodykit, which uses Nick's estimator 
     ''' 
     # first read in data and random catalogs 
     path_to_catalogs = UT.catalog_dir('boss') 
+    if NorS == 'ngc': str_nors = 'North'
+    else: str_nors = 'South'
     data = FITSCatalog(os.path.join(path_to_catalogs, 
-        'galaxy_DR12v5_CMASSLOWZTOT_North.fits'))
+        'galaxy_DR12v5_CMASSLOWZTOT_'+str_nors+'.fits'))
     randoms = FITSCatalog(os.path.join(path_to_catalogs, 
-        'random1_DR12v5_CMASSLOWZTOT_North.fits'))
+        'random1_DR12v5_CMASSLOWZTOT_'+str_nors+'.fits'))
     
     # impose fiducial BOSS DR12 cosmology
     cosmo = cosmology.Cosmology(H0=67.6, Om0=0.31, flat=True)
@@ -290,7 +292,7 @@ def nbodykit_bossPk(zbin):
     #print("true SN")
     #print((S_data+alpha**2*S)/r.attrs['randoms.norm'])
 
-    f = open(''.join([UT.catalog_dir('boss'), 'pk.nbodykit.zbin', str(zbin), '.dat']), 'w')
+    f = open(''.join([UT.catalog_dir('boss'), 'pk.nbodykit.', NorS, '.zbin', str(zbin), '.dat']), 'w')
     f.write("### header ### \n")
     for key in r.attrs:
         f.write("%s = %s \n" % (key, str(r.attrs[key])))
