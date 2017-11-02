@@ -277,7 +277,7 @@ def X_gmf(name, n_arr=False):
     return gmfs 
 
 
-def X_pk(mock, ell=0, krange=None, rebin=None, sys=None, k_arr=False): 
+def X_pk(mock, ell=0, krange=None, rebin=None, NorS='ngc', sys=None, k_arr=False): 
     ''' Construct data matrix X from P(k) measures of mock catalogs.
     
     X_i = P(k)_i 
@@ -287,7 +287,7 @@ def X_pk(mock, ell=0, krange=None, rebin=None, sys=None, k_arr=False):
     pkay = Data.Pk() # read in P(k) data 
     n_mock = pkay._n_mock(mock) 
     for i in range(1, n_mock+1):  
-        pkay.Read(mock, i, ell=ell, sys=sys) 
+        pkay.Read(mock, i, ell=ell, NorS=NorS, sys=sys) 
         pkay.krange(krange)
         if rebin is None: 
             k, pk = pkay.k, pkay.pk

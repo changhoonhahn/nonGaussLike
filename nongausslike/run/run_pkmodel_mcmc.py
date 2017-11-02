@@ -12,7 +12,7 @@ import model as Mod
 import infer as Inf
 
 
-def Pk_model_mcmc(tag): 
+def Pk_model_mcmc(tag, **kwargs): 
     ''' Evalulate the P(k) model for the `tag` MCMC chain 
     '''
     if tag == 'beutler_z1': 
@@ -27,8 +27,13 @@ def Pk_model_mcmc(tag):
         maxbin1 = len(k_list[0])+1
         k = np.concatenate(k_list)
 
+        if 'ichain' in kwargs.keys(): 
+            nchains = [kwargs['ichain']]
+        else:
+            nchains = range(4) 
+
         # read in Florian's RSD MCMC chains  
-        for ichain in range(4): # read in the 4 chains
+        for ichain in nchains: 
             chain_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
                 'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), '.dat']) 
             sample = np.loadtxt(chain_file, skiprows=1)
@@ -52,23 +57,16 @@ def Pk_model_mcmc(tag):
                 f_sgc = open(fname_sgc, 'a') 
                 if ns_ngc.max() != ns_sgc.max(): 
                     raise ValueError
-                mocks = range(ns_ngc.max()+1,sample.shape[0]) 
+                mocks = range(int(ns_ngc.max())+1,sample.shape[0]) 
 
             for i in mocks:
                 model_i = Mod.taruya_model(100, binrange1, binrange2, binrange3, maxbin1, k, 
                         chain[i,0], chain[i,1], chain[i,2], chain[i,3], chain[i,4], 
                         chain[i,5], chain[i,6], chain[i,7], chain[i,8], chain[i,9], chain[i,10])
-                #if i == 0: 
-                #    models_ngc = np.zeros((sample.shape[0], len(model_i[0])))
-                #    models_sgc = np.zeros((sample.shape[0], len(model_i[0])))
-                #models_ngc[i,:] = model_i[0]
-                #models_sgc[i,:] = model_i[1]
                 f_ngc.write('\t'.join([str(i)]+[str(model_i[0][ii]) for ii in range(len(model_i[0]))]))
                 f_sgc.write('\t'.join([str(i)]+[str(model_i[1][ii]) for ii in range(len(model_i[1]))]))
                 f_ngc.write('\n')
                 f_sgc.write('\n')
-            #np.savetxt(chain_model_ngc_file, models_ngc)
-            #np.savetxt(chain_model_sgc_file, models_sgc)
     else: 
         raise ValueError
     return None 
@@ -76,4 +74,5 @@ def Pk_model_mcmc(tag):
 
 if __name__=="__main__": 
     tag = sys.argv[1]
-    Pk_model_mcmc(tag)
+    ichain = sys.argv[2]
+    Pk_model_mcmc(tag, ichain=ichain)

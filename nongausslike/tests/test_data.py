@@ -97,7 +97,7 @@ def Plk_BOSS_Patchy(zbin):
         n_missing, i_mock = 0, 0 
         for i in range(1,n_mock+1):
             try: 
-                pkay.Read('patchy.ngc.z'+str(zbin), i, ell=ell, sys='fc')
+                pkay.Read('patchy.ngc.z'+str(zbin), i, ell=ell, NorS='ngc', sys='fc')
                 k = pkay.k
                 pk = pkay.pk
                 n_kbin = len(k) 
@@ -333,7 +333,7 @@ def readPk(catalog, ell=0, sys=None):
     sub = fig.add_subplot(111) 
 
     for i in i_sample: 
-        pkay.Read(catalog, i, ell=ell, sys=sys)
+        pkay.Read(catalog, i, ell=ell, NorS='ngc', sys=sys)
         k, pk = pkay.k, pkay.pk
         
         sub.plot(k, pk) 
@@ -403,7 +403,7 @@ def Pk_i(catalog, i_mock, sys=None, rebin=None):
             
             sub.plot(k, pk) 
 
-        pkay.Read(catalog, i_mock, ell=2*i_ell, sys=sys)
+        pkay.Read(catalog, i_mock, ell=2*i_ell, NorS='ngc', sys=sys)
         k, pk, _ = pkay.rebin(rebin)
         sub.plot(k, pk, lw=2, c='k') 
         

@@ -492,7 +492,7 @@ def invC(mock, ell=0, rebin=None):
     pkay = Data.Pk()
     n_mock = pkay._n_mock(mock) 
     for i in range(1, n_mock+1):  
-        pkay.Read(mock, i) 
+        pkay.Read(mock, i, NorS='ngc') 
         k, pk = pkay.k, pkay.pk
 
         if i == 1: 

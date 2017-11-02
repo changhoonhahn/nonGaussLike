@@ -96,14 +96,14 @@ class Pk:
         self.pk_obv = pk
         return k_central, pk 
 
-    def Read(self, name, i, ell=0, sys=None): 
+    def Read(self, name, i, ell=0, sys=None, NorS='ngc'): 
         ''' Read in the i th mock catalog P(k) 
         '''
         if ell not in [0, 2, 4]: 
             raise ValueError("ell can only be 0, 2, or 4") 
         
         #f = self._compressed_read(name, i, ell, sys) 
-        f = ''.join([UT.catalog_dir(name), self._file_name(name, i, sys)]) 
+        f = ''.join([UT.catalog_dir(name), self._file_name(name, i, NorS, sys)]) 
 
         if 'patchy' in name: 
             k, pk = np.loadtxt(f, skiprows=24, unpack=True, usecols=[0,1+ell/2]) # k, P_l(k) 
@@ -118,6 +118,81 @@ class Pk:
         self.k = k
         self.pk = pk
         return None
+
+    def krange(self, krange): 
+        ''' impose some k_max on self.k and self.pk  
+        Ideally kmax has to be imposed *before* rebinning.
+        '''
+        if krange is None: # do nothing
+            return None
+        kmin, kmax = krange
+        if self.k is None: 
+            raise ValueError("k and Pk have to be read in")
+        if self.pk is None: 
+            raise ValueError("k and Pk have to be read in")
+        kbin = np.where((self.k >= kmin) & (self.k <= kmax)) 
+        k = self.k[kbin]
+        pk = self.pk[kbin]
+
+        self.k = k
+        self.pk = pk
+        if self.counts is not None:
+            counts = self.counts[kbin]
+            self.counts = counts
+        return None 
+    
+    def _file_name(self, name, i, nors, sys): 
+        ''' Messy code for dealing with all the different file names 
+        '''
+        if 'patchy' in name: # patchy mocks now are computed using Nbodykit 
+            if sys != 'fc': 
+                raise ValueError
+            zbin = name.split('.z')[-1]
+            f = ''.join(['pk.patchy.', str(i), '.', nors, '.zbin', str(zbin), '.nbodykit.dat'])
+            #f = ''.join(['pk.patchy.', str(i), '.nbodykit.zbin', str(zbin), '.dat'])
+        else: 
+            if sys is None: 
+                str_sys = ''
+            elif sys == 'fc':  # fiber collisions 
+                if 'patchy' in name: 
+                    str_sys = '.fc'
+                else: 
+                    str_sys = '.fibcoll'
+            else: 
+                raise NotImplementedError
+
+            if name == 'nseries': 
+                f = ''.join(['POWER_Q_CutskyN', str(i), '.fidcosmo', str_sys, '.dat.grid480.P020000.box3600'])
+            elif name == 'qpm': 
+                f = ''.join(['POWER_Q_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed.fidcosmo', str_sys, '.dat.grid480.P020000.box3600']) 
+            elif 'patchy.ngc.' in name: 
+                zbin = name.split('.z')[-1]
+                f = ''.join(['plk.Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str(i).zfill(4), 
+                    '.Lbox3600.Ngrid480.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
+                    #'.Lbox2800.Ngrid360.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
+            else: 
+                raise NotImplementedError
+        return f 
+    
+    def _n_mock(self, name): 
+        ''' Given name of mock return n_mock. 
+        '''
+        if name == 'nseries': 
+            n_mock = 84
+        elif name == 'qpm': 
+            n_mock = 1000 
+        elif 'patchy' in name: 
+            n_mock = 2048
+        else: 
+            raise ValueError
+        return n_mock 
+    
+    def _tarfile(self, name): 
+        ''' tar ball that contains all the powerspectrum measurements. 
+        with/without systematics, everything. P(k) files are pretty small 
+        so who cares. 
+        '''
+        return ''.join([UT.catalog_dir(name), 'power_', name, '.tar'])
 
     def _compressed_read(name, i, ell, sys): 
         ''' Reading from compressed file. I experimented it because
@@ -141,7 +216,7 @@ class Pk:
         f = tar.extractfile(member)
         return f 
     
-    def rebin(self, rebin, pk_arr=None): 
+    def _rebin(self, rebin, pk_arr=None): 
         ''' *** Not a great way to re-bin***
         Rebin the P(k) using the counts 
 
@@ -194,87 +269,13 @@ class Pk:
 
         return [np.array(k_rebin), np.array(pk_rebin), np.array(tot_counts)]
 
-    def krange(self, krange): 
-        ''' impose some k_max on self.k and self.pk  
-        Ideally kmax has to be imposed *before* rebinning.
-        '''
-        if krange is None: # do nothing
-            return None
-        kmin, kmax = krange
-        if self.k is None: 
-            raise ValueError("k and Pk have to be read in")
-        if self.pk is None: 
-            raise ValueError("k and Pk have to be read in")
-        kbin = np.where((self.k >= kmin) & (self.k <= kmax)) 
-        k = self.k[kbin]
-        pk = self.pk[kbin]
-
-        self.k = k
-        self.pk = pk
-        if self.counts is not None:
-            counts = self.counts[kbin]
-            self.counts = counts
-        return None 
-    
-    def _n_mock(self, name): 
-        ''' Given name of mock return n_mock. 
-        '''
-        if name == 'nseries': 
-            n_mock = 84
-        elif name == 'qpm': 
-            n_mock = 1000 
-        elif 'patchy' in name: 
-            n_mock = 2048
-        else: 
-            raise ValueError
-        return n_mock 
-    
-    def _tarfile(self, name): 
-        ''' tar ball that contains all the powerspectrum measurements. 
-        with/without systematics, everything. P(k) files are pretty small 
-        so who cares. 
-        '''
-        return ''.join([UT.catalog_dir(name), 'power_', name, '.tar'])
-
-    def _file_name(self, name, i, sys): 
-        ''' Messy code for dealing with all the different file names 
-        '''
-        if 'patchy' in name: # patchy mocks now are computed using Nbodykit 
-            if sys != 'fc': 
-                raise ValueError
-            zbin = name.split('.z')[-1]
-            f = ''.join(['pk.patchy.', str(i), '.nbodykit.zbin', str(zbin), '.dat'])
-        else: 
-            if sys is None: 
-                str_sys = ''
-            elif sys == 'fc':  # fiber collisions 
-                if 'patchy' in name: 
-                    str_sys = '.fc'
-                else: 
-                    str_sys = '.fibcoll'
-            else: 
-                raise NotImplementedError
-
-            if name == 'nseries': 
-                f = ''.join(['POWER_Q_CutskyN', str(i), '.fidcosmo', str_sys, '.dat.grid480.P020000.box3600'])
-            elif name == 'qpm': 
-                f = ''.join(['POWER_Q_a0.6452_', str(i).zfill(4), '.dr12d_cmass_ngc.vetoed.fidcosmo', str_sys, '.dat.grid480.P020000.box3600']) 
-            elif 'patchy.ngc.' in name: 
-                zbin = name.split('.z')[-1]
-                f = ''.join(['plk.Patchy-Mocks-DR12NGC-COMPSAM_V6C_', str(i).zfill(4), 
-                    '.Lbox3600.Ngrid480.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
-                    #'.Lbox2800.Ngrid360.Nbin40.O4intp.P010000', str_sys, '.z', zbin]) 
-            else: 
-                raise NotImplementedError
-        return f 
-
 
 def patchyCov(zbin, NorS='ngc', ell=0, clobber=False): 
     ''' Construct covariance matrix for patchy mocks measured using Nbodykit 
     '''
     catalog = 'patchy.'+NorS+'.z'+str(zbin)
 
-    f_cov = ''.join([UT.catalog_dir(catalog), 'Cov_pk.', catalog, '.ell', str(ell), '.NBKT.dat']) 
+    f_cov = ''.join([UT.catalog_dir(catalog), 'Cov_pk.', catalog, '.ell', str(ell), '.', NorS, '.NBKT.dat']) 
     
     if os.path.isfile(f_cov) and not clobber:  
         i_k, j_k, k_i, k_j, C_ij = np.loadtxt(f_cov, skiprows=4, unpack=True, usecols=[0,1,2,3,-1])
@@ -290,7 +291,7 @@ def patchyCov(zbin, NorS='ngc', ell=0, clobber=False):
         i_mock, n_missing = 0, 0 
         for i in range(1,n_mock+1):
             try: 
-                pkay.Read(catalog, i, ell=ell, sys='fc')
+                pkay.Read(catalog, i, ell=ell, NorS=NorS, sys='fc')
                 pkay.krange([0.01,0.15])
                 k = pkay.k
                 pk = pkay.pk
@@ -344,7 +345,7 @@ def _patchyCov(zbin, NorS='ngc', ell=0, clobber=False):
     '''
     catalog = 'patchy.'+NorS+'.z'+str(zbin)
 
-    f_cov = ''.join([UT.catalog_dir(catalog), 'Cov_pk.', catalog, '.ell', str(ell), '.beutler.dat']) 
+    f_cov = ''.join([UT.catalog_dir(catalog), 'Cov_pk.', catalog, '.ell', str(ell), '.', NorS, '.beutler.dat']) 
     
     if os.path.isfile(f_cov) and not clobber:  
         i_k, j_k, k_i, k_j, C_ij = np.loadtxt(f_cov, skiprows=4, unpack=True, usecols=[0,1,2,3,-1])
@@ -362,7 +363,7 @@ def _patchyCov(zbin, NorS='ngc', ell=0, clobber=False):
         for i in range(1,n_mock+1):
             try: 
                 # read in monopole
-                pkay.Read(catalog, i, ell=ell, sys='fc')
+                pkay.Read(catalog, i, ell=ell, NorS=NorS, sys='fc')
                 pkay.krange([0.01,0.15])
                 k = pkay.k
                 pk = pkay.pk
