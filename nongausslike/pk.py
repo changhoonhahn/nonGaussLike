@@ -245,6 +245,18 @@ def Pk_NBKT_boss(zbin, NorS='ngc'):
     randoms = FITSCatalog(os.path.join(path_to_catalogs, 
         'random1_DR12v5_CMASSLOWZTOT_'+str_nors+'.fits'))
     
+    # selection effects
+    if zbin == 1: 
+        ZMIN, ZMAX = 0.2, 0.5
+    elif zbin == 2:
+        ZMIN, ZMAX = 0.4, 0.6
+
+    randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)
+    randoms = randoms[randoms['Selection']]
+    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)
+    data = data[data['Selection']]
+    print(np.min(np.array(data['Z'])), np.max(np.array(data['Z'])))
+    
     # impose fiducial BOSS DR12 cosmology
     cosmo = cosmology.Cosmology(H0=67.6, Om0=0.31, flat=True)
     # add Cartesian position column
@@ -252,18 +264,10 @@ def Pk_NBKT_boss(zbin, NorS='ngc'):
     randoms['Position'] = transform.SkyToCartesian(randoms['RA'], randoms['DEC'], randoms['Z'], cosmo=cosmo)
     randoms['WEIGHT'] = 1.0
     data['WEIGHT'] = data['WEIGHT_SYSTOT'] * (data['WEIGHT_NOZ'] + data['WEIGHT_CP'] - 1.0)
-    
-    if zbin == 1: 
-        ZMIN, ZMAX = 0.2, 0.5
-    elif zbin == 2:
-        ZMIN, ZMAX = 0.4, 0.6
-
-    randoms['Selection'] = (randoms['Z'] > ZMIN)&(randoms['Z'] < ZMAX)
-    data['Selection'] = (data['Z'] > ZMIN)&(data['Z'] < ZMAX)
 
     # combine the data and randoms into a single catalog
     fkp = FKPCatalog(data, randoms)
-    mesh = fkp.to_mesh(Nmesh=360, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WEIGHT', window='tsc')
+    mesh = fkp.to_mesh(Nmesh=360, nbar='NZ', fkp_weight='WEIGHT_FKP', comp_weight='WEIGHT', window='tsc', selection='Selection')
     # compute the multipoles
     r = ConvolvedFFTPower(mesh, poles=[0,2,4], dk=0.01, kmin=0.)
 
