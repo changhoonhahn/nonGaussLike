@@ -11,10 +11,19 @@ import data as Data
 import util as UT 
 import nongauss as NG 
 # -- plotting -- 
+import matplotlib as mpl 
 import matplotlib.pyplot as plt 
-from matplotlib.colors import LogNorm 
-from ChangTools.plotting import prettyplot
-from ChangTools.plotting import prettycolors
+mpl.rcParams['text.usetex'] = True
+mpl.rcParams['font.family'] = 'serif'
+mpl.rcParams['axes.linewidth'] = 1.5
+mpl.rcParams['axes.xmargin'] = 1
+mpl.rcParams['xtick.labelsize'] = 'x-large'
+mpl.rcParams['xtick.major.size'] = 5
+mpl.rcParams['xtick.major.width'] = 1.5
+mpl.rcParams['ytick.labelsize'] = 'x-large'
+mpl.rcParams['ytick.major.size'] = 5
+mpl.rcParams['ytick.major.width'] = 1.5
+mpl.rcParams['legend.frameon'] = False
 
 
 def lnL_sys(mock, ell=0, rebin=None, sys='fc'): 
@@ -80,6 +89,39 @@ def lnL(mock, ell=0, rebin=None, krange=None):
     
     f = ''.join([UT.fig_dir(), 'tests/test.lnL.', mock, '.ell', str(ell), 
         str_rebin, str_krange, '.png'])
+    fig.savefig(f, bbox_inches='tight') 
+    return None 
+
+
+def lnL_pca_gauss(mock, ell=0, krange=None, NorS='ngc'): 
+    ''' ***TESTED***
+    Test that lnL_pca_gauss is consistent with chi-squared calculated directly 
+    from the mocks with the covariance matrix. 
+    '''
+    # Calculate the lnL_pca_gauss
+    Pk = NG.X_pk(mock, ell=ell, krange=krange, NorS=NorS)
+    dpk , mu_pk = NG.meansub(Pk) 
+    pca_gauss = NG.lnL_pca_gauss(dpk, Pk)
+
+    # calculate chi-squared 
+    C_X = np.cov(Pk.T) 
+    chi2 = np.zeros(Pk.shape[0])
+    for i in range(Pk.shape[0]): 
+        chi2[i] = -0.5 * np.sum(np.dot(dpk[i,:], np.linalg.solve(C_X, dpk[i,:].T)))
+    
+    offset = chi2 - pca_gauss
+    print offset
+
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    nbin = 32 
+    sub.hist(pca_gauss, bins=nbin, normed=True, alpha=0.75, label='PCA Gaussian')
+    sub.hist(chi2, bins=nbin, normed=True, alpha=0.75, label=r'$\chi^2$')
+    sub.set_xlabel('log $\mathcal{L}$', fontsize=25)
+    sub.set_xlim([-2.2*Pk.shape[1], 0.])
+    sub.legend(loc='upper left', prop={'size': 20}) 
+
+    f = ''.join([UT.fig_dir(), 'tests/test.lnL_pca_gauss_test.', mock, '.ell', str(ell), '.png'])
     fig.savefig(f, bbox_inches='tight') 
     return None 
 
@@ -515,5 +557,4 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    for ell in [0,2,4]: 
-        p_Xw_i_MISE('qpm', ell=ell, rebin='beutler', krange=[0.01,0.3], method='pca', b=0.1)
+    lnL_pca_gauss('patchy.z1', ell=0, krange=[0.01, 0.15], NorS='ngc')

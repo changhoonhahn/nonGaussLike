@@ -33,8 +33,8 @@ def importance_weight(tag, chain, **kwargs):
         k = np.concatenate(k_list)
         
         # calculate D - m(theta) for all the mcmc chain
-        delta_ngc = chain['pk_ngc'] = pk_ngc_data
-        delta_sgc = chain['pk_sgc'] = pk_sgc_data
+        delta_ngc = chain['pk_ngc'] - pk_ngc_data
+        delta_sgc = chain['pk_sgc'] - pk_sgc_data
 
         # import PATCHY mocks 
         pk_ngc_list, pk_sgc_list = [], [] 
@@ -49,16 +49,28 @@ def importance_weight(tag, chain, **kwargs):
         pk_sgc_mock = np.concatenate(pk_sgc_list, axis=1) 
 
     if tag == 'RSD_ica_pca': # P_ICA(D - m(theta)) / P_PCA(D - m(theta))
-        lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
-        lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock) 
+        lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock)
+        lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock)
         
         lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
         lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
 
-        lnw_ngc = lnP_ica_ngc - lnP_pca_ngc
-        lnw_sgc = lnP_ica_sgc - lnP_pca_sgc
+        P_ica = np.exp(lnP_ica_ngc + lnP_ica_sgc)
+        P_pca = np.exp(lnP_pca_ngc + lnP_pca_sgc)
+        ws = P_ica / P_pca
+        return [P_pca, P_ica, ws]
 
-        return np.exp(lnw_ngc + lnw_sgc)
+    elif tag == 'RSD_pca_gauss': # P_PCA,KDE (D - m(theta)) / P_Gauss(D - m(theta))
+        lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock)
+        lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
+        
+        lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
+        lnP_gauss_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
+
+        P_gauss = np.exp(lnP_gauss_ngc + lnP_gauss_sgc)
+        P_pca = np.exp(lnP_pca_ngc + lnP_pca_sgc)
+        ws = P_pca / P_gauss
+        return [P_gauss, P_pca, ws]
 
     elif tag == 'RSD_ica_pca_gauss': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
         lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
