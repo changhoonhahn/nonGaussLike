@@ -38,6 +38,10 @@ def fig_dir():
     return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/figs/'
 
 
+def tex_dir():
+    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/paper/'
+
+
 def run_dir(): 
     ''' 
     '''

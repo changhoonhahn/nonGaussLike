@@ -21,8 +21,8 @@ def importance_weight(tag_mcmc, tag_like, ichain):
     weight_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
         'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), 
         '.', tag_like, '_weights.dat']) 
-    hdr = 'P_denom, P_nomin, w_importance'
-    np.savetxt(weight_file, ws.T, header=hdr) 
+    hdr = 'ln(P_denom), ln(P_nomin), w_importance'
+    np.savetxt(weight_file, np.array(ws).T, header=hdr) 
     return None 
 
 
