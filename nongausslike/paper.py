@@ -36,7 +36,7 @@ def LikelihoodPDF_B2017(tag_mcmc, tag_like, ichain):
     '''
     '''
     # import MCMC chain 
-    chain = Inf.mcmc_chains(tag_mcmc, ichain)
+    chain = Inf.mcmc_chains(tag_mcmc, ichain=ichain)
 
     # import importance weight
     f_wimp = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
@@ -79,6 +79,53 @@ def LikelihoodPDF_B2017(tag_mcmc, tag_like, ichain):
             bbox_inches='tight') 
     return None
 
+
+def LikelihoodPDF_GMF(tag_mcmc, tag_like, irun):
+    '''
+    '''
+    # import MCMC chain 
+    chain = Inf.mcmc_chains(tag_mcmc)
+
+    # import importance weight
+    f_wimp = ''.join([UT.dat_dir(), 'manodeep/', 
+        'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0'
+        '.run', str(irun), '.', tag_like, '_weights.dat']) 
+    wimp = np.loadtxt(f_wimp, skiprows=1, unpack=True, usecols=[2]) 
+    lims = np.where(wimp < 1e3)
+
+    labels = ['logMmin', 'sig_logM', 'logM0', 'logM1', 'alpha']
+    lbltex = [r'$\log M_\mathrm{min}$', r'$\sigma_{\log M}$', r'$\log M_0$', r'$\log M_1$', r'$\alpha$'] 
+    prior_min = [11., 0.001, 6., 12., 0.001]
+    prior_max = [12.2, 1., 14., 14., 2.]
     
+    nbin = 40 
+    fig = plt.figure(figsize=(5*len(labels), 5)) 
+    for i in range(len(labels)): 
+        sub = fig.add_subplot(1, len(labels), i+1) 
+        hh = sub.hist(chain[labels[i]], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]],
+                alpha=0.5, label='Sinha+2017') 
+        sub.hist(chain[labels[i]][lims], weights=wimp[lims], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]], 
+                alpha=0.5) 
+        # constraints 
+        low, med, high = np.percentile(chain[labels[i]], [15.86555, 50, 84.13445])
+        low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
+        txt = ''.join(['B2017:$', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$\n', 
+            '$', str(round(med_w,3)), '^{+', str(round(high_w-med_w,3)), '}_{-', str(round(med_w-low_w,3)), '}$']) 
+        sub.text(0.1, 0.95, txt, 
+                ha='left', va='top', transform=sub.transAxes, fontsize=20)
+
+        # x-axis 
+        sub.set_xlim([prior_min[i], prior_max[i]]) 
+        sub.set_xlabel(lbltex[i], fontsize=20)
+        # y-axis
+        sub.set_ylim([0., 1.5*hh[0].max()])
+        #if i == 0: sub.legend(loc='upper right', prop={'size':15}) 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/likelihoodPDF_gmf.', tag_mcmc, '.', tag_like, '.run', str(irun), '.pdf']), 
+            bbox_inches='tight') 
+    return None
+   
+
 if __name__=="__main__": 
-    LikelihoodPDF_B2017('beutler_z1', 'RSD_ica_pca', 0)
+    LikelihoodPDF_GMF('manodeep', 'gmf_ica_chi2', 1)
+    LikelihoodPDF_GMF('manodeep', 'gmf_pca_chi2', 1)
+    #LikelihoodPDF_B2017('beutler_z1', 'RSD_ica_pca', 0)

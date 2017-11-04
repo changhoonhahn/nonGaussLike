@@ -48,49 +48,84 @@ def importance_weight(tag, chain, **kwargs):
         pk_ngc_mock = np.concatenate(pk_ngc_list, axis=1) 
         pk_sgc_mock = np.concatenate(pk_sgc_list, axis=1) 
 
-    if tag == 'RSD_ica_pca': # P_ICA(D - m(theta)) / P_PCA(D - m(theta))
-        lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock)
-        lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock)
+        if tag == 'RSD_ica_pca': # P_ICA(D - m(theta)) / P_PCA(D - m(theta))
+            lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock)
+            lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock)
+            
+            lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
+            lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
+
+            lnP_pca = lnP_pca_ngc + lnP_pca_sgc
+            lnP_ica = lnP_ica_ngc + lnP_ica_sgc
+            ws = np.exp(lnP_ica - lnP_pca)
+            return [lnP_pca, lnP_ica, ws]
+
+        elif tag == 'RSD_pca_gauss': # P_PCA,KDE (D - m(theta)) / P_Gauss(D - m(theta))
+            lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock)
+            lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
+            
+            lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
+            lnP_gauss_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
+
+            lnP_gauss = lnP_gauss_ngc + lnP_gauss_sgc
+            lnP_pca = lnP_pca_ngc + lnP_pca_sgc
+            ws = np.exp(lnP_pca - lnP_gauss)
+            return [lnP_gauss, lnP_pca, ws]
+
+        elif tag == 'RSD_ica_pca_gauss': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
+            lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
+            lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
+            
+            lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
+            lnP_gauss_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
+            
+            lnP_gauss = lnP_gauss_ngc + lnP_gauss_sgc
+            lnP_ica = lnP_ica_ngc + lnP_ica_sgc
+            ws = np.exp(lnP_ica - lnP_gauss)
+            return [lnP_gauss, lnP_ica, ws]
+
+        elif tag == 'RSD_ica_chi2': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
+            lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
+            lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
+
+            lnP_chi2 = -0.5 * chain['chi2']
+            
+            lnP_ica = lnP_ica_ngc + lnP_ica_sgc
+            ws = np.exp(lnP_ica - lnP_chi2)
+            return [lnP_gauss, lnP_chi2, ws]
+
+    elif 'gmf' in tag: # GMF
+        # read in SDSS GMF (data D) 
+        geemf = Dat.Gmf()
+        nbins, gmf_data = geemf.Observation()
+
+        # calculate D - m(theta) for all the mcmc chain
+        dgmf = gmf_data - chain['gmf'] 
         
-        lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
-        lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
-
-        lnP_pca = lnP_pca_ngc + lnP_pca_sgc
-        lnP_ica = lnP_ica_ngc + lnP_ica_sgc
-        ws = np.exp(lnP_ica - lnP_pca)
-        return [lnP_pca, lnP_ica, ws]
-
-    elif tag == 'RSD_pca_gauss': # P_PCA,KDE (D - m(theta)) / P_Gauss(D - m(theta))
-        lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock)
-        lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
+        # read in mock catalog 
+        gmf_mock = NG.X_gmf('manodeep.run'+str(kwargs['run']))
         
-        lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
-        lnP_gauss_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
+        if tag == 'gmf_ica_chi2':
+            lnP_ica = NG.lnL_ica(dgmf, gmf_mock)
+            lnP_chi2 = -0.5 * chain['chi2']
+            
+            ws = np.exp(lnP_ica - lnP_chi2)
+            return [lnP_chi2, lnP_ica, ws]
 
-        lnP_gauss = lnP_gauss_ngc + lnP_gauss_sgc
-        lnP_pca = lnP_pca_ngc + lnP_pca_sgc
-        ws = np.exp(lnP_pca - lnP_gauss)
-        return [lnP_gauss, lnP_pca, ws]
-
-    elif tag == 'RSD_ica_pca_gauss': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
-        lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
-        lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
-        
-        lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
-        lnP_gauss_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
-        
-        lnP_gauss = lnP_gauss_ngc + lnP_gauss_sgc
-        lnP_ica = lnP_ica_ngc + lnP_ica_sgc
-        ws = np.exp(lnP_ica - lnP_gauss)
-        return [lnP_gauss, lnP_ica, ws]
-
+        elif tag == 'gmf_pca_chi2':
+            lnP_pca = NG.lnL_pca(dgmf, gmf_mock)
+            lnP_chi2 = -0.5 * chain['chi2']
+            
+            ws = np.exp(lnP_pca - lnP_chi2)
+            return [lnP_chi2, lnP_pca, ws]
     else: 
         raise ValueError
 
 
-def mcmc_chains(tag, ichain): 
+def mcmc_chains(tag, ichain=None): 
     ''' Given some tag string return mcmc chain in a dictionary 
     '''
+    chain_dict = {} 
     if tag == 'beutler_z1': 
         # read in Florian's RSD MCMC chains  
         chain_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
@@ -99,7 +134,6 @@ def mcmc_chains(tag, ichain):
 
         labels = ['alpha_perp', 'alpha_para', 'fsig8', 'b1sig8_NGC', 'b1sig8_SGC', 'b2sig8_NGC', 'b2sig8_SGC', 
                 'N_NGC', 'N_SGC', 'sigmav_NGC', 'sigmav_SGC', 'chi2'] 
-        chain_dict = {} 
         for i in range(len(labels)): 
             chain_dict[labels[i]] = chain[:,i+1]
 
@@ -112,6 +146,21 @@ def mcmc_chains(tag, ichain):
         pk_sgc = np.loadtxt(chain_model_sgc_file) 
         chain_dict['pk_ngc'] = pk_ngc[:,1:]
         chain_dict['pk_sgc'] = pk_sgc[:,1:]
+
+    elif tag == 'manodeep': 
+        # read in Manodeep's GMF MCMC chains 
+        chain_file = ''.join([UT.dat_dir(), 'manodeep/', 
+            'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0.out']) 
+        chain = np.loadtxt(chain_file, skiprows=5)
+        labels = ['logMmin', 'sig_logM', 'logM0', 'logM1', 'alpha', 'chi2']
+        
+        for i,lbl in enumerate(labels): 
+            if lbl == 'chi2': 
+                chain_dict[lbl] = -2.*chain[:,i]
+            else:
+                chain_dict[lbl] = chain[:,i]
+
+        chain_dict['gmf'] = chain [:,-8:]
     else: 
         raise ValueError
     return chain_dict 

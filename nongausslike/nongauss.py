@@ -263,14 +263,14 @@ def X_gmf(name, n_arr=False):
     X_i = gmf(N)_i      X has N_mock x N_n dimensions. 
     '''
     geemf = Data.Gmf() # read in GMF mocks 
-    n_mock = pkay._n_mock(mock) 
+    n_mock = geemf._n_mock(name) 
     for i in range(n_mock):  
         ibox = i % 4
         ireal = int((i - ibox)/4)+1
         geemf.Read(name, ireal, ibox)
 
-        if i == 1: gmfs = np.zeros((n_mock, len(k)))
-        gmfs[i-1,:] = geemf.gmf 
+        if i == 0: gmfs = np.zeros((n_mock, len(geemf.gmf)))
+        gmfs[i,:] = geemf.gmf 
 
     if n_arr:
         return gmfs, geemf.nbins

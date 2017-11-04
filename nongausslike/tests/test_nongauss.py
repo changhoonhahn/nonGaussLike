@@ -26,6 +26,68 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
+def GMF_p_Xw_i(name, ica=False, pca=False): 
+    ''' Test the probability distribution function of each X_w^i
+    component -- p(X_w^i). First compare the histograms of p(X_w^i) 
+    with N(0,1). Then compare the gaussian KDE of p(X_w^i).
+    '''
+    gmf = NG.X_gmf(name)
+    X, _ = NG.meansub(gmf)
+    str_w = 'W'
+    if ica and pca: 
+        raise ValueError
+    if ica: # ICA components
+        # ICA components do not need to be Gaussian.
+        # in fact the whole point of the ICA transform
+        # is to capture the non-Gaussianity...
+        X_white, _ = NG.whiten(X) # whitened data
+        X_w, _ = NG.Ica(X_white) 
+        str_w = 'ICA'
+    if pca: # PCA components
+        X_w, _ = NG.whiten(X, method='pca') # whitened data
+        str_w = 'PCA'
+    if not ica and not pca: # just whitened 
+        X_w, W = NG.whiten(X) # whitened data
+    
+    # p(X_w^i) histograms
+    fig = plt.figure(figsize=(15,7))
+    sub = fig.add_subplot(121)
+    for i_bin in range(X_w.shape[1]): 
+        p_X_w, edges = np.histogram(X_w[:,i_bin], normed=True)
+        p_X_w_arr = UT.bar_plot(edges, p_X_w)
+        sub.plot(p_X_w_arr[0], p_X_w_arr[1])
+    x = np.arange(-5., 5.1, 0.1)
+    sub.plot(x, UT.gauss(x, 1., 0.), c='k', lw=3, label='$\mathcal{N}(0,1)$')
+    sub.set_xlim([-2.5, 2.5])
+    sub.set_xlabel('$X_{'+str_w+'}$', fontsize=25) 
+    sub.set_ylim([0., 0.6])
+    sub.set_ylabel('$P(X_{'+str_w+'})$', fontsize=25) 
+    sub.legend(loc='upper right') 
+
+    # p(X_w^i) gaussian KDE fits  
+    pdfs = NG.p_Xw_i(X_w, range(X_w.shape[1]), x=x)
+
+    sub = fig.add_subplot(122)
+    for i_bin in range(X_w.shape[1]): 
+        sub.plot(x, pdfs[i_bin])
+    sub.plot(x, UT.gauss(x, 1., 0.), c='k', lw=3, label='$\mathcal{N}(0,1)$')
+    sub.set_xlim([-2.5, 2.5])
+    sub.set_xlabel('$X_{W}$', fontsize=25) 
+    sub.set_ylim([0., 0.6])
+    sub.set_ylabel('$P(X_{W})$', fontsize=25) 
+    sub.legend(loc='upper right') 
+
+    str_ica, str_pca = '', ''
+    if ica: 
+        str_ica = '.ICA'
+    if pca: 
+        str_pca = '.PCA'
+
+    f = ''.join([UT.fig_dir(), 'tests/test.GMF_p_Xw_i', str_pca, str_ica, '.', name, '.png'])
+    fig.savefig(f, bbox_inches='tight') 
+    return None 
+
+
 def lnL_sys(mock, ell=0, rebin=None, sys='fc'): 
     ''' Compare the pseudo gaussian L with no systematics, ICA L estimation with 
     no systematics, and ICA L estimation with fiber collisions.
@@ -378,7 +440,6 @@ def p_Xw_i(mock, ell=0, rebin=None, krange=None, ica=False, pca=False):
     if not ica and not pca: # just whitened 
         X_w, W = NG.whiten(X) # whitened data
     
-    prettyplot() 
     # p(X_w^i) histograms
     fig = plt.figure(figsize=(15,7))
     sub = fig.add_subplot(121)
@@ -557,4 +618,5 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    lnL_pca_gauss('patchy.z1', ell=0, krange=[0.01, 0.15], NorS='ngc')
+    GMF_p_Xw_i('manodeep.run1', ica=True, pca=False)
+    #lnL_pca_gauss('patchy.z1', ell=0, krange=[0.01, 0.15], NorS='ngc')
