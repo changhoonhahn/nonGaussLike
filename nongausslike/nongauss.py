@@ -101,15 +101,16 @@ def lnL_pca_gauss(delta_pk, Pk):
 
 
 def lnL_pca(delta_pk, Pk): 
-    ''' Gaussian pseudo-likelihood calculated using PCA decomposition for 
-    convenience. i.e. the data vector is decomposed in PCA components so that
+    ''' Gaussian pseudo-likelihood calculated using PCA decomposition -- 
+    i.e. the data vector is decomposed in PCA components so that
     L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated by 
     gaussian KDE of the PCA transformed mock data. 
     
     Notes
     -----
     - This estimates the Gaussian functional pseudo-likelihood. Its main 
-    use is to quantify the impact of the KDE.  
+    use is to quantify the impact of the nonparametric density estimation 
+    (e.g. the KDE).
     '''
     X, mu_X = meansub(Pk) # mean subtract
     X_pca, W_pca = whiten(X, method='pca') # whitened data

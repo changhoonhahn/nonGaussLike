@@ -41,10 +41,10 @@ def importance_weight(tag, chain, **kwargs):
         for ell in [0, 2, 4]:
             if ell == 4: kmax = 0.1 
             else: kmax = 0.15
-            pk_ngc_list.append(NG.X_pk('patchy.ngc.z'+str(kwargs['zbin']), 
-                krange=[0.01,kmax], ell=ell, sys='fc'))
-            pk_sgc_list.append(NG.X_pk('patchy.sgc.z'+str(kwargs['zbin']), 
-                krange=[0.01,kmax], ell=ell, sys='fc'))
+            pk_ngc_list.append(NG.X_pk('patchy.z'+str(kwargs['zbin']), 
+                krange=[0.01,kmax], ell=ell, NorS='ngc', sys='fc'))
+            pk_sgc_list.append(NG.X_pk('patchy.z'+str(kwargs['zbin']), 
+                krange=[0.01,kmax], ell=ell, NorS='sgc', sys='fc'))
         pk_ngc_mock = np.concatenate(pk_ngc_list, axis=1) 
         pk_sgc_mock = np.concatenate(pk_sgc_list, axis=1) 
 
@@ -72,7 +72,7 @@ def importance_weight(tag, chain, **kwargs):
             ws = np.exp(lnP_pca - lnP_gauss)
             return [lnP_gauss, lnP_pca, ws]
 
-        elif tag == 'RSD_ica_pca_gauss': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
+        elif tag == 'RSD_ica_gauss': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
             lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
             lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
             
@@ -166,6 +166,147 @@ def mcmc_chains(tag, ichain=None):
     return chain_dict 
 
 
+def mcmc(tag=None, zbin=1, nwalkers=48, Nchains=4, minlength=600, likelihood='pseudo'): 
+    '''
+    
+    Parameters
+    ---------- 
+
+    Nchains : int 
+        Number of independent chains to run for the gelman rubin convergence test
+    
+    '''
+    if tag is None: 
+        raise ValueError("specify a tag, otherwise it's confusing") 
+    temperature = 2.e-3 # temperature
+
+    # read in BOSS P(k) NGC
+    pkay = Dat.Pk()
+    k0, p0k_ngc = pkay.Observation(0, zbin, 'ngc')
+    k2, p2k_ngc = pkay.Observation(2, zbin, 'ngc')
+    k4, p4k_ngc = pkay.Observation(4, zbin, 'ngc')
+    pk_ngc_list = [p0k_ngc, p2k_ngc, p4k_ngc]
+    k_list = [k0, k2, k4]
+    # read in BOSS P(k) SGC
+    k0, p0k_sgc = pkay.Observation(0, zbin, 'sgc')
+    k2, p2k_sgc = pkay.Observation(2, zbin, 'sgc')
+    k4, p4k_sgc = pkay.Observation(4, zbin, 'sgc')
+    pk_sgc_list = [p0k_sgc, p2k_sgc, p4k_sgc]
+    
+    if likelihood == 'psuedo': # standard pseudo Gaussian likelihood 
+        # read in Covariance matrix 
+        # currently for testing purposes, 
+        # implemented to read in Florian's covariance matrix  
+        _, _, C_pk_ngc = Dat.beutlerCov(zbin, NorS='ngc', ell='all')
+        _, _, C_pk_sgc = Dat.beutlerCov(zbin, NorS='sgc', ell='all')
+
+        # calculate precision matrices (including the hartlap factor) 
+        Cinv_ngc = np.linalg.inv(C_pk_ngc)
+        Cinv_sgc = np.linalg.inv(C_pk_sgc)
+        # hartlap factor 
+        n_mocks_ngc = 2045
+        n_mocks_sgc = 2048
+        f_hartlap_ngc = (float(n_mocks_ngc) - float(len(np.concatenate(pk_ngc_list))) - 2.)/(float(n_mocks_ngc) - 1.)
+        f_hartlap_sgc = (float(n_mocks_sgc) - float(len(np.concatenate(pk_sgc_list))) - 2.)/(float(n_mocks_sgc) - 1.)
+        Cinv_ngc *= f_hartlap_ngc  
+        Cinv_sgc *= f_hartlap_sgc
+   
+        # ln Posterior function 
+        lnPost = lnPost_pseudo
+        # args for ln Posterior function 
+        # data ks, BOSS NGC P_l(k), BOSS SGC P_l(k), NGC precision matrix, SGC precision matrix 
+        lnpost_args = (k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc)
+    elif likelihood in ['pca', 'ica'] : 
+        # read in patchy mock P(k)s for ngc and sgc 
+        pk_ngc_list, pk_sgc_list = [], [] 
+        for ell in [0, 2, 4]:
+            if ell == 4: kmax = 0.1 
+            else: kmax = 0.15
+            pk_ngc_list.append(NG.X_pk('patchy.z'+str(kwargs['zbin']), 
+                krange=[0.01,kmax], ell=ell, NorS='ngc', sys='fc'))
+            pk_sgc_list.append(NG.X_pk('patchy.z'+str(kwargs['zbin']), 
+                krange=[0.01,kmax], ell=ell, NorS='sgc', sys='fc'))
+        pk_ngc_mock = np.concatenate(pk_ngc_list, axis=1) 
+        pk_sgc_mock = np.concatenate(pk_sgc_list, axis=1) 
+    else: 
+        raise NotImplementedError
+        
+    if zbin == 1: # 0.2 < z < 0.5 
+        # maximum likelihood value 
+        start = np.array([1.008, 1.001, 0.478, 1.339, 1.337, 1.16, 0.32, -1580., -930., 6.1, 6.8] )
+    ndim = len(start) 
+
+    # initialize MPI pool
+    try: 
+        pool = MPIPool()
+        if not pool.is_master():
+            pool.wait()
+            sys.exit(0)
+    except ValueError: 
+        pool = None 
+    
+    print("initializing ", Nchains, " independent emcee chains")
+    pos, samplers =[], []
+    for ichain in range(Nchains):
+        pos.append([start + temperature*start*(2.*np.random.random_sample(ndim)-1.)
+            for i in range(nwalkers)])
+        samplers.append(emcee.EnsembleSampler(nwalkers, ndim, lnPost, 
+            args=lnpost_args, pool=pool)) 
+
+    # Start MCMC
+    print("Running MCMC...")
+    withinchainvar = np.zeros((Nchains, ndim))
+    meanchain = np.zeros((Nchains, ndim))
+    scalereduction = np.repeat(2., ndim)
+    
+    # bunch of numbers for the mcmc run 
+    itercounter = 0
+    chainstep = minlength
+    loop = 1
+    epsilon = 0.02 #0.02
+    ichaincheck = 100
+    rstate = np.random.get_state()
+
+    while loop:
+        itercounter += chainstep
+        print("chain length =",itercounter)
+
+        for jj in range(Nchains):
+            for result in samplers[jj].sample(pos[jj], iterations=chainstep, 
+                    rstate0=rstate, storechain=True):
+                pos[jj] = result[0]
+                chainchi2 = -2.*result[1]
+                rstate = result[2]
+
+                # append chain outputs to chain file  
+                chain_file = ''.join([UT.dat_dir(), 'mcmc/', tag, '.chain', str(jj), 
+                    '.zbin', str(zbin), '.dat']) 
+                f = open(chain_file, 'a')
+                for k in range(pos[jj].shape[0]): 
+                    output_str = '\t'.join(pos[jj][k].astype('str'))+'\t'+str(chainchi2[k])+'\n'
+                    f.write(output_str)
+                f.close()
+
+            # we do the convergence test on the second half of the current chain (itercounter/2)
+            chainsamples = samplers[jj].chain[:, itercounter/2:, :].reshape((-1, ndim))
+            withinchainvar[jj] = np.var(chainsamples, axis=0)
+            meanchain[jj] = np.mean(chainsamples, axis=0)
+    
+        scalereduction = gelman_rubin_convergence(withinchainvar, meanchain, itercounter/2, Nchains, ndim)
+        print("scalereduction = ", scalereduction)
+        
+        loop = 0
+        for jj in range(ndim):
+            if np.abs(1-scalereduction[jj]) > epsilon:
+                loopcriteria = 1
+
+        chainstep = ichaincheck
+
+    if pool is not None: 
+        pool.close() 
+    return None 
+
+
 def lnPrior(theta):
     ''' log prior function -- ln(Prior(theta)). theta should have 
     [alpha_perp, alpha_para, fsig8, 
@@ -187,10 +328,72 @@ def lnPrior(theta):
     return 0. 
 
 
-def lnLike(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
-    ''' log likelihood function 
+def lnLike_pca(theta, k_list, pk_ngc_list, pk_sgc_list, pk_ngc_mock, pk_sgc_mock):
+    ''' wrapper for nongauss.lnL_pca . lnL_pca decomposes  P_data - P_model into
+    PCA componenets, then measures the likelihood by calculating the probability
+    of each of the components p(x_pca,i), which is estimated using a nonparametric
+    density estimation method (e.g. KDE) from the mock catalogs 
 
-    Parameters
+    parameters
+    ----------
+    theta : array
+        cosmological parameters : alpha_perp, alpha_para, fsig8 and 
+        nuisance parameters : b1NGCsig8, b1SGCsig8, b2NGCsig8, b2SGCsig8, 
+        NNGC, NSGC, sigmavNGC, sigmavSGC
+
+    k_list : list
+        list of k values for the mono, quadru, and hexadecaopoles -- [k0, k2, k4]
+
+    pk_ngc_list : list 
+   
+    pk_sgc_list : list 
+
+    mocks_ngc : np.ndarray (N_mock x N_k)
+        Array of the mock catalog P(k)s for NGC
+    
+    mocks_sgc : np.ndarray (N_mock x N_k)
+        Array of the mock catalog P(k)s for SGC
+    '''
+    if 0.8 < theta[0] < 1.4 and 0.8 < theta[1] < 1.4:
+        binrange1, binrange2, binrange3 = len(k_list[0]), len(k_list[1]), len(k_list[2])
+        maxbin1 = len(k_list[0])+1
+
+        k = np.concatenate(k_list)
+        pk_ngc = np.concatenate(pk_ngc_list)
+        pk_sgc = np.concatenate(pk_sgc_list)
+
+        modelX = Mod.taruya_model(100, binrange1, binrange2, binrange3, maxbin1, 
+                k, theta[0], theta[1], theta[2], theta[3], 
+                theta[4], theta[5], theta[6], theta[7], 
+                theta[8], theta[9], theta[10])
+    
+        model_ngc = modelX[0]
+        model_sgc = modelX[1]
+
+        diff_ngc = model_ngc - pk_ngc
+        diff_sgc = model_sgc - pk_sgc 
+        lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock) 
+        lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
+        return lnP_pca_ngc + ln_pca_sgc #-0.5*(chi2_ngc + chi2_sgc)
+    else: 
+        return -0.5*(10000.)
+
+
+def lnPost_pca(theta, k_list, pk_ngc_list, pk_sgc_list, pk_ngc_mock, pk_sgc_mock): 
+    ''' log posterior 
+    '''
+    lp = lnPrior(theta)
+    if np.isfinite(lp):
+        return lp + lnLike_pca(theta, k_list, pk_ngc_list, pk_sgc_list, pk_ngc_mock, pk_sgc_mock)
+    else:
+        return -np.inf
+
+
+def lnLike_pseudo(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
+    ''' log of the pseudo Gaussian likelihood function. This is identical to 
+    Florian's implementation. 
+
+    parameters
     ----------
     theta : array
         cosmological parameters : alpha_perp, alpha_para, fsig8 and 
@@ -227,138 +430,14 @@ def lnLike(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
         return -0.5*(10000.)
 
 
-def lnPost(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
+def lnPost_pseudo(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc):
     ''' log posterior 
     '''
     lp = lnPrior(theta)
     if np.isfinite(lp):
-        return lp + lnLike(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc)
+        return lp + lnLike_pseudo(theta, k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc)
     else:
         return -np.inf
-
-
-def mcmc(tag=None, zbin=1, nwalkers=48, Nchains=4, minlength=600): 
-    '''
-    
-    Parameters
-    ---------- 
-
-    Nchains : int 
-        Number of independent chains to run for the gelman rubin convergence test
-    
-    '''
-    if tag is None: 
-        raise ValueError("specify a tag, otherwise it's confusing") 
-    temperature = 2.e-3 # temperature
-
-    # read in BOSS P(k) NGC
-    pkay = Dat.Pk()
-    k0, p0k_ngc = pkay.Observation(0, zbin, 'ngc')
-    k2, p2k_ngc = pkay.Observation(2, zbin, 'ngc')
-    k4, p4k_ngc = pkay.Observation(4, zbin, 'ngc')
-    pk_ngc_list = [p0k_ngc, p2k_ngc, p4k_ngc]
-    k_list = [k0, k2, k4]
-    # read in BOSS P(k) SGC
-    k0, p0k_sgc = pkay.Observation(0, zbin, 'sgc')
-    k2, p2k_sgc = pkay.Observation(2, zbin, 'sgc')
-    k4, p4k_sgc = pkay.Observation(4, zbin, 'sgc')
-    pk_sgc_list = [p0k_sgc, p2k_sgc, p4k_sgc]
-
-    # read in Covariance matrix 
-    # currently for testing purposes, 
-    # implemented to read in Florian's covariance matrix  
-    _, _, C_pk_ngc = Dat.beutlerCov(zbin, NorS='ngc', ell='all')
-    _, _, C_pk_sgc = Dat.beutlerCov(zbin, NorS='sgc', ell='all')
-
-    # calculate precision matrices (including the hartlap factor) 
-    Cinv_ngc = np.linalg.inv(C_pk_ngc)
-    Cinv_sgc = np.linalg.inv(C_pk_sgc)
-    # hartlap factor 
-    n_mocks_ngc = 2045
-    n_mocks_sgc = 2048
-    f_hartlap_ngc = (float(n_mocks_ngc) - float(len(np.concatenate(pk_ngc_list))) - 2.)/(float(n_mocks_ngc) - 1.)
-    f_hartlap_sgc = (float(n_mocks_sgc) - float(len(np.concatenate(pk_sgc_list))) - 2.)/(float(n_mocks_sgc) - 1.)
-    Cinv_ngc *= f_hartlap_ngc  
-    Cinv_sgc *= f_hartlap_sgc
-        
-    if zbin == 1: # 0.2 < z < 0.5 
-        # maximum likelihood value 
-        start = np.array([1.008, 1.001, 0.478, 1.339, 1.337, 1.16, 0.32, -1580., -930., 6.1, 6.8] )
-    ndim = len(start) 
-
-    # initialize MPI pool
-    try: 
-        pool = MPIPool()
-        if not pool.is_master():
-            pool.wait()
-            sys.exit(0)
-    except ValueError: 
-        pool = None 
-
-    # args for lnProb function 
-    # data ks, BOSS NGC P_l(k), BOSS SGC P_l(k), NGC precision matrix, SGC precision matrix 
-    lnpost_args = (k_list, pk_ngc_list, pk_sgc_list, Cinv_ngc, Cinv_sgc)
-    
-    print("initializing ", Nchains, " independent emcee chains")
-    pos, samplers =[], []
-    for ichain in range(Nchains):
-        pos.append([start + temperature*start*(2.*np.random.random_sample(ndim)-1.)
-            for i in range(nwalkers)])
-        samplers.append(emcee.EnsembleSampler(nwalkers, ndim, lnPost, args=lnpost_args, pool=pool)) 
-
-    # Start MCMC
-    print("Running MCMC...")
-    withinchainvar = np.zeros((Nchains, ndim))
-    meanchain = np.zeros((Nchains, ndim))
-    scalereduction = np.repeat(2., ndim)
-    
-    # bunch of numbers for the mcmc run 
-    itercounter = 0
-    chainstep = minlength
-    loop = 1
-    epsilon = 0.02 #0.02
-    ichaincheck = 100
-    rstate = np.random.get_state()
-
-    while loop:
-
-        itercounter += chainstep
-        print("chain length =",itercounter)
-
-        for jj in range(Nchains):
-            for result in samplers[jj].sample(pos[jj], iterations=chainstep, 
-                    rstate0=rstate, storechain=True):
-                pos[jj] = result[0]
-                chainchi2 = -2.*result[1]
-                rstate = result[2]
-
-                # append chain outputs to chain file  
-                chain_file = ''.join([UT.dat_dir(), 'mcmc/', tag, '.chain', str(jj), 
-                    '.zbin', str(zbin), '.dat']) 
-                f = open(chain_file, 'a')
-                for k in range(pos[jj].shape[0]): 
-                    output_str = '\t'.join(pos[jj][k].astype('str')) + '\n'
-                    f.write(output_str)
-                f.close()
-
-            # we do the convergence test on the second half of the current chain (itercounter/2)
-            chainsamples = samplers[jj].chain[:, itercounter/2:, :].reshape((-1, ndim))
-            withinchainvar[jj] = np.var(chainsamples, axis=0)
-            meanchain[jj] = np.mean(chainsamples, axis=0)
-    
-        scalereduction = gelman_rubin_convergence(withinchainvar, meanchain, itercounter/2, Nchains, ndim)
-        print("scalereduction = ", scalereduction)
-        
-        loop = 0
-        for jj in range(ndim):
-            if np.abs(1-scalereduction[jj]) > epsilon:
-                loopcriteria = 1
-
-        chainstep = ichaincheck
-
-    if pool is not None: 
-        pool.close() 
-    return None 
 
 
 def gelman_rubin_convergence(withinchainvar, meanchain, n, Nchains, ndim):

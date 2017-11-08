@@ -213,6 +213,65 @@ def lnPost(zbin=1):
     return None
 
 
+def mcmc_reproduceFlorian(zbin=1, ichain=0, nchains_burn=200, nwalkers=48): 
+    ''' see if the same mcmc run reproduce's florian's MCMC constraints 
+    '''
+    labels = [r'$\alpha_\perp$', r'$\alpha_\parallel$', '$f\sigma_8$', 
+            '$b_1^\mathrm{NGC} \sigma_8$', '$b_1^\mathrm{SGC}\sigma_8$', 
+            '$b_2^\mathrm{NGC} \sigma_8$', '$b_2^\mathrm{SGC}\sigma_8$', 
+            '$N_\mathrm{NGC}$', '$N_\mathrm{SGC}$', 
+            '$\sigma_v^\mathrm{NGC}$', '$\sigma_v^\mathrm{SGC}$']
+    # plot range are the prior ranges 
+    prior_min = [0.8, 0.8, 0.1, 0.3, 0.3, -6., -6., -10000., -10000., 0.5, 0.5]
+    prior_max = [1.4, 1.4, 1.1, 5., 5., 6., 6., 10000., 10000., 15., 15.]
+    plot_range = [(mi, ma) for mi, ma in zip(prior_min, prior_max)]
+
+    # read Florian's chain file
+    chain_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
+        'Beutler_et_al_full_shape_analysis_z', str(zbin), '_chain', str(ichain), '.dat']) 
+    sample = np.loadtxt(chain_file, skiprows=1)
+    sample = sample[:,1:-1]
+    print sample.shape
+
+    # read in my chain 
+    mychain_file = ''.join([UT.dat_dir(), 
+        'mcmc/testing2.chain', str(ichain), '.zbin', str(zbin), '.dat']) 
+    mysample = np.loadtxt(mychain_file)
+    mysample = mysample[:,:-1]
+    print mysample.shape
+    
+    # Posterior Likelihood Corner Plot
+    fig = DFM.corner(sample[nchains_burn*nwalkers:],
+            labels=labels,
+            label_kwargs={'fontsize': 25},
+            range=plot_range,
+            quantiles=[0.16,0.5,0.84],
+            show_titles=True,
+            title_args={"fontsize": 12},
+            fill_contours=True,
+            levels=[0.68, 0.95],
+            color='k', bins=16, smooth=1.0)
+    ws = np.repeat(float(sample[nchains_burn*nwalkers:].shape[0])/float(mysample[nchains_burn*nwalkers:].shape[0]), mysample[nchains_burn*nwalkers:].shape[0])
+    print mysample[nchains_burn*nwalkers:].shape[0]
+    DFM.corner(mysample[nchains_burn*nwalkers:],
+            weights=ws,
+            labels=labels,
+            label_kwargs={'fontsize': 25},
+            range=plot_range,
+            quantiles=[0.16,0.5,0.84],
+            show_titles=True,
+            title_args={"fontsize": 12},
+            fill_contours=True,
+            levels=[0.68, 0.95],
+            color='b', bins=16, smooth=1.0, fig=fig)
+
+    fig_file = ''.join([UT.fig_dir(), 'mcmc.corner.reproduceFlorian.chain', str(ichain), 
+        '.zbin', str(zbin), '.png']) 
+    plt.savefig(fig_file)
+    plt.close()
+    return None 
+
+
 def plot_mcmc(tag=None, zbin=1, nwalkers=48, nchains_burn=200):
     '''
     Plot MCMC chains
@@ -285,7 +344,8 @@ def plot_mcmc(tag=None, zbin=1, nwalkers=48, nchains_burn=200):
 
 
 if __name__=="__main__":
-    model() 
+    mcmc_reproduceFlorian(zbin=1, ichain=0, nchains_burn=200, nwalkers=48)
+    #model() 
     #importance_weight()
     #lnPost()
     #plot_mcmc(tag='beutler', zbin=1, nwalkers=48, nchains_burn=200) #tag=testing, zbin=1)
