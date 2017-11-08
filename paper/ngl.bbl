@@ -1,0 +1,32 @@
+\begin{thebibliography}{}
+\providecommand\natexlab[1]{#1}
+\providecommand\JournalTitle[1]{#1}
+
+\bibitem[{Kitaura {et~al.}(2016)Kitaura, Rodr{\'\i}guez-Torres, Chuang, Zhao,
+  Prada, Gil-Mar{\'\i}n, Guo, Yepes, Klypin, Sc{\'o}ccola, Tinker, McBride,
+  Reid, S{\'a}nchez, Salazar-Albornoz, Grieb, Vargas-Magana, Cuesta, Neyrinck,
+  Beutler, Comparat, Percival, \& Ross}]{kitaura2016}
+Kitaura, F.-S., Rodr{\'\i}guez-Torres, S., Chuang, C.-H., {et~al.} 2016,
+  \href{http://dx.doi.org/10.1093/mnras/stv2826}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 456, 4156}
+
+\bibitem[{Krishnamurthy {et~al.}(2014)Krishnamurthy, Kandasamy, Poczos, \&
+  Wasserman}]{krishnamurthy2014}
+Krishnamurthy, A., Kandasamy, K., Poczos, B., \& Wasserman, L. 2014,
+  \JournalTitle{arXiv:1402.2966 [math, stat]},
+  \href{http://arxiv.org/abs/1402.2966}{{\sffamily arXiv:1402.2966 [math,
+  stat]}}
+
+\bibitem[{Poczos {et~al.}(2012)Poczos, Xiong, \& Schneider}]{poczos2012}
+Poczos, B., Xiong, L., \& Schneider, J. 2012, \JournalTitle{arXiv:1202.3758
+  [cs, stat]}, \href{http://arxiv.org/abs/1202.3758}{{\sffamily arXiv:1202.3758
+  [cs, stat]}}
+
+\bibitem[{Sinha {et~al.}(2017)Sinha, Berlind, McBride, Scoccimarro, Piscionere,
+  \& Wibking}]{sinha2017}
+Sinha, M., Berlind, A.~A., McBride, C.~K., {et~al.} 2017,
+  \JournalTitle{arXiv:1708.04892 [astro-ph]},
+  \href{http://arxiv.org/abs/1708.04892}{{\sffamily arXiv:1708.04892
+  [astro-ph]}}
+
+\end{thebibliography}
