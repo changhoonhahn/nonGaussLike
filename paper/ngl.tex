@@ -29,8 +29,10 @@
 \newcommand{\opcit}{\foreign{Op.~cit.}}
 \newcommand{\documentname}{\textsl{Article}}
 \newcommand{\equationname}{equation}
+\newcommand{\bitem}{\begin{itemize}}
+\newcommand{\eitem}{\end{itemize}}
 
-\begin{document}\sloppy\sloppypar\frenchspacing % oh yeah
+\begin{document}\sloppy\sloppypar\frenchspacing 
 
 \title{How I Learned to Stop Worrying and Love The Central Limit Theorem}
 \date{\texttt{DRAFT~---~\githash~---~\gitdate~---~NOT READY FOR DISTRIBUTION}}
@@ -43,11 +45,11 @@
 \end{abstract}
 
 \keywords{
-methods: data analysis
----
 methods: statistical
 ---
 galaxies: statistics
+---
+methods: data analysis
 ---
 cosmological parameters
 ---
@@ -70,21 +72,53 @@ large-scale structure of universe
     \item Depending on Hogg's paper maybe a simple illustration of how the likelihood asumption 
 \end{itemize}
 
-\section{Beyond Central Limit Theorem}
-\subsection{Quantifying non-Gaussianity}
-\begin{itemize}
-\item non parameteric $k$-NN estimates of the divergence between the pdf from mock and Gaussian described by the covariance matrix
-\end{itemize} 
-
-\subsection{Estimating the Non-Gaussian Likelihood}
+\section{Quantifying Likelihood non-Gaussianity}
+\subsection{Mock Catalogs}
+\bitem
+    \item brief descriptin of the mock catalogs 
+    \item \cite{kitaura2016, sinha2017}
+\eitem
+\subsection{$k$-NN Nonparametric Divergence Estimation}
+\bitem
+    \item \cite{poczos2012, krishnamurthy2014}
+\eitem
+\section{Estimating the Non-Gaussian Likelihood}
+\subsection{Independent Component Analysis} 
 
 \section{Impact on Parameter Inference}
-\begin{itemize}
-    \item 
-\end{itemize}
+\bitem
+    \item explain importance sampling 
+\eitem
 
-\acknowledgements
+\section{Discussion}
+\bitem
+    \item Will it matter for future surveys? 
+    \item Likelihood free inference
+\eitem
 
-%\bibliography{}
+\section{Summary}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figures 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=0.9\textwidth]{figs/}
+%\caption{}
+%\label{fig:abc_demo}
+%\end{center}
+%\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Acknowledgements
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgements}
+It's a pleasure to thank 
+    Simone~Ferraro,
+    Zachary~Slepian,
+    David~W.~Hogg,
+    Roman~Scoccimarro
+
+\bibliographystyle{yahapj}
+\bibliography{nongausslike}
 \end{document}
