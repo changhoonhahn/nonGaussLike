@@ -75,23 +75,34 @@ def Corner_updatedLike(tag_mcmc, tag_like, ichain):
     return None
 
 
-def LikelihoodPDF_B2017(tag_mcmc, tag_like, ichain):
-    '''
+def Like_RSD(tag_like, tag_mcmc='beutler_z1'):
+    ''' comparison between Florian's MCMC posterior distribution from 
+    Beutler et al. (2017), to importance sampled posteriors derived for 
+    `tag_like`. 
     '''
     if tag_like == 'RSD_ica_gauss': 
         str_like = 'ICA'
     elif tag_like == 'RSD_pca_gauss': 
         str_like = 'PCA'
-    # import MCMC chain 
-    chain = Inf.mcmc_chains(tag_mcmc, ichain=ichain)
-
-    # import importance weight
-    f_wimp = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
-        'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), 
-        '.', tag_like, '_weights.dat']) 
-    wimp = np.loadtxt(f_wimp, skiprows=1, unpack=True, usecols=[2]) 
+    else: 
+        raise NotImplementedError
+    chain, wimp = [], [] 
+    for ichain in range(3) 
+        # read in Florian's MCMC chains
+        chain.append(Inf.mcmc_chains(tag_mcmc, ichain=ichain)) 
+        # read in importance weight
+        f_wimp = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
+            'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), 
+            '.', tag_like, '_weights.dat']) 
+        wimp.append(np.loadtxt(f_wimp, skiprows=1, unpack=True, usecols=[2])) 
+    chain = np.concatenate(chain) 
+    wimp = np.concatenate(wimp) 
+    print chain.shape
+    print wimp.shape 
     lims = np.where(wimp < 1e3)
 
+    
+    # ignoring some of the nuissance parameters
     labels = ['alpha_perp', 'alpha_para', 'fsig8', 'b1sig8_NGC', 'b1sig8_SGC', 'b2sig8_NGC', 'b2sig8_SGC'] 
     lbltex = [r'$\alpha_\perp$', r'$\alpha_\parallel$', r'$f \sigma_8$', 
             r'$b_1\sigma_8^{NGC}$', r'$b_1\sigma_8^{SGC}$', 
@@ -104,25 +115,31 @@ def LikelihoodPDF_B2017(tag_mcmc, tag_like, ichain):
     fig = plt.figure(figsize=(5*len(labels), 5)) 
     for i in range(len(labels)): 
         sub = fig.add_subplot(1, len(labels), i+1) 
+        # over-plot the two histograms
         hh = sub.hist(chain[labels[i]], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]],
-                alpha=1, edgecolor='none', label='Beutler+2017') 
+                alpha=1, edgecolor='none', label='Beutler et al.(2017)') 
         sub.hist(chain[labels[i]][lims], weights=wimp[lims], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]], 
-                alpha=0.75, edgecolor='none') 
-        # constraints 
+                alpha=0.75, edgecolor='none', label=str_like+' (imp. sampl.)') 
+
+        # get parameter quanties from the chains and put them in the title of each subplot
         low, med, high = np.percentile(chain[labels[i]], [15.86555, 50, 84.13445])
         low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
-        txt = ''.join(['Beutler+(2017):$', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$\n', 
+
+        txt = ''.join(['B2017: $', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$\n', 
             str_like, ': $', str(round(med_w,3)), '^{+', str(round(high_w-med_w,3)), '}_{-', str(round(med_w-low_w,3)), '}$']) 
-        sub.text(0.1, 0.95, txt, 
-                ha='left', va='top', transform=sub.transAxes, fontsize=15)
+        sub.set_title(txt)
+        #sub.text(0.1, 0.95, txt, ha='left', va='top', transform=sub.transAxes, fontsize=15)
+    
+        # legend
+        if i == 0: sub.legend(loc='upper right', prop={'size': 15})  
 
         # x-axis 
         sub.set_xlim([prior_min[i], prior_max[i]]) 
         sub.set_xlabel(lbltex[i], fontsize=20)
         # y-axis
         sub.set_ylim([0., 1.5*hh[0].max()])
-        #if i == 0: sub.legend(loc='upper right', prop={'size':15}) 
-    fig.savefig(''.join([UT.tex_dir(), 'figs/likelihoodPDF_B2017.', tag_mcmc, '.', tag_like, '.chain', str(ichain), '.pdf']), 
+
+    fig.savefig(''.join([UT.tex_dir(), 'figs/Like_RSD.beutler_z1.', tag_like, '.pdf']), 
             bbox_inches='tight') 
     return None
 
@@ -174,7 +191,6 @@ def LikelihoodPDF_GMF(tag_mcmc, tag_like, irun):
 
 if __name__=="__main__": 
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
-    LikelihoodPDF_B2017('beutler_z1', 'RSD_ica_gauss', 0)
-    #LikelihoodPDF_B2017('beutler_z1', 'RSD_pca_gauss', 0)
+    Like_RSD('RSD_ica_gauss', 0)
     #LikelihoodPDF_GMF('manodeep', 'gmf_ica_chi2', 1)
     #LikelihoodPDF_GMF('manodeep', 'gmf_pca_chi2', 1)
