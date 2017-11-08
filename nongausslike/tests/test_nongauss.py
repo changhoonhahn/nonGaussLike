@@ -560,6 +560,31 @@ def whiten(mock, ell=0, rebin=None, krange=None, method='choletsky'):
     return None 
 
 
+def X_gmf_all():
+    ''' ***TESTED -- Nov 8, 2017***
+    Test to make sure that NG.X_gmf_all returns correct values
+    '''
+    X, nbins = NG.X_gmf_all(n_arr=True) 
+    nmid = 0.5*(nbins[1:] + nbins[:-1])
+    assert X.shape[1] == len(nmid)
+    assert X.shape[0] == 20000
+
+    fig = plt.figure(figsize=(5,5)) 
+    sub = fig.add_subplot(111)
+    for i in np.random.choice(range(X.shape[0]), 1000, replace=False):
+        sub.plot(nmid, X[i,:], c='k', lw=0.01)
+    sub.plot(nmid, np.average(X, axis=0), c='r', lw=2, ls='--')
+    # x-axis
+    sub.set_xlim([0., 180.]) 
+    sub.set_xlabel('$N$', fontsize=20) 
+    # y-axis
+    sub.set_yscale('log') 
+    sub.set_ylabel(r'$\zeta(N)$', fontsize=20) 
+    fig.savefig(''.join([UT.fig_dir(), 'tests/X_gmf_all.png']), bbox_inches='tight') 
+    plt.close() 
+    return None 
+
+
 def dataX(mock, ell=0, rebin=None, krange=None): 
     ''' ***TESTED***
     Test the data X calculation 
@@ -618,5 +643,6 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    GMF_p_Xw_i('manodeep.run1', ica=True, pca=False)
+    X_gmf_all()
+    #GMF_p_Xw_i('manodeep.run1', ica=True, pca=False)
     #lnL_pca_gauss('patchy.z1', ell=0, krange=[0.01, 0.15], NorS='ngc')

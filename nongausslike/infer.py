@@ -9,7 +9,7 @@ import model as Mod
 import nongauss as NG 
 
 
-def importance_weight(tag, chain, **kwargs): 
+def W_importance(tag, chain, **kwargs): 
     ''' Given a dictionary with the MCMC chain, evaluate the likelihood ratio 
     '''
     if 'RSD' in tag: # Florian's RSD analysis 
@@ -55,11 +55,8 @@ def importance_weight(tag, chain, **kwargs):
             lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
             lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
 
-            lnP_pca = lnP_pca_ngc + lnP_pca_sgc
-            lnP_ica = lnP_ica_ngc + lnP_ica_sgc
-            ws = np.exp(lnP_ica - lnP_pca)
-            return [lnP_pca, lnP_ica, ws]
-
+            lnP_den = lnP_pca_ngc + lnP_pca_sgc
+            lnP_num = lnP_ica_ngc + lnP_ica_sgc
         elif tag == 'RSD_pca_gauss': # P_PCA,KDE (D - m(theta)) / P_Gauss(D - m(theta))
             lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock)
             lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
@@ -67,11 +64,8 @@ def importance_weight(tag, chain, **kwargs):
             lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
             lnP_gauss_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
 
-            lnP_gauss = lnP_gauss_ngc + lnP_gauss_sgc
-            lnP_pca = lnP_pca_ngc + lnP_pca_sgc
-            ws = np.exp(lnP_pca - lnP_gauss)
-            return [lnP_gauss, lnP_pca, ws]
-
+            lnP_den = lnP_gauss_ngc + lnP_gauss_sgc
+            lnP_num = lnP_pca_ngc + lnP_pca_sgc
         elif tag == 'RSD_ica_gauss': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
             lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
             lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
@@ -79,47 +73,49 @@ def importance_weight(tag, chain, **kwargs):
             lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
             lnP_gauss_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
             
-            lnP_gauss = lnP_gauss_ngc + lnP_gauss_sgc
-            lnP_ica = lnP_ica_ngc + lnP_ica_sgc
-            ws = np.exp(lnP_ica - lnP_gauss)
-            return [lnP_gauss, lnP_ica, ws]
-
+            lnP_den = lnP_gauss_ngc + lnP_gauss_sgc
+            lnP_num = lnP_ica_ngc + lnP_ica_sgc
         elif tag == 'RSD_ica_chi2': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
             lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
             lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
 
-            lnP_chi2 = -0.5 * chain['chi2']
-            
-            lnP_ica = lnP_ica_ngc + lnP_ica_sgc
-            ws = np.exp(lnP_ica - lnP_chi2)
-            return [lnP_gauss, lnP_chi2, ws]
+            lnP_den = -0.5 * chain['chi2']
+            lnP_num = lnP_ica_ngc + lnP_ica_sgc
 
     elif 'gmf' in tag: # GMF
-        # read in SDSS GMF (data D) 
-        geemf = Dat.Gmf()
+        geemf = Dat.Gmf() # read in SDSS GMF (data D) 
         nbins, gmf_data = geemf.Observation()
-
+        
         # calculate D - m(theta) for all the mcmc chain
         dgmf = gmf_data - chain['gmf'] 
         
-        # read in mock catalog 
-        gmf_mock = NG.X_gmf('manodeep.run'+str(kwargs['run']))
+        # read mock gmfs (all mocks from 100 differnet HOD parameter points)
+        gmf_mock = NG.X_gmf_all() #gmf_mock = NG.X_gmf('manodeep.run'+str(kwargs['run']))#
         
         if tag == 'gmf_ica_chi2':
-            lnP_ica = NG.lnL_ica(dgmf, gmf_mock)
-            lnP_chi2 = -0.5 * chain['chi2']
-            
-            ws = np.exp(lnP_ica - lnP_chi2)
-            return [lnP_chi2, lnP_ica, ws]
-
+            lnP_den = -0.5 * chain['chi2'] # -0.5 chi-squared
+            lnP_num = NG.lnL_ica(dgmf, gmf_mock)
+        elif tag == 'gmf_all_chi2': 
+            # importance weight determined by the ratio of 
+            # the chi^2 from the chain and the chi^2 calculated 
+            # using the covariance matrix from the entire catalog
+            # we note that Sinha et al.(2017) does not include the
+            # hartlap factor
+            Cgmf = np.cov(gmf_mock.T) # covariance matrix 
+            Cinv = np.linalg.inv(Cgmf) # precision matrix
+             
+            lnP_num = -0.5 * chain['chi2'] # chi-squared calculated 
+            lnP_den = -0.5 * np.dot(dgmf, np.dot(Cinv, dgmf)) # updated chi-square
         elif tag == 'gmf_pca_chi2':
-            lnP_pca = NG.lnL_pca(dgmf, gmf_mock)
-            lnP_chi2 = -0.5 * chain['chi2']
-            
-            ws = np.exp(lnP_pca - lnP_chi2)
-            return [lnP_chi2, lnP_pca, ws]
+            lnP_num = NG.lnL_pca(dgmf, gmf_mock)
+            lnP_den = -0.5 * chain['chi2']
+        else: 
+            raise NotImplementedError
     else: 
         raise ValueError
+
+    ws = np.exp(lnP_den - lnP_num)
+    return [lnP_den, lnP_num, ws]
 
 
 def mcmc_chains(tag, ichain=None): 
@@ -155,11 +151,8 @@ def mcmc_chains(tag, ichain=None):
         labels = ['logMmin', 'sig_logM', 'logM0', 'logM1', 'alpha', 'chi2']
         
         for i,lbl in enumerate(labels): 
-            if lbl == 'chi2': 
-                chain_dict[lbl] = -2.*chain[:,i]
-            else:
-                chain_dict[lbl] = chain[:,i]
-
+            if lbl == 'chi2': chain_dict[lbl] = -2.*chain[:,i]
+            else: chain_dict[lbl] = chain[:,i]
         chain_dict['gmf'] = chain [:,-8:]
     else: 
         raise ValueError

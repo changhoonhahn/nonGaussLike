@@ -258,6 +258,24 @@ def meansub(X):
     return X - mu_X, mu_X
 
 
+def X_gmf_all(n_arr=False): 
+    ''' Construct data matrix X from mock GMFs. But instead of 
+    using one theta_HOD realization like the function X_gmf, use 
+    all 100 different theta_HOD realizations.  
+    '''
+    X = [] 
+    for i in range(100): 
+        name = ('manodeep.run%i' % i) 
+        if n_arr and i == 0: 
+            X_i, nbins = X_gmf(name, n_arr=True) 
+        else: 
+            X_i = X_gmf(name) 
+        X.append(X_i) 
+    if n_arr:
+        return np.concatenate(X), nbins
+    return np.concatenate(X)  
+
+
 def X_gmf(name, n_arr=False): 
     ''' Construct data matrix X from mock GMFs 
     
