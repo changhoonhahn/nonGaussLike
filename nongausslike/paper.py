@@ -75,7 +75,7 @@ def Corner_updatedLike(tag_mcmc, tag_like, ichain):
     return None
 
 
-def Like_RSD(tag_like, tag_mcmc='beutler_z1'):
+def Like_RSD(tag_like, tag_mcmc='beutler_z1', ichain=0):
     ''' comparison between Florian's MCMC posterior distribution from 
     Beutler et al. (2017), to importance sampled posteriors derived for 
     `tag_like`. 
@@ -86,21 +86,19 @@ def Like_RSD(tag_like, tag_mcmc='beutler_z1'):
         str_like = 'PCA'
     else: 
         raise NotImplementedError
-    chain, wimp = [], [] 
-    for ichain in range(3) 
-        # read in Florian's MCMC chains
-        chain.append(Inf.mcmc_chains(tag_mcmc, ichain=ichain)) 
-        # read in importance weight
-        f_wimp = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
-            'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), 
-            '.', tag_like, '_weights.dat']) 
-        wimp.append(np.loadtxt(f_wimp, skiprows=1, unpack=True, usecols=[2])) 
-    chain = np.concatenate(chain) 
-    wimp = np.concatenate(wimp) 
-    print chain.shape
-    print wimp.shape 
-    lims = np.where(wimp < 1e3)
+    # read in Florian's MCMC chains
+    chain = Inf.mcmc_chains(tag_mcmc, ichain=ichain) 
+    # read in importance weight
+    f_wimp = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
+        'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), 
+        '.', tag_like, '_weights.dat']) 
+    wimp = np.loadtxt(f_wimp, skiprows=1, unpack=True, usecols=[2]) 
+    
+    # remove burnin (half of Florian's chain is burn in) 
+    burnin = np.zeros(wimp.shape, dtype=bool) 
+    burnin[int(wimp.shape[0]/2):] = True 
 
+    lims = np.where(burnin & (wimp < 1e3)) 
     
     # ignoring some of the nuissance parameters
     labels = ['alpha_perp', 'alpha_para', 'fsig8', 'b1sig8_NGC', 'b1sig8_SGC', 'b2sig8_NGC', 'b2sig8_SGC'] 
@@ -116,7 +114,7 @@ def Like_RSD(tag_like, tag_mcmc='beutler_z1'):
     for i in range(len(labels)): 
         sub = fig.add_subplot(1, len(labels), i+1) 
         # over-plot the two histograms
-        hh = sub.hist(chain[labels[i]], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]],
+        hh = sub.hist(chain[labels[i]][burnin], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]],
                 alpha=1, edgecolor='none', label='Beutler et al.(2017)') 
         sub.hist(chain[labels[i]][lims], weights=wimp[lims], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]], 
                 alpha=0.75, edgecolor='none', label=str_like+' (imp. sampl.)') 
@@ -139,7 +137,7 @@ def Like_RSD(tag_like, tag_mcmc='beutler_z1'):
         # y-axis
         sub.set_ylim([0., 1.5*hh[0].max()])
 
-    fig.savefig(''.join([UT.tex_dir(), 'figs/Like_RSD.beutler_z1.', tag_like, '.pdf']), 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/Like_RSD.beutler_z1.', tag_like, '.chain', str(ichain), '.pdf']), 
             bbox_inches='tight') 
     return None
 
@@ -191,6 +189,7 @@ def LikelihoodPDF_GMF(tag_mcmc, tag_like, irun):
 
 if __name__=="__main__": 
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
-    Like_RSD('RSD_ica_gauss', 0)
+    #Like_RSD('RSD_ica_gauss', ichain=2)
+    Like_RSD('RSD_pca_gauss', ichain=0)
     #LikelihoodPDF_GMF('manodeep', 'gmf_ica_chi2', 1)
     #LikelihoodPDF_GMF('manodeep', 'gmf_pca_chi2', 1)

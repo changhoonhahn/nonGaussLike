@@ -16,7 +16,7 @@ def importance_weight_Pk(tag_like, ichain, zbin=1):
     ''' save importance weights to file 
     '''
     chain = Inf.mcmc_chains('beutler_z'+str(zbin), ichain=ichain)
-    ws = Inf.importance_weight(tag_like, chain, zbin=zbin) # watch out zbin hardcoded. 
+    ws = Inf.W_importance(tag_like, chain, zbin=zbin) # watch out zbin hardcoded. 
 
     weight_file = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
         'Beutler_et_al_full_shape_analysis_z', str(zbin), '_chain', str(ichain), 
@@ -44,9 +44,10 @@ def importance_weight_Gmf(tag_like, run):
 
 if __name__=='__main__': 
     tag_like = Sys.argv[1]
+    tag_mcmc = Sys.argv[2]
     if 'beutler' in tag_mcmc: 
-        ichain = int(Sys.argv[2]) 
-        importance_weight_Pk(tag_mcmc, tag_like, ichain) 
+        ichain = int(Sys.argv[3]) 
+        importance_weight_Pk(tag_like, ichain) 
     elif 'manodeep' in tag_mcmc: 
         irun = int(Sys.argv[2]) 
-        importance_weight_Gmf(tag_mcmc, tag_like, run=irun) 
+        importance_weight_Gmf(tag_like, run=irun) 

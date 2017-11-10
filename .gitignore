@@ -8,3 +8,11 @@ run/*
 *hdf5
 *.o7*
 *.o
+
+*cpp
+*.so
+
+*.aux
+*.blg
+*.log
+*.out
