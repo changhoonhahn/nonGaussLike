@@ -105,7 +105,9 @@ def W_importance(tag, chain, **kwargs):
             Cinv = np.linalg.inv(Cgmf) # precision matrix
              
             lnP_num = -0.5 * chain['chi2'] # chi-squared calculated 
-            lnP_den = -0.5 * np.dot(dgmf, np.dot(Cinv, dgmf)) # updated chi-square
+            lnP_den = np.empty(dgmf.shape[0])
+            for i in range(dgmf.shape[0]): # updated chi-square
+                lnP_den[i] = -0.5 * np.dot(dgmf[i,:], np.dot(Cinv, dgmf[i,:].T)) 
         elif tag == 'gmf_pca_chi2':
             lnP_num = NG.lnL_pca(dgmf, gmf_mock)
             lnP_den = -0.5 * chain['chi2']
