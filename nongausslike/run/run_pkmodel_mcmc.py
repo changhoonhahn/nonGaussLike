@@ -73,6 +73,7 @@ def Pk_model_mcmc(tag, **kwargs):
 
 
 if __name__=="__main__": 
+    # e.g. python run/run_pkmodel_mcmc.py beutler_z1 1
     tag = sys.argv[1]
     ichain = sys.argv[2]
     Pk_model_mcmc(tag, ichain=ichain)

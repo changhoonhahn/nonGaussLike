@@ -110,30 +110,31 @@ def Like_RSD(tag_like, tag_mcmc='beutler_z1', ichain=0):
     #prior_max = [1.4, 1.4, 1.1, 5., 5., 6., 6.]#, 10000., 10000., 15., 15.]
     
     nbin = 40 
-    fig = plt.figure(figsize=(5*len(labels), 5)) 
+    fig = plt.figure(figsize=(5*len(labels), 4.5)) 
     for i in range(len(labels)): 
-        sub = fig.add_subplot(1, len(labels), i+1) 
-        # over-plot the two histograms
-        hh = sub.hist(chain[labels[i]][burnin], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]],
-                alpha=1, edgecolor='none', label='Beutler et al.(2017)') 
-        sub.hist(chain[labels[i]][lims], weights=wimp[lims], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]], 
-                alpha=0.75, edgecolor='none', label=str_like+' (imp. sampl.)') 
+        sub = fig.add_subplot(1, len(labels), i+1) # over-plot the two histograms
+        # original Beutler et al.(2017) constraints
+        hh = np.histogram(chain[labels[i]][burnin], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', label='Beutler et al.(2017)') 
+        # updated constraints
+        hh = np.histogram(chain[labels[i]][lims], weights=wimp[lims],normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none', label=str_like+' (imp. sampl.)') 
 
         # get parameter quanties from the chains and put them in the title of each subplot
         low, med, high = np.percentile(chain[labels[i]], [15.86555, 50, 84.13445])
         low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
 
-        txt = ''.join(['B2017: $', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$\n', 
+        txt = ''.join(['B2017: $', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$; ', 
             str_like, ': $', str(round(med_w,3)), '^{+', str(round(high_w-med_w,3)), '}_{-', str(round(med_w-low_w,3)), '}$']) 
         sub.set_title(txt)
         #sub.text(0.1, 0.95, txt, ha='left', va='top', transform=sub.transAxes, fontsize=15)
     
-        # legend
-        if i == 0: sub.legend(loc='upper right', prop={'size': 15})  
-
+        if i == 0: sub.legend(loc='upper right', prop={'size': 15})  # legend
         # x-axis 
         sub.set_xlim([prior_min[i], prior_max[i]]) 
-        sub.set_xlabel(lbltex[i], fontsize=20)
+        sub.set_xlabel(lbltex[i], fontsize=25)
         # y-axis
         sub.set_ylim([0., 1.5*hh[0].max()])
 
@@ -145,6 +146,14 @@ def Like_RSD(tag_like, tag_mcmc='beutler_z1', ichain=0):
 def Like_GMF(tag_mcmc, tag_like):
     '''
     '''
+    if tag_like == 'gmf_ica_chi2': 
+        str_like = 'ICA'
+    elif tag_like == 'gmf_pca_chi2': 
+        str_like = 'PCA'
+    elif tag_like == 'gmf_all_chi2': 
+        str_like = 'All'
+    else: 
+        raise NotImplementedError
     # import MCMC chain 
     chain = Inf.mcmc_chains(tag_mcmc)
 
@@ -176,10 +185,9 @@ def Like_GMF(tag_mcmc, tag_like):
         # constraints 
         low, med, high = np.percentile(chain[labels[i]], [15.86555, 50, 84.13445])
         low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
-        txt = ''.join(['B2017:$', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$\n', 
-            '$', str(round(med_w,3)), '^{+', str(round(high_w-med_w,3)), '}_{-', str(round(med_w-low_w,3)), '}$']) 
-        sub.text(0.1, 0.95, txt, 
-                ha='left', va='top', transform=sub.transAxes, fontsize=20)
+        txt = ''.join(['S2017: $', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$; ', 
+            str_like, ': $', str(round(med_w,3)), '^{+', str(round(high_w-med_w,3)), '}_{-', str(round(med_w-low_w,3)), '}$']) 
+        sub.set_title(txt)
 
         # x-axis 
         sub.set_xlim([prior_min[i], prior_max[i]]) 
@@ -194,5 +202,6 @@ def Like_GMF(tag_mcmc, tag_like):
 
 if __name__=="__main__": 
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
-    #Like_RSD('RSD_ica_gauss', ichain=2)
+    #Like_RSD('RSD_ica_gauss', ichain=0)
     Like_GMF('manodeep', 'gmf_all_chi2')
+    Like_GMF('manodeep', 'gmf_pca_chi2')

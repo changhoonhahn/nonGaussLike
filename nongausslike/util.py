@@ -48,7 +48,7 @@ def run_dir():
     return code_dir()+'run/'
 
 
-def bar_plot(bin_edges, values): 
+def bar_plot(values, bin_edges): 
     ''' Take outputs from numpy histogram and return pretty bar plot
     '''
     xx = [] 

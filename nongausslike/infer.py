@@ -93,7 +93,7 @@ def W_importance(tag, chain, **kwargs):
         gmf_mock = NG.X_gmf_all() #gmf_mock = NG.X_gmf('manodeep.run'+str(kwargs['run']))#
         
         if tag == 'gmf_ica_chi2':
-            lnP_den = -0.5 * chain['chi2'] # -0.5 chi-squared
+            lnP_den = -0.5 * chain['chi2'] # -0.5 chi-squared from MCMC chain
             lnP_num = NG.lnL_ica(dgmf, gmf_mock)
         elif tag == 'gmf_all_chi2': 
             # importance weight determined by the ratio of 
@@ -104,19 +104,19 @@ def W_importance(tag, chain, **kwargs):
             Cgmf = np.cov(gmf_mock.T) # covariance matrix 
             Cinv = np.linalg.inv(Cgmf) # precision matrix
              
-            lnP_num = -0.5 * chain['chi2'] # chi-squared calculated 
-            lnP_den = np.empty(dgmf.shape[0])
+            lnP_den = -0.5 * chain['chi2'] # chi-squared calculated 
+            lnP_num = np.empty(dgmf.shape[0])
             for i in range(dgmf.shape[0]): # updated chi-square
-                lnP_den[i] = -0.5 * np.dot(dgmf[i,:], np.dot(Cinv, dgmf[i,:].T)) 
+                lnP_num[i] = -0.5 * np.dot(dgmf[i,:], np.dot(Cinv, dgmf[i,:].T)) 
         elif tag == 'gmf_pca_chi2':
-            lnP_num = NG.lnL_pca(dgmf, gmf_mock)
             lnP_den = -0.5 * chain['chi2']
+            lnP_num = NG.lnL_pca(dgmf, gmf_mock)
         else: 
             raise NotImplementedError
     else: 
         raise ValueError
 
-    ws = np.exp(lnP_den - lnP_num)
+    ws = np.exp(lnP_num - lnP_den)
     return [lnP_den, lnP_num, ws]
 
 
