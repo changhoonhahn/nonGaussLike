@@ -98,7 +98,8 @@ def Like_RSD(tag_like, tag_mcmc='beutler_z1', ichain=0):
     burnin = np.zeros(wimp.shape, dtype=bool) 
     burnin[int(wimp.shape[0]/2):] = True 
 
-    lims = np.where(burnin & (wimp < 1e3)) 
+    wlim = np.percentile(wimp[burnin], 99.5)
+    lims = np.where(burnin & (wimp < wlim)) 
     
     # ignoring some of the nuissance parameters
     labels = ['alpha_perp', 'alpha_para', 'fsig8', 'b1sig8_NGC', 'b1sig8_SGC', 'b2sig8_NGC', 'b2sig8_SGC'] 
@@ -167,7 +168,8 @@ def Like_GMF(tag_mcmc, tag_like):
     burnin = np.zeros(wimp.shape, dtype=bool) 
     burnin[int(wimp.shape[0]/2):] = True 
 
-    lims = np.where(burnin & (wimp < 1e3)) #lims = np.where(wimp < 1e3)
+    wlim = np.percentile(wimp[burnin], 99.5)
+    lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
 
     labels = ['logMmin', 'sig_logM', 'logM0', 'logM1', 'alpha']
     lbltex = [r'$\log M_\mathrm{min}$', r'$\sigma_{\log M}$', r'$\log M_0$', r'$\log M_1$', r'$\alpha$'] 
@@ -203,5 +205,7 @@ def Like_GMF(tag_mcmc, tag_like):
 if __name__=="__main__": 
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
+    #Like_RSD('RSD_pca_gauss', ichain=0)
     Like_GMF('manodeep', 'gmf_all_chi2')
     Like_GMF('manodeep', 'gmf_pca_chi2')
+    Like_GMF('manodeep', 'gmf_ica_chi2')

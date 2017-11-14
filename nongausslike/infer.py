@@ -111,6 +111,10 @@ def W_importance(tag, chain, **kwargs):
         elif tag == 'gmf_pca_chi2':
             lnP_den = -0.5 * chain['chi2']
             lnP_num = NG.lnL_pca(dgmf, gmf_mock)
+            
+        elif tag == 'gmf_gauss_chi2': 
+            lnP_den = -0.5 * chain['chi2']
+            lnP_num = NG.lnL_pca_gauss(dgmf, gmf_mock) 
         else: 
             raise NotImplementedError
     else: 
