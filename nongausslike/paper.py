@@ -153,6 +153,8 @@ def Like_GMF(tag_mcmc, tag_like):
         str_like = 'PCA'
     elif tag_like == 'gmf_all_chi2': 
         str_like = 'All'
+    elif tag_like == 'gmf_gauss_chi2': 
+        str_like = 'Gauss'
     else: 
         raise NotImplementedError
     # import MCMC chain 
@@ -202,10 +204,91 @@ def Like_GMF(tag_mcmc, tag_like):
     return None
    
 
+def GMF_contours(tag_mcmc='manodeep'):
+    '''
+    '''
+    # import MCMC chain 
+    chain = Inf.mcmc_chains(tag_mcmc)
+
+    # import importance weight
+    f_all = ''.join([UT.dat_dir(), 'manodeep/', 
+        'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0', 
+        '.gmf_gauss_chi2_weights.dat']) 
+    w_all = np.loadtxt(f_all, skiprows=1, unpack=True, usecols=[2]) 
+    f_ica = ''.join([UT.dat_dir(), 'manodeep/', 
+        'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0', 
+        '.gmf_ica_chi2_weights.dat']) 
+    w_ica = np.loadtxt(f_ica, skiprows=1, unpack=True, usecols=[2]) 
+    
+    # remove burnin?  
+    burnin = np.ones(w_all.shape, dtype=bool) 
+    #burnin[:int(w_all.shape[0]/4)] = False 
+
+    wlim_all = np.percentile(w_all[burnin], 99.5)
+    lims_all = np.where(burnin & (w_all < wlim_all)) #lims = np.where(wimp < 1e3)
+    wlim_ica = np.percentile(w_ica[burnin], 99.5)
+    lims_ica = np.where(burnin & (w_ica < wlim_ica)) #lims = np.where(wimp < 1e3)
+
+    labels = ['logMmin', 'sig_logM', 'logM0', 'logM1', 'alpha']
+    lbltex = [r'$\log M_\mathrm{min}$', r'$\sigma_{\log M}$', r'$\log M_0$', r'$\log M_1$', r'$\alpha$'] 
+    prior_min = [11., 0.001, 6., 12., 0.001]
+    prior_max = [12.2, 1., 14., 14., 2.]
+    
+    # log M_min vs sigma log M and log M_1 vs alpha
+    nbin = 40 
+    fig = plt.figure(figsize=(2*len(labels), 5)) 
+    # log M_min vs sigma log M 
+    sub = fig.add_subplot(121)
+
+    DFM.hist2d(chain['logMmin'][burnin], chain['sig_logM'][burnin], color='k', 
+            levels=[0.68, 0.95], alpha=0.5, 
+            range=[[prior_min[0], prior_max[0]], [prior_min[1], prior_max[1]]], 
+            plot_datapoints=False, plot_density=False, fill_contours=True, 
+            ax=sub)
+
+    DFM.hist2d(chain['logMmin'][lims_all], chain['sig_logM'][lims_all], weights=w_all[lims_all], 
+            color='b', levels=[0.68, 0.95], alpha=0.5, 
+            range=[[prior_min[0], prior_max[0]], [prior_min[1], prior_max[1]]], 
+            plot_datapoints=False, plot_density=False, fill_contours=True, 
+            ax=sub)
+    
+    DFM.hist2d(chain['logMmin'][lims_ica], chain['sig_logM'][lims_ica], weights=w_all[lims_ica], 
+            color='r', levels=[0.68, 0.95], alpha=0.5, 
+            range=[[prior_min[0], prior_max[0]], [prior_min[1], prior_max[1]]], 
+            plot_datapoints=False, plot_density=False, fill_contours=True, 
+            ax=sub)
+    # log M_1 vs alpha 
+    sub = fig.add_subplot(122)
+
+    DFM.hist2d(chain['logM1'][burnin], chain['alpha'][burnin], color='k', 
+            levels=[0.68, 0.95], alpha=0.5, 
+            range=[[prior_min[3], prior_max[3]], [prior_min[4], prior_max[4]]], 
+            plot_datapoints=False, plot_density=False, fill_contours=True, 
+            ax=sub)
+
+    DFM.hist2d(chain['logM1'][lims_all], chain['alpha'][lims_all], weights=w_all[lims_all], 
+            color='b', levels=[0.68, 0.95], alpha=0.5, 
+            range=[[prior_min[3], prior_max[3]], [prior_min[4], prior_max[4]]], 
+            plot_datapoints=False, plot_density=False, fill_contours=True, 
+            ax=sub)
+    
+    DFM.hist2d(chain['logM1'][lims_ica], chain['alpha'][lims_ica], weights=w_all[lims_ica], 
+            color='r', levels=[0.68, 0.95], alpha=0.5, 
+            range=[[prior_min[3], prior_max[3]], [prior_min[4], prior_max[4]]], 
+            plot_datapoints=False, plot_density=False, fill_contours=True, 
+            ax=sub)
+
+    fig.savefig(''.join([UT.tex_dir(), 'figs/', 
+        'GMFcontours.', tag_mcmc, '.pdf']), bbox_inches='tight') 
+    return None
+   
+
+
 if __name__=="__main__": 
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
     #Like_RSD('RSD_pca_gauss', ichain=0)
-    Like_GMF('manodeep', 'gmf_all_chi2')
-    Like_GMF('manodeep', 'gmf_pca_chi2')
-    Like_GMF('manodeep', 'gmf_ica_chi2')
+    #Like_GMF('manodeep', 'gmf_all_chi2')
+    #Like_GMF('manodeep', 'gmf_gauss_chi2')
+    #Like_GMF('manodeep', 'gmf_ica_chi2')
+    GMF_contours(tag_mcmc='manodeep')
