@@ -8,6 +8,7 @@ import numpy as np
 import corner as DFM
 import wquantiles as wq
 from scipy.stats import gaussian_kde as gkde
+from sklearn.mixture import GaussianMixture as GMix
 from scipy.stats import multivariate_normal as mGauss
 
 # kNN-Divergence
@@ -38,7 +39,7 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
-def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10):
+def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10, density_method='gkde', n_comp_max=10):
     ''' compare the divergence estimates between 
     D( gmfs || gauss(C_gmf) ), D( gauss(C_gmf) || gauss(C_gmf) ) 
     and 
@@ -60,7 +61,18 @@ def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10):
     X_ica, _ = NG.Ica(gmfs_white) # get ICA transformation 
     kerns = [] 
     for i_bin in range(X_ica.shape[1]): 
-        kerns.append(gkde(X_ica[:,i_bin])) 
+        if density_method == 'gkde': 
+            kerns.append(gkde(X_ica[:,i_bin])) 
+        elif density_method == 'gmm': 
+            gmms, bics = [], [] 
+            for i_comp in range(1,n_comp_max+1):
+                X = np.reshape(X_ica[:,i_bin], (-1,1))
+                gmm = GMix(n_components=i_comp)
+                gmm.fit(X) 
+                gmms.append(gmm)
+                bics.append(gmm.bic(X))
+            ibest = np.array(bics).argmin() 
+            kerns.append(gmms[ibest])
 
     # caluclate the divergences now 
     div_knns, div_knns_ref = [], [] 
@@ -83,7 +95,8 @@ def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10):
 
         # estimate divergence between the ICA transformed gmfs_white and 
         # distribution derived from KDE of ICA transform
-        div_knn_ica_i = NG.kNNdiv_ICA(X_ica, X_ica, Knn=K, div_func=div_func, Nref=Nref)
+        div_knn_ica_i = NG.kNNdiv_ICA(X_ica, X_ica, Knn=K, div_func=div_func, Nref=Nref, 
+                density_method=density_method, n_comp_max=n_comp_max)
         
         if i == 0: div_knn_ica = 0.
         div_knn_ica += div_knn_ica_i
@@ -93,8 +106,13 @@ def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10):
         # Gaussian distribution described by C_gmf with same n_mock mocks 
         ica_ref = np.zeros((n_mock, X_ica.shape[1])) 
         for i_bin in range(X_ica.shape[1]): 
-            ica_ref[:,i_bin] = kerns[i_bin].resample(n_mock)
-        div_knn_ref_ica_i = NG.kNNdiv_ICA(ica_ref, X_ica, Knn=K, div_func=div_func, Nref=Nref) 
+            if density_method == 'gkde': 
+                ica_ref[:,i_bin] = kerns[i_bin].resample(n_mock)
+            elif density_method == 'gmm': 
+                samp, _ = kerns[i_bin].sample(n_mock)
+                ica_ref[:,i_bin] = samp.flatten()
+        div_knn_ref_ica_i = NG.kNNdiv_ICA(ica_ref, X_ica, Knn=K, div_func=div_func, Nref=Nref, 
+                density_method=density_method, n_comp_max=n_comp_max) 
         div_knns_ref_ica.append(div_knn_ref_ica_i)
 
     div_knn /= float(n_mc)
@@ -133,9 +151,11 @@ def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10):
         sub.set_xlabel(r'KL divergence', fontsize=20)
 
     if 'renyi' in div_func: 
-        f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence.gmf.renyi', str(alpha), '.pdf'])
+        f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence.gmf.renyi', str(alpha), '.', 
+            density_method, '.pdf'])
     elif div_func == 'kl':
-        f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence.gmf.kl.pdf'])
+        f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence.gmf.kl.', 
+            density_method, '.pdf'])
     fig.savefig(f_fig)#, bbox_inches='tight') 
     return None
 
@@ -412,7 +432,8 @@ def GMF_contours(tag_mcmc='manodeep'):
    
 
 if __name__=="__main__": 
-    divGMF(div_func='kl', Nref=5000, K=10, n_mc=100)
+    divGMF(div_func='kl', Nref=10000, K=10, n_mc=5, density_method='gmm')
+    divGMF(div_func='kl', Nref=10000, K=10, n_mc=5, density_method='gkde')
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
     #Like_RSD('RSD_pca_gauss', ichain=0)
