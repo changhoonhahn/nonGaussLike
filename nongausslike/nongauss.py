@@ -8,7 +8,10 @@ of the Likelihood for galaxy clustering analyses.
 import numpy as np 
 from scipy.stats import norm as Norm
 from scipy.stats import gaussian_kde as gkde
+from sklearn.model_selection import GridSearchCV
 from scipy.stats import multivariate_normal as multinorm
+from sklearn.neighbors import KernelDensity as skKDE 
+from statsmodels.nonparametric.kde import KDEUnivariate
 from sklearn.mixture import GaussianMixture as GMix
 from sklearn.decomposition import FastICA, PCA
 # -- kNN divergence ---
@@ -19,9 +22,9 @@ import util as UT
 import data as Data
 
 
-def kNNdiv_ICA(X_white, X_ica, Knn=3, div_func='renyi:.5', Nref=None, density_method='gkde', 
+def kNNdiv_ICA(X_white, ica_kernel, Knn=3, div_func='renyi:.5', Nref=None, compwise=True, density_method='gkde', 
         n_comp_max=10): 
-    ''' `div_func` kNN divergence estimate between X_white and an ICA 
+    ''' `div_func` kNN divergence estimate between some data X_white and an ICA 
     distribution.
     '''
     if isinstance(Knn, int): 
@@ -29,23 +32,16 @@ def kNNdiv_ICA(X_white, X_ica, Knn=3, div_func='renyi:.5', Nref=None, density_me
     elif isinstance(Knn, list): 
         Knns = Knn
 
-    ica_dist = np.zeros((Nref, X_white.shape[1])) 
-    for i_bin in range(X_ica.shape[1]): 
-        if density_method == 'gkde': 
-            kern = gkde(X_ica[:,i_bin]) # gaussian KDE kernel using "rule of thumb" scott's rule.
-            ica_dist[:,i_bin] = kern.resample(Nref)
-        elif density_method == 'gmm':
-            gmms, bics = [], [] 
-            for i_comp in range(1,n_comp_max+1):
-                X = np.reshape(X_ica[:,i_bin], (-1,1))
-                gmm = GMix(n_components=i_comp)
-                gmm.fit(X) 
-                gmms.append(gmm)
-                bics.append(gmm.bic(X))
-            ibest = np.array(bics).argmin() 
-            gbest = gmms[ibest]
-            samp, _ = gbest.sample(Nref)
-            ica_dist[:,i_bin] = samp.flatten()
+    if compwise and X_white.shape[1] != len(ica_kernel): raise ValueError
+
+    if compwise: 
+        ica_dist = np.zeros((Nref, X_ica.shape[1])) 
+        for icomp in range(X_ica.shape[1]): 
+            samp, _ = ica_kernel[icomp].sample(Nref)
+            ica_dist[:,icomp] = samp
+    else: 
+        samp, _ = ica_kernel.sample(Nref)
+        ica_dist = samp 
    
     kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', clamp=False)
     feat = Features([X_white, ica_dist])
@@ -85,31 +81,70 @@ def kNNdiv_gauss(X_white, cov_X, Knn=3, div_func='renyi:.5', gauss=None, Nref=No
     return div_knns
 
 
-def lnL_ica(delta_pk, Pk, density_method='gkde'):
+def lnL_ica(delta_pk, Pk, component_wise=True, density_method='gkde', n_comp_max=10):
     ''' Given 'observed' delta P(k) (a.k.a. P(k) observed - model P(k)) 
     and mock P(k) data, calculate the ICA log likelihood estimate.
     '''
     X, mu_X = meansub(Pk) # mean subtract
     X_w, W = whiten(X) # whitened data
-    
     X_ica, W_ica = Ica(X_w) # get ICA transformation 
     
     if len(delta_pk.shape) == 1: 
-        x_obv = np.dot(np.dot(delta_pk, W), W_ica) # mean subtract, whiten, and ica transform observd pk
-        p_Xica = 0. 
+        x_obv = np.dot(np.dot(delta_pk, W), W_ica) # whiten, and ica transform observd pk
+        if component_wise: p_Xica = 0. 
     else: 
         x_obv = np.zeros(delta_pk.shape)
         for i_obv in range(delta_pk.shape[0]):
             x_obv[i_obv,:] = np.dot(np.dot(delta_pk[i_obv,:], W), W_ica)
-        p_Xica = np.zeros(delta_pk.shape[0]) 
+        if component_wise: p_Xica = np.zeros(delta_pk.shape[0]) 
 
-    for i in range(X_ica.shape[1]):
-        if len(delta_pk.shape) == 1: 
-            x_obv_i = x_obv[i]
-        else: 
-            x_obv_i = x_obv[:,i]
-        p_Xica += np.log(p_Xw_i(X_ica, i, x=x_obv_i, method=density_method))
+    if component_wise: 
+        for i in range(X_ica.shape[1]):
+            if len(delta_pk.shape) == 1: 
+                x_obv_i = x_obv[i]
+            else: 
+                x_obv_i = x_obv[:,i]
+            p_Xica += np.log(p_Xw_i(X_ica, i, x=x_obv_i, method=density_method, n_comp_max=n_comp_max))
+    else: 
+        p_Xica = np.log(p_Xw(X_ica, x=x_obv, method=density_method, n_comp_max=n_comp_max))
     return p_Xica
+
+
+def lnL_pca(delta_pk, Pk, component_wise=True, density_method='gkde', n_comp_max=10): 
+    ''' Gaussian pseudo-likelihood calculated using PCA decomposition -- 
+    i.e. the data vector is decomposed in PCA components so that
+    L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated by 
+    gaussian KDE of the PCA transformed mock data. 
+    
+    Notes
+    -----
+    - This estimates the Gaussian functional pseudo-likelihood. Its main 
+    use is to quantify the impact of the nonparametric density estimation 
+    (e.g. the KDE).
+    '''
+    X, mu_X = meansub(Pk) # mean subtract
+    X_pca, W_pca = whiten(X, method='pca') # whitened data
+    
+    if len(delta_pk.shape) == 1: 
+        # PCA transform delta_pk 
+        x_obv = np.dot(delta_pk, W_pca) 
+        if component_wise: p_Xpca = 0. 
+    else: 
+        x_obv = np.zeros(delta_pk.shape)
+        for i_obv in range(delta_pk.shape[0]):
+            x_obv[i_obv,:] = np.dot(delta_pk[i_obv,:], W_pca)
+        if component_wise: p_Xpca = np.zeros(delta_pk.shape[0]) 
+    
+    if component_wise: 
+        for i in range(X_pca.shape[1]):
+            if len(delta_pk.shape) == 1: 
+                x_obv_i = x_obv[i]
+            else: 
+                x_obv_i = x_obv[:,i]
+            p_Xpca += np.log(p_Xw_i(X_pca, i, x=x_obv_i, method=density_method, n_comp_max=n_comp_max))
+    else: 
+        p_Xpca = np.log(p_Xw(X_pca, x=x_obv, method=density_method, n_comp_max=n_comp_max))
+    return p_Xpca
 
 
 def lnL_pca_gauss(delta_pk, Pk): 
@@ -139,40 +174,6 @@ def lnL_pca_gauss(delta_pk, Pk):
         for i_obv in range(delta_pk.shape[0]):
             x_obv[i_obv, :] = np.dot(delta_pk[i_obv,:], W_pca)
     return np.log(ggg.pdf(x_obv))
-
-
-def lnL_pca(delta_pk, Pk, density_method='gkde'): 
-    ''' Gaussian pseudo-likelihood calculated using PCA decomposition -- 
-    i.e. the data vector is decomposed in PCA components so that
-    L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated by 
-    gaussian KDE of the PCA transformed mock data. 
-    
-    Notes
-    -----
-    - This estimates the Gaussian functional pseudo-likelihood. Its main 
-    use is to quantify the impact of the nonparametric density estimation 
-    (e.g. the KDE).
-    '''
-    X, mu_X = meansub(Pk) # mean subtract
-    X_pca, W_pca = whiten(X, method='pca') # whitened data
-    
-    if len(delta_pk.shape) == 1: 
-        # PCA transform delta_pk 
-        x_obv = np.dot(delta_pk, W_pca) 
-        p_Xpca = 0. 
-    else: 
-        x_obv = np.zeros(delta_pk.shape)
-        for i_obv in range(delta_pk.shape[0]):
-            x_obv[i_obv,:] = np.dot(delta_pk[i_obv,:], W_pca)
-        p_Xpca = np.zeros(delta_pk.shape[0]) 
-
-    for i in range(X_pca.shape[1]):
-        if len(delta_pk.shape) == 1: 
-            x_obv_i = x_obv[i]
-        else: 
-            x_obv_i = x_obv[:,i]
-        p_Xpca += np.log(p_Xw_i(X_pca, i, x=x_obv_i, method=density_method))
-    return p_Xpca
 
 
 def lnL_gauss(pk_obv, Pk): 
@@ -239,10 +240,11 @@ def p_Xwi_Xwj(X_w, ij_bins, x=np.linspace(-5., 5., 100), y=np.linspace(-5., 5., 
 
 
 def p_Xw_i(X_w, i_bins, x=np.linspace(-5., 5., 100), method='gkde', n_comp_max=10): 
-    ''' Evaluate the pdf for Xw[:,ibins] at x using a nonparametric density estimation: 
+    ''' Estimate the pdf for Xw[:,ibins] at x using a nonparametric density estimation: 
     either gaussian KDE (gkde) or Gaussian Mixture Models (gmm)
     '''
-    if method not in ['gkde', 'gmm']: raise ValueError("method = gkde or gmm") 
+    if method not in ['gkde', 'sk_kde', 'sm_kde', 'gmm']: 
+        raise ValueError("method = gkde, sk_kde, sm_kde, or gmm") 
     if isinstance(i_bins, int): 
         i_bins = [i_bins]
     pdfs = []
@@ -251,9 +253,27 @@ def p_Xw_i(X_w, i_bins, x=np.linspace(-5., 5., 100), method='gkde', n_comp_max=1
             # gaussian KDE kernel using "rule of thumb" scott's rule. 
             kern = gkde(X_w[:,i_bin]) 
             if len(i_bins) == 1: 
-                return kern.evaluate(x)
+                return kern.pdf(x)
             else: 
-                pdfs.append(kern.evaluate(x))
+                pdfs.append(kern.pdf(x))
+        elif method == 'sk_kde':
+            # Search for best-fit through GridSearchCV
+            grid = GridSearchCV(skKDE(),
+                    {'bandwidth': np.linspace(0.1, 1.0, 30)},
+                    cv=20) # 20-fold cross-validation
+            grid.fit(X_w[:,i_bin][:,None]) 
+            kde = grid.best_estimator_
+            if len(i_bins) == 1: 
+                return np.exp(kde.score_samples(x[:,None]))
+            else: 
+                pdfs.append(np.exp(kde.score_samples(x[:,None])))
+        elif method == 'sm_kde': 
+            dens = KDEUnivariate(X_w[:,i_bin]) 
+            dens.fit() 
+            if len(i_bins) == 1: 
+                return dens.evaluate(x)
+            else: 
+                pdfs.append(dens.evaluate(x)) 
         elif method == 'gmm': 
             # select number of components based on BIC 
             # so that we're not overfitting the PDF
@@ -275,21 +295,56 @@ def p_Xw_i(X_w, i_bins, x=np.linspace(-5., 5., 100), method='gkde', n_comp_max=1
     return np.array(pdfs)
 
 
-def GMM_pdf(gmm_obj): 
-    ''' Return a function that will evaluate the 
-    pdf of the GMM given GMM object from sklearn.mixture
-    For simplicity assumes a 1D
+def p_Xw(X_w, x=None, method='gkde', n_comp_max=10): 
+    ''' Estimate the multi-dimensional pdf for Xw using a nonparametric density 
+    estimation (either KDE or GMM). 
+
+    Notes
+    -----
+    - This is mainly written for GMF because there's enough points to sample the 
+    multidimensional space. 
     '''
-    ws = gmm_obj.weights_.flatten()
-    mus = gmm_obj.means_.flatten()
-    cov = gmm_obj.covariances_.flatten()
+    if X_w.shape[1] != x.shape[1]: raise ValueError("dimension mismatch") 
+    if method not in ['gkde', 'gmm']: raise ValueError("method = gkde or gmm") 
+    if method == 'gkde': 
+        # gaussian KDE kernel using "rule of thumb" scott's rule. 
+        kern = gkde(X_w.T) 
+        # evaluate kernal at x 
+        return kern.pdf(x.T)
+    elif method == 'gmm': 
+        # select number of components based on BIC 
+        # so that we're not overfitting the PDF
+        gmms, bics = [], [] 
+        for i_comp in range(1,n_comp_max+1):
+            gmm = GMix(n_components=i_comp)
+            gmm.fit(X_w) 
+            gmms.append(gmm)
+            bics.append(gmm.bic(X_w))
+        ibest = np.array(bics).argmin() 
+        gbest = gmms[ibest]
+        gbest_pdf = GMM_pdf(gbest) # function to estimate pdf from GMM 
+        return gbest_pdf(x)
+    return np.array(pdfs)
+
+
+def GMM_pdf(gmm_obj): 
+    ''' Return a function that will evaluate the pdf of the GMM 
+    given sklearn.mixture.GaussianMixture object
+    '''
+    ws = gmm_obj.weights_
+    mus = gmm_obj.means_
+    cov = gmm_obj.covariances_
+
+    ndim = mus[0].shape[0] # number of dimensions
+    ncomp = mus.shape[0]
 
     def pdf(xx):  
         pdfx = 0.
-        for icomp in range(mus.shape[0]):
-            pdfx += ws[icomp]*Norm.pdf(xx, loc=mus[icomp], scale=np.sqrt(cov[icomp]))
+        for icomp in range(ncomp):
+            pdfx += ws[icomp]*multinorm.pdf(xx, mean=mus[icomp], cov=cov[icomp])
         return pdfx
     return pdf 
+
 
 def whiten(X, method='choletsky', hartlap=False): 
     ''' Given data matrix X, use Choletsky decomposition of the 

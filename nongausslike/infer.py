@@ -12,7 +12,7 @@ except OSError:
 import nongauss as NG 
 
 
-def W_importance(tag, chain, **kwargs): 
+def W_importance(tag, chain, component_wise=True, density_method='gkde', **kwargs): 
     ''' Given a dictionary with the MCMC chain, evaluate the likelihood ratio 
     '''
     if 'RSD' in tag: # Florian's RSD analysis 
@@ -97,7 +97,8 @@ def W_importance(tag, chain, **kwargs):
         
         if tag == 'gmf_ica_chi2':
             lnP_den = -0.5 * chain['chi2'] # -0.5 chi-squared from MCMC chain
-            lnP_num = NG.lnL_ica(dgmf, gmf_mock)
+            lnP_num = NG.lnL_ica(dgmf, gmf_mock, 
+                    component_wise=component_wise, density_method=density_method)
         elif tag == 'gmf_all_chi2': 
             # importance weight determined by the ratio of 
             # the chi^2 from the chain and the chi^2 calculated 
@@ -126,8 +127,8 @@ def W_importance(tag, chain, **kwargs):
                 lnP_num[i] = -0.5 * np.dot(dgmf[i,:Nlim], np.dot(Cinv[:Nlim,:Nlim], dgmf[i,:Nlim].T)) 
         elif tag == 'gmf_pca_chi2':
             lnP_den = -0.5 * chain['chi2']
-            lnP_num = NG.lnL_pca(dgmf, gmf_mock)
-            
+            lnP_num = NG.lnL_pca(dgmf, gmf_mock,
+                    component_wise=component_wise, density_method=density_method)
         elif tag == 'gmf_gauss_chi2': 
             lnP_den = -0.5 * chain['chi2']
             lnP_num = NG.lnL_pca_gauss(dgmf, gmf_mock) 

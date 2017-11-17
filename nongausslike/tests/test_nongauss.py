@@ -3,6 +3,7 @@
 Tests for each step of nongauss.py
 
 '''
+import time 
 import numpy as np 
 from scipy.stats import gaussian_kde as gkde
 from scipy.stats import multivariate_normal as mGauss
@@ -26,16 +27,15 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
-def GMF_p_Xw_i(name, ica=False, pca=False): 
-    ''' Test the probability distribution function of each X_w^i
-    component -- p(X_w^i). First compare the histograms of p(X_w^i) 
+def GMF_p_Xw_i(ica=False, pca=False): 
+    ''' Test the probability distribution function of each transformed X
+    component -- p(X^i). First compare the histograms of p(X_w^i) 
     with N(0,1). Then compare the gaussian KDE of p(X_w^i).
     '''
-    gmf = NG.X_gmf(name)
+    gmf = NG.X_gmf_all() # import all the GMF mocks 
     X, _ = NG.meansub(gmf)
     str_w = 'W'
-    if ica and pca: 
-        raise ValueError
+    if ica and pca: raise ValueError
     if ica: # ICA components
         # ICA components do not need to be Gaussian.
         # in fact the whole point of the ICA transform
@@ -50,40 +50,46 @@ def GMF_p_Xw_i(name, ica=False, pca=False):
         X_w, W = NG.whiten(X) # whitened data
     
     # p(X_w^i) histograms
-    fig = plt.figure(figsize=(15,7))
-    sub = fig.add_subplot(121)
-    for i_bin in range(X_w.shape[1]): 
-        p_X_w, edges = np.histogram(X_w[:,i_bin], normed=True)
-        p_X_w_arr = UT.bar_plot(edges, p_X_w)
-        sub.plot(p_X_w_arr[0], p_X_w_arr[1])
-    x = np.arange(-5., 5.1, 0.1)
-    sub.plot(x, UT.gauss(x, 1., 0.), c='k', lw=3, label='$\mathcal{N}(0,1)$')
-    sub.set_xlim([-2.5, 2.5])
-    sub.set_xlabel('$X_{'+str_w+'}$', fontsize=25) 
-    sub.set_ylim([0., 0.6])
-    sub.set_ylabel('$P(X_{'+str_w+'})$', fontsize=25) 
-    sub.legend(loc='upper right') 
-
-    # p(X_w^i) gaussian KDE fits  
-    pdfs = NG.p_Xw_i(X_w, range(X_w.shape[1]), x=x)
-
-    sub = fig.add_subplot(122)
-    for i_bin in range(X_w.shape[1]): 
-        sub.plot(x, pdfs[i_bin])
-    sub.plot(x, UT.gauss(x, 1., 0.), c='k', lw=3, label='$\mathcal{N}(0,1)$')
-    sub.set_xlim([-2.5, 2.5])
-    sub.set_xlabel('$X_{W}$', fontsize=25) 
-    sub.set_ylim([0., 0.6])
-    sub.set_ylabel('$P(X_{W})$', fontsize=25) 
-    sub.legend(loc='upper right') 
+    fig = plt.figure(figsize=(5*gmf.shape[1],4))
+    for icomp in range(gmf.shape[1]): 
+        sub = fig.add_subplot(1, gmf.shape[1], icomp+1)
+        # histogram of X_w^i s 
+        hh = np.histogram(X_w[:,icomp], normed=True, bins=50, range=[-5., 5.])
+        p_X_w_arr = UT.bar_plot(*hh)
+        sub.fill_between(p_X_w_arr[0], np.zeros(len(p_X_w_arr[1])), p_X_w_arr[1], 
+                color='k', alpha=0.25)
+        x = np.linspace(-5., 5., 100)
+        sub.plot(x, UT.gauss(x, 1., 0.), c='k', lw=2, ls=':', label='$\mathcal{N}(0,1)$')
+        # p(X_w^i) gaussian KDE fits  
+        t_start = time.time() 
+        pdf = NG.p_Xw_i(X_w, icomp, x=x, method='gkde')
+        sub.plot(x, pdf, lw=2.5, label='Gaussian KDE')
+        print 'scipy Gaussian KDE ', time.time()-t_start
+        # p(X_w^i) SKlearn KDE fits  
+        t_start = time.time() 
+        pdf = NG.p_Xw_i(X_w, icomp, x=x, method='sk_kde')
+        sub.plot(x, pdf, lw=2.5, label='SKlearn KDE')
+        print 'SKlearn CV best-fit KDE ', time.time()-t_start
+        # p(X_w^i) statsmodels KDE fits  
+        t_start = time.time() 
+        pdf = NG.p_Xw_i(X_w, icomp, x=x, method='sm_kde')
+        sub.plot(x, pdf, lw=2.5, label='StatsModels KDE')
+        print 'Stats Models KDE ', time.time()-t_start
+        # p(X_w^i) GMM fits  
+        pdf = NG.p_Xw_i(X_w, icomp, x=x, method='gmm', n_comp_max=20)
+        sub.plot(x, pdf, lw=2.5, ls='--', label='GMM')
+        sub.set_xlim([-3., 3.])
+        sub.set_xlabel('$X_{'+str_w+'}^{('+str(icomp)+')}$', fontsize=25) 
+        sub.set_ylim([0., 0.6])
+        if icomp == 0: 
+            sub.set_ylabel('$P(X_{'+str_w+'})$', fontsize=25) 
+            sub.legend(loc='upper left', prop={'size': 15}) 
 
     str_ica, str_pca = '', ''
-    if ica: 
-        str_ica = '.ICA'
-    if pca: 
-        str_pca = '.PCA'
+    if ica: str_ica = '.ICA'
+    if pca: str_pca = '.PCA'
 
-    f = ''.join([UT.fig_dir(), 'tests/test.GMF_p_Xw_i', str_pca, str_ica, '.', name, '.png'])
+    f = ''.join([UT.fig_dir(), 'tests/test.GMF_p_Xw_i', str_pca, str_ica, '.png'])
     fig.savefig(f, bbox_inches='tight') 
     return None 
 
@@ -643,6 +649,5 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    X_gmf_all()
-    #GMF_p_Xw_i('manodeep.run1', ica=True, pca=False)
+    GMF_p_Xw_i(ica=True, pca=False)
     #lnL_pca_gauss('patchy.z1', ell=0, krange=[0.01, 0.15], NorS='ngc')
