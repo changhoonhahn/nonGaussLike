@@ -5,7 +5,10 @@ from emcee.utils import MPIPool
 # --- local ---
 import util as UT
 import data as Dat 
-import model as Mod
+try:
+    import model as Mod
+except OSError: 
+    pass
 import nongauss as NG 
 
 

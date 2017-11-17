@@ -82,11 +82,8 @@ def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10, density_method='gkde', 
         # estimate divergence between gmfs_white and a 
         # Gaussian distribution described by C_gmf
         div_knn_i = NG.kNNdiv_gauss(gmfs_white, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
-
-        if i == 0: div_knn = 0. 
-        div_knn += div_knn_i 
         div_knns.append(div_knn_i)
-        
+
         # reference divergence in order to showcase the estimator's scatter
         # Gaussian distribution described by C_gmf with same n_mock mocks 
         gauss = mvn(np.zeros(len(gmf_mock_avg)), C_gmf, size=n_mock)
@@ -97,9 +94,6 @@ def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10, density_method='gkde', 
         # distribution derived from KDE of ICA transform
         div_knn_ica_i = NG.kNNdiv_ICA(X_ica, X_ica, Knn=K, div_func=div_func, Nref=Nref, 
                 density_method=density_method, n_comp_max=n_comp_max)
-        
-        if i == 0: div_knn_ica = 0.
-        div_knn_ica += div_knn_ica_i
         div_knns_ica.append(div_knn_ica_i)
 
         # reference divergence in order to showcase the estimator's scatter
@@ -114,9 +108,6 @@ def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10, density_method='gkde', 
         div_knn_ref_ica_i = NG.kNNdiv_ICA(ica_ref, X_ica, Knn=K, div_func=div_func, Nref=Nref, 
                 density_method=density_method, n_comp_max=n_comp_max) 
         div_knns_ref_ica.append(div_knn_ref_ica_i)
-
-    div_knn /= float(n_mc)
-    div_knn_ica /= float(n_mc)
 
     fig = plt.figure(figsize=(7,5))
     sub = fig.add_subplot(211)
