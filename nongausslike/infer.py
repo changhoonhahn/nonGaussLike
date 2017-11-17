@@ -108,6 +108,19 @@ def W_importance(tag, chain, **kwargs):
             lnP_num = np.empty(dgmf.shape[0])
             for i in range(dgmf.shape[0]): # updated chi-square
                 lnP_num[i] = -0.5 * np.dot(dgmf[i,:], np.dot(Cinv, dgmf[i,:].T)) 
+        elif tag == 'gmf_lowN_chi2': 
+            # importance weight determined by the ratio of 
+            # the chi^2 from the chain and the chi^2 calculated 
+            # using the covariance matrix from the entire catalog
+            # and *excluding the highest N bin* 
+            Cgmf = np.cov(gmf_mock.T) # covariance matrix 
+            Cinv = np.linalg.inv(Cgmf) # precision matrix
+            Nlim = Cinv.shape[0]-1
+             
+            lnP_den = -0.5 * chain['chi2'] # chi-squared calculated 
+            lnP_num = np.empty(dgmf.shape[0])
+            for i in range(dgmf.shape[0]): # updated chi-square
+                lnP_num[i] = -0.5 * np.dot(dgmf[i,:Nlim], np.dot(Cinv[:Nlim,:Nlim], dgmf[i,:Nlim].T)) 
         elif tag == 'gmf_pca_chi2':
             lnP_den = -0.5 * chain['chi2']
             lnP_num = NG.lnL_pca(dgmf, gmf_mock)

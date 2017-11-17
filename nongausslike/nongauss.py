@@ -17,6 +17,31 @@ import util as UT
 import data as Data
 
 
+def kNNdiv_ICA(X_white, X_ica, Knn=3, div_func='renyi:.5', Nref=None): 
+    ''' `div_func` kNN divergence estimate between X_white and an ICA 
+    distribution.
+    '''
+    if isinstance(Knn, int): 
+        Knns = [Knn]
+    elif isinstance(Knn, list): 
+        Knns = Knn
+
+    ica_dist = np.zeros((Nref, X_white.shape[1])) 
+    for i_bin in range(X_ica.shape[1]): 
+        kern = gkde(X_ica[:,i_bin]) # gaussian KDE kernel using "rule of thumb" scott's rule.
+        ica_dist[:,i_bin] = kern.resample(Nref)
+   
+    kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', clamp=False)
+    feat = Features([X_white, ica_dist])
+    div_knn = kNN.fit_transform(feat)
+    if len(Knns) ==1: 
+        return div_knn[0][0][0][1]
+    div_knns = np.zeros(len(Knns))
+    for i in range(len(Knns)): 
+        div_knns[i] = div_knn[0][i][0][1]
+    return div_knns
+
+
 def kNNdiv_gauss(X_white, cov_X, Knn=3, div_func='renyi:.5', gauss=None, Nref=None): 
     ''' `div_func` kNN divergence estimate between X_white and a 
     reference Gaussian with covariance matrix cov_X.
