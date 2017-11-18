@@ -44,146 +44,85 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
-def divGMF(div_func='renyi:.5', Nref=1000, K=5, n_mc=10, compwise=True, density_method='gkde', n_comp_max=10):
+def divGMF(Nref=1000, K=5, n_mc=10, n_comp_max=10):
     ''' compare the divergence estimates between 
-    D( gmfs || gauss(C_gmf) ), D( gauss(C_gmf) || gauss(C_gmf) ) 
-    and 
-    D( gmfs || p_ICA ), D( p_ICA || p_ICA )
+    D( gmfs || gauss(C_gmf) ), D( gauss(C_gmf) || gauss(C_gmf) ) and  D( gmfs || p(gmfs) GMM) 
     '''
     # read in mock GMFs from all HOD realizations (20,000 mocks)
     gmfs_mock = NG.X_gmf_all()[:2000]
     n_mock = gmfs_mock.shape[0] # number of mocks 
     print("%i mocks" % n_mock) 
 
-    #gmf_mock_avg = (np.sum(gmfs_mock, axis=0)/float(n_mock)) # average gmf 
     gmfs_mock_meansub, _ = NG.meansub(gmfs_mock) # mean subtract
-    gmfs_white, W = NG.whiten(gmfs_mock_meansub)
+    X_w, W = NG.whiten(gmfs_mock_meansub)
 
-    C_gmf = np.cov(gmfs_white.T) # covariance matrix
-
-    # construct a distirbution based on the ICA transform of X_white
-    X_ica, _ = NG.Ica(gmfs_white) # get ICA transformation 
-    if compwise: kerns, ica_dist = [], np.zeros(X_ica.shape) 
-
-    if density_method == 'gkde': 
-        if compwise: 
-            for icomp in range(X_ica.shape[1]): 
-                grid = GridSearchCV(skKDE(), {'bandwidth': np.linspace(0.1, 1.0, 30)}, cv=20) # 20-fold cross-validation
-                grid.fit(X_ica[:,icomp][:,None]) 
-                print grid.best_params_
-                kerns.append(grid.best_estimator_)
-                #kerns.append(gkde(X_ica[:,icomp]))
-        else: 
-            t_start = time.time()
-            grid = GridSearchCV(skKDE(), {'bandwidth': np.linspace(0.1, 1.0, 30)}, cv=20) # 20-fold cross-validation
-            grid.fit(X_ica) 
-            print('%f sec for CV grid search' % time.time()-t_start) 
-            print grid.best_params_
-            kerns = grid.best_estimator_
-    elif density_method == 'gmm':
-        if compwise: 
-            for icomp in range(X_ica.shape[1]): 
-                gmms, bics = [], [] 
-                for i_comp in range(1,n_comp_max+1):
-                    gmm = GMix(n_components=i_comp)
-                    gmm.fit(X_ica[:,icomp][:,None]) 
-                    gmms.append(gmm)
-                    bics.append(gmm.bic(X_ica))
-                ibest = np.array(bics).argmin() 
-                kerns.append(gmms[ibest])
-        else: 
-            gmms, bics = [], [] 
-            for i_comp in range(1,n_comp_max+1):
-                gmm = GMix(n_components=i_comp)
-                gmm.fit(X_ica) 
-                gmms.append(gmm)
-                bics.append(gmm.bic(X_ica))
-            ibest = np.array(bics).argmin() 
-            kerns = gmms[ibest]
-
-    # caluclate the divergences now 
-    div_knns, div_knns_ref = [], [] 
-    div_knns_ica, div_knns_ref_ica = [], [] 
-    for i in range(n_mc): 
-        print('%i montecarlo' % i)
-        t_start = time.time() 
-        # estimate divergence between gmfs_white and a 
-        # Gaussian distribution described by C_gmf
-        div_knn_i = NG.kNNdiv_gauss(gmfs_white, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
-        div_knns.append(div_knn_i)
-
-        # reference divergence in order to showcase the estimator's scatter
-        # Gaussian distribution described by C_gmf with same n_mock mocks 
-        gauss = mvn(np.zeros(gmfs_mock.shape[1]), C_gmf, size=n_mock)
-        div_knn_ref_i = NG.kNNdiv_gauss(gauss, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
-        div_knns_ref.append(div_knn_ref_i)
-
-        # estimate divergence between the ICA transformed gmfs_white and 
-        # distribution derived from KDE of ICA transform
-        div_knn_ica_i = NG.kNNdiv_ICA(X_ica, kerns, Knn=K, div_func=div_func, Nref=Nref, 
-                density_method=density_method, n_comp_max=n_comp_max)
-        div_knns_ica.append(div_knn_ica_i)
-
-        # reference divergence in order to showcase the estimator's scatter
-        # Gaussian distribution described by C_gmf with same n_mock mocks 
-        if compwise: ica_ref = np.zeros(X_ica.shape)
-        if density_method == 'gkde': 
-            if compwise: 
-                for icomp in range(X_ica.shape[1]): 
-                    ica_ref[:,icomp] = kerns[icomp].sample(n_mock)
-            else: 
-                ica_ref = kern.sample(n_mock)
-        elif density_method == 'gmm': 
-            if compwise: 
-                for icomp in range(X_ica.shape[1]): 
-                    samp,_ = kerns[icomp].sample(n_mock)
-                    ica_ref[:,icomp] = samp
-            else: 
-                samp,_ = kern.sample(n_mock)
-                ica_ref = samp
-        div_knn_ref_ica_i = NG.kNNdiv_ICA(ica_ref, kerns, Knn=K, div_func=div_func, Nref=Nref, 
-                density_method=density_method, n_comp_max=n_comp_max) 
-        div_knns_ref_ica.append(div_knn_ref_ica_i)
-        print('t= %f sec' % round(time.time()-t_start,2))
-
+    C_gmf = np.cov(X_w.T) # covariance matrix
+    
+    # evaluate best-fit GMM based on Bayesian Information Criterion  
+    gmms, bics = [], [] 
+    for i_comp in range(1,n_comp_max+1):
+        gmm = GMix(n_components=i_comp)
+        gmm.fit(X_w) 
+        gmms.append(gmm)
+        bics.append(gmm.bic(X_w))
+    ibest = np.array(bics).argmin() 
+    kerns = gmms[ibest]
+    
     fig = plt.figure(figsize=(7,5))
-    sub = fig.add_subplot(211)
-    # divergence between mock GMFs and Gaussian distribution 
-    hh = np.histogram(np.array(div_knns), normed=True)
-    bp = UT.bar_plot(*hh) 
-    sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
-            label=r'$D($mock $\zeta(N)\parallel \mathcal{N})$') 
-    # reference to show scatter of estimator
-    hh = np.histogram(np.array(div_knns_ref), normed=True)
-    bp = UT.bar_plot(*hh) 
-    sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
-    sub.set_xlim([-0.05, 0.25]) 
-    sub.legend(loc='upper right', prop={'size': 15})
-        
-    sub = fig.add_subplot(212)
-    # divergence between mock GMFs and Gaussian distribution 
-    hh = np.histogram(np.array(div_knns_ica), normed=True)
-    bp = UT.bar_plot(*hh) 
-    sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
-            label=r'$D($mock $\zeta^\mathrm{ICA}(N)\parallel p^\mathrm{ICA}_{'+density_method+'})$') 
-    # reference to show scatter of estimator
-    hh = np.histogram(np.array(div_knns_ref_ica), normed=True)
-    bp = UT.bar_plot(*hh) 
-    sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
-    sub.set_xlim([-0.05, 0.25]) 
-    sub.legend(loc='upper right', prop={'size': 15})
-    if 'renyi' in div_func: 
-        alpha = float(div_func.split(':')[-1])
-        sub.set_xlabel(r'Renyi-$\alpha='+str(alpha)+'$ divergence', fontsize=20)
-    elif 'kl' in div_func: 
-        sub.set_xlabel(r'KL divergence', fontsize=20)
+    for i_div, div_func in enumerate(['renyi:.5', 'kl']): 
+        # caluclate the divergences now 
+        div_gauss = []
+        div_gauss_ref = []
+        div_gmm = [] 
+        for i in range(n_mc): 
+            print('%i montecarlo' % i)
+            t_start = time.time() 
+            # estimate divergence between gmfs_white and a 
+            # Gaussian distribution described by C_gmf
+            div_gauss_i = NG.kNNdiv_gauss(X_w, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
+            div_gauss.append(div_gauss_i)
+            # reference divergence in order to showcase the estimator's scatter
+            # Gaussian distribution described by C_gmf with same n_mock mocks 
+            gauss = mvn(np.zeros(gmfs_mock.shape[1]), C_gmf, size=n_mock)
+            div_gauss_ref_i = NG.kNNdiv_gauss(gauss, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
+            div_gauss_ref.append(div_gauss_ref_i)
+            # estimate divergence between the gmfs_white and GMM distribution estimate
+            div_gmm_i = NG.kNNdiv_Kernel(X_w, kerns, Knn=K, div_func=div_func, Nref=Nref, compwise=False) 
+            div_gmm.append(div_gmm_i)
+            print('t= %f sec' % round(time.time()-t_start,2))
 
-    if 'renyi' in div_func: 
-        f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence.gmf.renyi', str(alpha), '.', 
-            density_method, '.pdf'])
-    elif div_func == 'kl':
-        f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence.gmf.kl.', 
-            density_method, '.pdf'])
+        sub = fig.add_subplot(2,1,i_div+1)
+        hrange = [-0.1, 0.25]
+        nbins = 50
+        # divergence between mock GMFs and Gaussian distribution 
+        hh = np.histogram(np.array(div_gauss), normed=True, range=hrange, bins=nbins)
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
+                label=r'$D(\{\zeta_i^{(m)}\}\parallel \mathcal{N}({\bf C}^{(m)}))$') 
+        y_max = bp[1].max() 
+        # reference to show scatter of estimator
+        hh = np.histogram(np.array(div_gauss_ref), normed=True, range=hrange, bins=nbins)
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
+        y_max = max(y_max, bp[1].max()) 
+        # divergence between mock GMFs and Gaussian distribution 
+        hh = np.histogram(np.array(div_gmm), normed=True, range=hrange, bins=nbins)
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
+                label=r'$D(\{\zeta_i^{(m)}\}\parallel p_\mathrm{GMM}(\{\zeta_i^{m}\}))$') 
+        y_max = max(y_max, bp[1].max()) 
+        sub.set_xlim(hrange) 
+        sub.set_ylim([0., y_max*1.2]) 
+        if i_div == 1: 
+            sub.legend(loc='upper right', prop={'size': 15})
+        # xlabels
+        if 'renyi' in div_func: 
+            alpha = float(div_func.split(':')[-1])
+            sub.set_xlabel(r'Renyi-$\alpha='+str(alpha)+'$ divergence', fontsize=20)
+        elif 'kl' in div_func: 
+            sub.set_xlabel(r'KL divergence', fontsize=20)
+    fig.subplots_adjust(hspace=.5)
+    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence.gmf.pdf'])
     fig.savefig(f_fig)#, bbox_inches='tight') 
     return None
 
@@ -460,8 +399,7 @@ def GMF_contours(tag_mcmc='manodeep'):
    
 
 if __name__=="__main__": 
-    #divGMF(div_func='kl', Nref=3000, K=10, n_mc=20, density_method='gmm', n_comp_max=20)
-    divGMF(div_func='kl', Nref=3000, K=10, n_mc=20, compwise=False, density_method='gkde')
+    divGMF(Nref=3000, K=10, n_mc=200, n_comp_max=20)
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
     #Like_RSD('RSD_pca_gauss', ichain=0)
