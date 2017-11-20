@@ -1,4 +1,5 @@
 import sys as Sys
+import os 
 import time
 import numpy as np 
 
@@ -99,38 +100,6 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
             kern_kde_ica.append(grid.best_estimator_) 
             dt = time.time() - t0 
             print('%f sec' % dt) 
-
-    # caluclate the divergences now 
-    divs = []
-    for i in range(n_mc): 
-        print('%i montecarlo' % i)
-        if diver == 'pX_gauss': 
-            # estimate divergence between gmfs_white and a 
-            # Gaussian distribution described by C_gmf
-            div_i = NG.kNNdiv_gauss(X_w, C_X, Knn=K, div_func=div_func, Nref=Nref)
-            divs.append(div_i)
-        elif diver == 'ref': 
-            # reference divergence in order to showcase the estimator's scatter
-            # Gaussian distribution described by C_gmf with same n_mock mocks 
-            gauss = mvn(np.zeros(X_mock.shape[1]), C_X, size=n_mock)
-            div_i = NG.kNNdiv_gauss(gauss, C_X, Knn=K, div_func=div_func, Nref=Nref)
-            divs.append(div_i)
-        elif diver == 'pX_GMM': # D( mock X || p(X) GMM)
-            div_i = NG.kNNdiv_Kernel(X_w, kern_gmm, Knn=K, div_func=div_func, 
-                    Nref=Nref, compwise=False) 
-            divs.append(div_i)
-        elif diver == 'pX_KDE': # D( mock X || p(X) KDE)
-            div_i = NG.kNNdiv_Kernel(X_w, kern_kde, Knn=K, div_func=div_func, 
-                    Nref=Nref, compwise=False) 
-            divs.append(div_i)
-        elif diver == 'pXi_ICA_GMM': # D( mock X || PI p(X^i_ICA) GMM), 
-            div_i = NG.kNNdiv_Kernel(X_ica, kern_gmm_ica, Knn=K, div_func=div_func, 
-                    Nref=Nref, compwise=True)
-            divs.append(div_gmm_ica_i)
-        elif diver == 'pXi_ICA_KDE': # D( mock X || PI p(X^i_ICA) KDE), 
-            div_i = NG.kNNdiv_Kernel(X_ica, kern_kde_ica, Knn=K, div_func=div_func, 
-                    Nref=Nref, compwise=True)
-            divs.append(div_i)
     
     str_obvs = ''
     if obvs == 'pk': str_obvs = '.'+NorS
@@ -143,9 +112,41 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
     str_comp = ''
     if 'GMM' in diver: str_comp = '.ncomp'+str(n_comp_max) 
 
-    f = ''.join([UT.dat_dir(), 'diverg.', obvs, str_obvs, '.', diver, '.K', str(K), str_comp, 
-        '.Nref', str(Nref), '.', str_div, '.png']) 
-    np.savetxt(f, np.array(divs).T) 
+    f_dat = ''.join([UT.dat_dir(), 'diverg.', obvs, str_obvs, '.', diver, '.K', str(K), str_comp, 
+        '.Nref', str(Nref), '.', str_div, '.dat'])
+    if os.path.isfile(f_dat): 
+        f = open(f_dat, 'a') 
+    else: 
+        f = open(f_dat, 'w') 
+
+    # caluclate the divergences now 
+    divs = []
+    for i in range(n_mc): 
+        print('%i montecarlo' % i)
+        if diver == 'pX_gauss': 
+            # estimate divergence between gmfs_white and a 
+            # Gaussian distribution described by C_gmf
+            div_i = NG.kNNdiv_gauss(X_w, C_X, Knn=K, div_func=div_func, Nref=Nref)
+        elif diver == 'ref': 
+            # reference divergence in order to showcase the estimator's scatter
+            # Gaussian distribution described by C_gmf with same n_mock mocks 
+            gauss = mvn(np.zeros(X_mock.shape[1]), C_X, size=n_mock)
+            div_i = NG.kNNdiv_gauss(gauss, C_X, Knn=K, div_func=div_func, Nref=Nref)
+        elif diver == 'pX_GMM': # D( mock X || p(X) GMM)
+            div_i = NG.kNNdiv_Kernel(X_w, kern_gmm, Knn=K, div_func=div_func, 
+                    Nref=Nref, compwise=False) 
+        elif diver == 'pX_KDE': # D( mock X || p(X) KDE)
+            div_i = NG.kNNdiv_Kernel(X_w, kern_kde, Knn=K, div_func=div_func, 
+                    Nref=Nref, compwise=False) 
+            divs.append(div_i)
+        elif diver == 'pXi_ICA_GMM': # D( mock X || PI p(X^i_ICA) GMM), 
+            div_i = NG.kNNdiv_Kernel(X_ica, kern_gmm_ica, Knn=K, div_func=div_func, 
+                    Nref=Nref, compwise=True)
+        elif diver == 'pXi_ICA_KDE': # D( mock X || PI p(X^i_ICA) KDE), 
+            div_i = NG.kNNdiv_Kernel(X_ica, kern_kde_ica, Knn=K, div_func=div_func, 
+                    Nref=Nref, compwise=True)
+        f.write('%s \n' % div_i)  
+    f.close() 
     return None
 
 
