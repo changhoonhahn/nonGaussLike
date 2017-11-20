@@ -121,6 +121,59 @@ def kNNdiv_gauss(X_white, cov_X, Knn=3, div_func='renyi:.5', gauss=None, Nref=No
     return div_knns
 
 
+def lnL_pX(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit='bic'): 
+    ''' Given delta_X = observed X - model X, and data matrix
+    X from mocks, estimate the log likelihood using a `density_method`
+    (gmm or gkde) fit of p(X_mock).
+
+    i.e. ln( p( X_obs - X_model(theta) | X_mock^(gmm/kde)) )
+    '''
+    if density_method not in ['gmm', 'kde']: raise ValueError 
+    if len(delta_X.shape) == 1: 
+        if len(delta_X) != X_mock.shape[1]: raise ValueError
+    else: 
+        if delta_X.shape[1] != X_mock.shape[1]: raise ValueError
+
+    X, mu_X = meansub(X_mock)
+    X_w, W = whiten(X) # whiten data 
+
+    return lnp_Xw(X_w, x=delta_X, method=density_method, n_comp_max=n_comp_max, info_crit=info_crit)
+    
+
+def lnL_pXi_ICA(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit='bic'): 
+    ''' Given delta_X = observed X - model X, and data matrix
+    X from mocks, estimate the log likelihood using a `density_method`
+    (gmm or gkde) fit of p(X_mock_i,ICA) for each componenet.
+    
+    ICA transformed X_mock
+        X_ICA = X_mock x W_ica 
+    ICA transformed delta X
+        delta_X_ICA = delta_X x W_ica 
+
+    ln( PI_i p( delta_X_ICA_i | X_ICA_i^(gmm/kde)) )
+    '''
+    X, mu_X = meansub(X_mock) # mean subtract
+    X_w, W = whiten(X) # whitened data
+    X_ica, W_ica = Ica(X_w) # get ICA transformation 
+
+    if len(delta_X.shape) == 1: 
+        x_obv = np.dot(np.dot(delta_X, W), W_ica) # whiten, and ica transform observd pk
+        lnp_Xica = 0. 
+    else: 
+        x_obv = np.zeros(delta_X.shape)
+        for i_obv in range(delta_X.shape[0]):
+            x_obv[i_obv,:] = np.dot(np.dot(delta_X[i_obv,:], W), W_ica)
+        lnp_Xica = np.zeros(delta_X.shape[0]) 
+
+    for i in range(X_ica.shape[1]): # loop through each ICA component
+        if len(delta_X.shape) == 1: 
+            x_obv_i = x_obv[i]
+        else: 
+            x_obv_i = x_obv[:,i]
+        lnp_Xica += lnp_Xw_i(X_ica, i, x=x_obv_i, method=density_method, n_comp_max=n_comp_max)
+    return lnp_Xica 
+
+
 def lnL_ica(delta_pk, Pk, component_wise=True, density_method='gkde', n_comp_max=10):
     ''' Given 'observed' delta P(k) (a.k.a. P(k) observed - model P(k)) 
     and mock P(k) data, calculate the ICA log likelihood estimate.
@@ -261,110 +314,98 @@ def MISE(Xis, b=0.1):
     return np.sum((hb_Xi - UT.gauss(0.5*(Xi_edges[1:] + Xi_edges[:-1]), 1., 0.))**2)/np.float(nbin)
 
 
-def p_Xwi_Xwj(X_w, ij_bins, x=np.linspace(-5., 5., 100), y=np.linspace(-5., 5., 100)):  
-    ''' Calculate the gaussian KDE of the joint distribution Xwi and Xwj
-    '''
-    xx, yy = np.meshgrid(x, y) 
-    pos = np.vstack([xx.ravel(), yy.ravel()])
-    
-    pdfs = [] 
-    for i in range(ij_bins.shape[1]): 
-        ij = ij_bins[:,i]
-        if ij[0] != ij[1]: 
-            # 2D gaussian KDE kernel using "rule of thumb" scott's rule. 
-            kern = gkde(np.vstack([X_w[:,ij[0]], X_w[:,ij[1]]])) 
-            pdfs.append(kern(pos))
-        else: 
-            pdfs.append(0.)
-    return pdfs
-
-
-def p_Xw_i(X_w, i_bins, x=np.linspace(-5., 5., 100), method='gkde', n_comp_max=10): 
+def p_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10): 
     ''' Estimate the pdf for Xw[:,ibins] at x using a nonparametric density estimation: 
     either gaussian KDE (gkde) or Gaussian Mixture Models (gmm)
     '''
-    if method not in ['gkde', 'sk_kde', 'sm_kde', 'gmm']: 
-        raise ValueError("method = gkde, sk_kde, sm_kde, or gmm") 
-    if isinstance(i_bins, int): 
-        i_bins = [i_bins]
+    lnpdfs = lnp_Xw_i(X_w, i_bins, x=x, method=method, n_comp_max=n_comp_max)
+    return [np.exp(lnpdf) for lnpdf in lnpdfs]
+
+
+def lnp_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10):
+    ''' Estimate the log pdf of X_w[:,i_bins] at x using a nonparametric 
+    density estimation (either KDE or GMM). 
+    
+    parameters
+    ----------
+    X_w : np.ndarray 
+        N_sample x N_feature matrix 
+
+    i_bins : int or list of ints 
+        specifies the feature bin(s) 
+
+    x : np.ndarray or list of np.ndarray
+        values to evaluate the pdf. Must be consistent with 
+        i_bins!
+    '''
+    if x is None: raise ValueError
+    if method not in ['kde', 'gmm']: raise ValueError("method = gkde or gmm") 
+    if isinstance(i_bins, int): i_bins = [i_bins]
+    if np.max(i_bins) > X_w.shape[1] or np.min(i_bins) < 0: raise ValueError
+    if len(i_bins) > 1:  # more than one bin 
+        if not isinstance(x, list): raise ValueError
+        else: 
+            if len(i_bins) != len(x): raise ValueError 
+    else: x = [x] 
+
     pdfs = []
-    for i_bin in i_bins: 
-        if method == 'gkde': 
-            # gaussian KDE kernel using "rule of thumb" scott's rule. 
-            kern = gkde(X_w[:,i_bin]) 
-            if len(i_bins) == 1: 
-                return kern.pdf(x)
-            else: 
-                pdfs.append(kern.pdf(x))
-        elif method == 'sk_kde':
-            # Search for best-fit through GridSearchCV
+    for ii, i_bin in enumerate(i_bins): 
+        if method == 'gmm': 
+            # find best fit component using information criteria (BIC/AIC)
+            gmms, ics = [], [] 
+            for i_comp in range(1,n_comp_max+1):
+                gmm = GMix(n_components=i_comp)
+                gmm.fit(X_w[:,i_bin]) 
+                gmms.append(gmm)
+                if info_crit == 'bic':  # Bayesian Information Criterion
+                    ics.append(gmm.bic(X_w[:,i_bin]))
+                elif info_crit == 'aic': # Akaike information criterion
+                    ics.append(gmm.aic(X_w[:,i_bin]))
+            ibest = np.array(ics).argmin() # lower the better!
+            kern = gmms[ibest]
+        elif method == 'kde': 
+            # find the best fit bandwidth using cross-validation grid search  
             grid = GridSearchCV(skKDE(),
                     {'bandwidth': np.linspace(0.1, 1.0, 30)},
-                    cv=20) # 20-fold cross-validation
-            grid.fit(X_w[:,i_bin][:,None]) 
-            kde = grid.best_estimator_
-            if len(i_bins) == 1: 
-                return np.exp(kde.score_samples(x[:,None]))
-            else: 
-                pdfs.append(np.exp(kde.score_samples(x[:,None])))
-        elif method == 'sm_kde': 
-            dens = KDEUnivariate(X_w[:,i_bin]) 
-            dens.fit() 
-            if len(i_bins) == 1: 
-                return dens.evaluate(x)
-            else: 
-                pdfs.append(dens.evaluate(x)) 
-        elif method == 'gmm': 
-            # select number of components based on BIC 
-            # so that we're not overfitting the PDF
-            gmms, bics = [], [] 
-            for i_comp in range(1,n_comp_max+1):
-                X = np.reshape(X_w[:,i_bin], (-1,1))
-                gmm = GMix(n_components=i_comp)
-                gmm.fit(X) 
-                gmms.append(gmm)
-                bics.append(gmm.bic(X))
-            ibest = np.array(bics).argmin() 
-            gbest = gmms[ibest]
-            gbest_pdf = GMM_pdf(gbest)
-            if len(i_bins) == 1: 
-                return gbest_pdf(x)
-            else: 
-                pdfs.append(gbest_pdf(x))
-            
-    return np.array(pdfs)
+                    cv=10) # 10-fold cross-validation
+            grid.fit(X_w[:,i_bin][:,None])
+            kern = grid.best_estimator_
+        pdfs.append(kern.score_sample(x[ii][:,None]))  
+    return pdfs 
 
 
-def p_Xw(X_w, x=None, method='gkde', n_comp_max=10): 
-    ''' Estimate the multi-dimensional pdf for Xw using a nonparametric density 
-    estimation (either KDE or GMM). 
-
-    Notes
-    -----
-    - This is mainly written for GMF because there's enough points to sample the 
-    multidimensional space. 
+def lnp_Xw(X_w, x=None, method='gmm', n_comp_max=10, info_crit='bic'): 
+    ''' Estimate the multi-dimensional pdf at x for a given X_w using a 
+    nonparametric density estimation (either KDE or GMM). 
     '''
-    if X_w.shape[1] != x.shape[1]: raise ValueError("dimension mismatch") 
-    if method not in ['gkde', 'gmm']: raise ValueError("method = gkde or gmm") 
-    if method == 'gkde': 
-        # gaussian KDE kernel using "rule of thumb" scott's rule. 
-        kern = gkde(X_w.T) 
-        # evaluate kernal at x 
-        return kern.pdf(x.T)
-    elif method == 'gmm': 
-        # select number of components based on BIC 
-        # so that we're not overfitting the PDF
-        gmms, bics = [], [] 
+    if x is None: raise ValueError
+    if method not in ['kde', 'gmm']: raise ValueError("method = gkde or gmm") 
+
+    if method == 'gmm': 
+        # find best fit component using information criteria (BIC/AIC)
+        gmms, ics = [], [] 
         for i_comp in range(1,n_comp_max+1):
             gmm = GMix(n_components=i_comp)
             gmm.fit(X_w) 
             gmms.append(gmm)
-            bics.append(gmm.bic(X_w))
-        ibest = np.array(bics).argmin() 
-        gbest = gmms[ibest]
-        gbest_pdf = GMM_pdf(gbest) # function to estimate pdf from GMM 
-        return gbest_pdf(x)
-    return np.array(pdfs)
+            if info_crit == 'bic':  # Bayesian Information Criterion
+                ics.append(gmm.bic(X_w))
+            elif info_crit == 'aic': # Akaike information criterion
+                ics.append(gmm.aic(X_w))
+        ibest = np.array(ics).argmin() # lower the better!
+        kern = gmms[ibest]
+    elif method == 'kde': 
+        # find the best fit bandwidth using cross-validation grid search  
+        grid = GridSearchCV(skKDE(),
+                {'bandwidth': np.linspace(0.1, 1.0, 30)},
+                cv=10) # 10-fold cross-validation
+        grid.fit(X_w)
+        kern = grid.best_estimator_
+    
+    if len(x.shape) == 1: 
+        return kern.score_samples(x[:,None]) 
+    else: 
+        return kern.score_samples(x) 
 
 
 def GMM_pdf(gmm_obj): 
@@ -432,6 +473,7 @@ def meansub(X):
     return X - mu_X, mu_X
 
 
+# --- data matrices from mocks --- 
 def X_gmf_all(n_arr=False): 
     ''' Construct data matrix X from mock GMFs. But instead of 
     using one theta_HOD realization like the function X_gmf, use 
@@ -501,31 +543,6 @@ def X_pk(mock, ell=0, krange=None, NorS='ngc', sys='fc', k_arr=False):
         pkay.Read(mock, i, ell=ell, NorS=NorS, sys=sys) 
         pkay.krange(krange)
         k, pk = pkay.k, pkay.pk
-
-        if i == 1: 
-            pks = np.zeros((n_mock, len(k)))
-        pks[i-1,:] = pk 
-    if k_arr:
-        return pks, k
-    return pks
-
-
-def dataX(mock, ell=0, krange=None, rebin=None, sys=None, k_arr=False): 
-    ''' Construct data matrix X from P(k) measures of mock catalogs.
-    
-    X_i = P(k)_i 
-
-    X has N_mock x N_k dimensions. 
-    '''
-    pkay = Data.Pk() # read in P(k) data 
-    n_mock = pkay._n_mock(mock) 
-    for i in range(1, n_mock+1):  
-        pkay.Read(mock, i, ell=ell, sys=sys) 
-        pkay.krange(krange)
-        if rebin is None: 
-            k, pk = pkay.k, pkay.pk
-        else: 
-            k, pk, _ = pkay.rebin(rebin)
 
         if i == 1: 
             pks = np.zeros((n_mock, len(k)))

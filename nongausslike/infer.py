@@ -12,7 +12,8 @@ except OSError:
 import nongauss as NG 
 
 
-def W_importance(tag, chain, component_wise=True, density_method='gkde', **kwargs): 
+def W_importance(tag, chain, density_method='kde', n_comp_max=20, 
+        info_crit='bic', **kwargs): 
     ''' Given a dictionary with the MCMC chain, evaluate the likelihood ratio 
     '''
     if 'RSD' in tag: # Florian's RSD analysis 
@@ -95,10 +96,16 @@ def W_importance(tag, chain, component_wise=True, density_method='gkde', **kwarg
         # read mock gmfs (all mocks from 100 differnet HOD parameter points)
         gmf_mock = NG.X_gmf_all() #gmf_mock = NG.X_gmf('manodeep.run'+str(kwargs['run']))#
         
-        if tag == 'gmf_ica_chi2':
-            lnP_den = -0.5 * chain['chi2'] # -0.5 chi-squared from MCMC chain
-            lnP_num = NG.lnL_ica(dgmf, gmf_mock, 
-                    component_wise=component_wise, density_method=density_method)
+        # old likelihood derived from chi-squared of MCMC chain 
+        lnP_den = -0.5 * chain['chi2'] # -0.5 chi-squared from MCMC chain
+        if tag == 'gmf_pXiICA_chi2':
+            # updated likelihood is calculated using  
+            # ln( PI_i p( delta_X_ICA_i | X_ICA_i^(gmm/kde)) )
+            lnP_num = NG.lnL_pXi_ICA(dgmf, gmf_mock, density_method=density_method, n_comp_max=n_comp_max, info_crit=info_crit)
+        elif tag == 'gmf_pX_chi2': 
+            # updated likelihood is calculated using 
+            # ln( p( delta_X | X^(gmm/kde) ) ) 
+            lnP_num = NG.lnL_pX(dgmf, gmf_mock, density_method=density_method, n_comp_max=n_comp_max, info_crit=info_crit)
         elif tag == 'gmf_all_chi2': 
             # importance weight determined by the ratio of 
             # the chi^2 from the chain and the chi^2 calculated 
@@ -108,7 +115,6 @@ def W_importance(tag, chain, component_wise=True, density_method='gkde', **kwarg
             Cgmf = np.cov(gmf_mock.T) # covariance matrix 
             Cinv = np.linalg.inv(Cgmf) # precision matrix
              
-            lnP_den = -0.5 * chain['chi2'] # chi-squared calculated 
             lnP_num = np.empty(dgmf.shape[0])
             for i in range(dgmf.shape[0]): # updated chi-square
                 lnP_num[i] = -0.5 * np.dot(dgmf[i,:], np.dot(Cinv, dgmf[i,:].T)) 
@@ -121,16 +127,12 @@ def W_importance(tag, chain, component_wise=True, density_method='gkde', **kwarg
             Cinv = np.linalg.inv(Cgmf) # precision matrix
             Nlim = Cinv.shape[0]-1
              
-            lnP_den = -0.5 * chain['chi2'] # chi-squared calculated 
             lnP_num = np.empty(dgmf.shape[0])
             for i in range(dgmf.shape[0]): # updated chi-square
                 lnP_num[i] = -0.5 * np.dot(dgmf[i,:Nlim], np.dot(Cinv[:Nlim,:Nlim], dgmf[i,:Nlim].T)) 
         elif tag == 'gmf_pca_chi2':
-            lnP_den = -0.5 * chain['chi2']
-            lnP_num = NG.lnL_pca(dgmf, gmf_mock,
-                    component_wise=component_wise, density_method=density_method)
+            lnP_num = NG.lnL_pca(dgmf, gmf_mock, density_method=density_method)
         elif tag == 'gmf_gauss_chi2': 
-            lnP_den = -0.5 * chain['chi2']
             lnP_num = NG.lnL_pca_gauss(dgmf, gmf_mock) 
         else: 
             raise NotImplementedError

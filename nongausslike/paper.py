@@ -238,62 +238,59 @@ def Like_RSD(tag_like, tag_mcmc='beutler_z1', ichain=0):
     return None
 
 
-def Like_GMF(tag_mcmc, tag_like):
+def Like_GMF(): 
+    ''' Compare importance sampled likelihoods of GMFs to original likelihood 
     '''
-    '''
-    if tag_like == 'gmf_ica_chi2': 
-        str_like = 'ICA'
-    elif tag_like == 'gmf_pca_chi2': 
-        str_like = 'PCA'
-    elif tag_like == 'gmf_all_chi2': 
-        str_like = r'all $\theta$s'
-    elif tag_like == 'gmf_lowN_chi2': 
-        str_like = r'low $N$'
-    elif tag_like == 'gmf_gauss_chi2': 
-        str_like = 'Gauss'
-    else: 
-        raise NotImplementedError
     # import MCMC chain 
-    chain = Inf.mcmc_chains(tag_mcmc)
-
-    # import importance weight
-    f_wimp = ''.join([UT.dat_dir(), 'manodeep/', 
-        'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0', 
-        '.', tag_like, '_weights.dat']) 
-    wimp = np.loadtxt(f_wimp, skiprows=1, unpack=True, usecols=[2]) 
-    
+    chain = Inf.mcmc_chains('manodeep')
     # remove burnin?  
-    burnin = np.ones(wimp.shape, dtype=bool) 
-    burnin[:int(wimp.shape[0]/4)] = False 
+    burnin = np.ones(chain['chi2'].shape, dtype=bool) 
+    burnin[:int(chain['chi2'].shape[0]/4)] = False 
 
-    wlim = np.percentile(wimp[burnin], 99.9)
-    lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
+    # importance weights derived for N(C_all) estimates 
+    f_all = ''.join([UT.dat_dir(), 'manodeep/', 
+        'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0', 
+        '.gmf_gauss_chi2_weights.dat']) 
+    w_all = np.loadtxt(f_all, skiprows=1, unpack=True, usecols=[2]) 
+    # importance weight derived from p(X) GMM estimate 
+    f_pX = ''.join([UT.dat_dir(), 'manodeep/', 
+        'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0.gmf_pX_chi2_weights.gmm_max30comp_bic.dat']) 
+    w_pX = np.loadtxt(f_pX, skiprows=1, unpack=True, usecols=[2]) 
+
+    wimps = [w_all, w_pX]
+    like_lbls = [r'$\mathcal{N}({\bf C}^{all})', r'$p_\mathrm{GMM}(\{\zeta^{m}\})$']
 
     labels = ['logMmin', 'sig_logM', 'logM0', 'logM1', 'alpha']
     lbltex = [r'$\log M_\mathrm{min}$', r'$\sigma_{\log M}$', r'$\log M_0$', r'$\log M_1$', r'$\alpha$'] 
     prior_min = [11.2, 0.001, 6., 12.2, 0.6]
     prior_max = [12.2, 1., 14., 13., 1.2]
     yrange = [[0.,4.], [0., 2.], [0., 0.3], [0., 7], [0., 10]]
-    
     nbin = 40 
+    
     fig = plt.figure(figsize=(5*len(labels), 4.5)) 
     for i in range(len(labels)): 
         sub = fig.add_subplot(1, len(labels), i+1) 
         # original Beutler et al.(2017) constraints
         hh = np.histogram(chain[labels[i]][burnin], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
         bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', label='Sinha et al.(2017)') 
-        # updated constraints
-        hh = np.histogram(chain[labels[i]][lims], weights=wimp[lims],normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
-        bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none', label=str_like+' (imp. sampl.)') 
-        # constraints 
-        low, med, high = np.percentile(chain[labels[i]], [15.86555, 50, 84.13445])
-        low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], facecolor='k', alpha=0.5, edgecolor='none', 
+                label='Sinha et al.(2017)') 
 
-        txt = ''.join(['S2017: $', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$; ', 
-            str_like, ': $', str(round(med_w,3)), '^{+', str(round(high_w-med_w,3)), '}_{-', str(round(med_w-low_w,3)), '}$']) 
-        sub.set_title(txt)
+        for wimp, like_lbl in zip(wimps, like_lbls): 
+            wlim = np.percentile(wimp[burnin], 99.9)
+            lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
+            # importance weighted constraints
+            hh = np.histogram(chain[labels[i]][lims], weights=wimp[lims],normed=True, bins=nbin, 
+                    range=[prior_min[i], prior_max[i]])
+            bp = UT.bar_plot(*hh) 
+            sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none', label=like_lbl+' (imp. sampl.)') 
+            # constraints 
+            low, med, high = np.percentile(chain[labels[i]], [15.86555, 50, 84.13445])
+            low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
+
+            txt = ''.join(['S2017: $', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$; ', 
+                like_lbl, ': $', str(round(med_w,3)), '^{+', str(round(high_w-med_w,3)), '}_{-', str(round(med_w-low_w,3)), '}$']) 
+            sub.set_title(txt)
 
         if i == 0: sub.legend(loc='upper right', prop={'size': 15})  # legend
         # x-axis 
@@ -301,8 +298,7 @@ def Like_GMF(tag_mcmc, tag_like):
         sub.set_xlabel(lbltex[i], fontsize=25)
         # y-axis
         sub.set_ylim(yrange[i]) 
-    fig.savefig(''.join([UT.tex_dir(), 'figs/', 
-        'Like_GMF.', tag_mcmc, '.', tag_like, '.pdf']), bbox_inches='tight') 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/', 'Like_GMF_comparison.pdf']), bbox_inches='tight') 
     return None
    
 
@@ -311,25 +307,24 @@ def GMF_contours(tag_mcmc='manodeep'):
     '''
     # import MCMC chain 
     chain = Inf.mcmc_chains(tag_mcmc)
+    # remove burnin?  
+    burnin = np.ones(chain['chi2'].shape, dtype=bool) 
+    burnin[:int(chain['chi2'].shape[0]/4)] = False 
 
-    # import importance weight
+    # importance weight
     f_all = ''.join([UT.dat_dir(), 'manodeep/', 
         'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0', 
         '.gmf_gauss_chi2_weights.dat']) 
     w_all = np.loadtxt(f_all, skiprows=1, unpack=True, usecols=[2]) 
-    f_ica = ''.join([UT.dat_dir(), 'manodeep/', 
-        'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0', 
-        '.gmf_ica_chi2_weights.dat']) 
-    w_ica = np.loadtxt(f_ica, skiprows=1, unpack=True, usecols=[2]) 
-    
-    # remove burnin?  
-    burnin = np.ones(w_all.shape, dtype=bool) 
-    burnin[:int(w_all.shape[0]/4)] = False 
+    f_pX = ''.join([UT.dat_dir(), 'manodeep/', 
+        'status_file_Consuelo_so_mvir_Mr19_box_4022_and_4002_fit_wp_0_fit_gmf_1_pca_0.gmf_pX_chi2_weights.gmm_max30comp_bic.dat']) 
+    w_pX = np.loadtxt(f_pX, skiprows=1, unpack=True, usecols=[2]) 
 
-    wlim_all = np.percentile(w_all[burnin], 99.9)
-    lims_all = np.where(burnin & (w_all < wlim_all)) #lims = np.where(wimp < 1e3)
-    wlim_ica = np.percentile(w_ica[burnin], 99.9)
-    lims_ica = np.where(burnin & (w_ica < wlim_ica)) #lims = np.where(wimp < 1e3)
+    wimps = [w_all, w_pX]
+    imp_lbls = [r'$\mathcal{N}({\bf C}^{\mathrm{all}\;\theta})$', r'$p_\mathrm{GMM}(\{\zeta^{m}\})$']
+    imp_colors = ['#1F77B4', '#FF7F0E']
+    imp_conts = [False, True]
+    imp_lws = [1, 0]
 
     labels = ['logMmin', 'sig_logM', 'logM0', 'logM1', 'alpha']
     lbltex = [r'$\log M_\mathrm{min}$', r'$\sigma_{\log M}$', r'$\log M_0$', r'$\log M_1$', r'$\alpha$'] 
@@ -341,71 +336,59 @@ def GMF_contours(tag_mcmc='manodeep'):
     fig = plt.figure(figsize=(2*len(labels), 5)) 
     # log M_min vs sigma log M 
     sub = fig.add_subplot(121)
-
     DFM.hist2d(chain['logMmin'][burnin], chain['sig_logM'][burnin], color='k', 
             levels=[0.68, 0.95], bins=nbin, 
             range=[[prior_min[0], prior_max[0]], [prior_min[1], prior_max[1]]], 
             plot_datapoints=False, plot_density=False, fill_contours=False, smooth=1, 
             contour_kwargs={'linewidths': 1, 'linestyles': 'dashed'}, ax=sub)
-
-    DFM.hist2d(chain['logMmin'][lims_all], chain['sig_logM'][lims_all], weights=w_all[lims_all], 
-            color='#1F77B4', levels=[0.68, 0.95], alpha=0.1, bins=nbin, 
-            range=[[prior_min[0], prior_max[0]], [prior_min[1], prior_max[1]]], 
-            plot_datapoints=False, plot_density=False, fill_contours=False, smooth=1,
-            contour_kwargs={'linewidths': 1}, ax=sub)
-    
-    DFM.hist2d(chain['logMmin'][lims_ica], chain['sig_logM'][lims_ica], weights=w_ica[lims_ica], 
-            color='#FF7F0E', levels=[0.68, 0.95], alpha=0.1, bins=nbin, 
-            range=[[prior_min[0], prior_max[0]], [prior_min[1], prior_max[1]]], 
-            plot_datapoints=False, plot_density=False, fill_contours=True, smooth=1,
-            contour_kwargs={'linewidths': 0.0}, ax=sub)
+    for wimp, imp_color, imp_cont, imp_lw in zip(wimps, imp_colors, imp_conts, imp_lws): 
+        wlim = np.percentile(wimp[burnin], 99.9)
+        lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
+        DFM.hist2d(chain['logMmin'][lims], chain['sig_logM'][lims], weights=wimp[lims], 
+                color=imp_color, levels=[0.68, 0.95], alpha=0.1, bins=nbin, 
+                range=[[prior_min[0], prior_max[0]], [prior_min[1], prior_max[1]]], 
+                plot_datapoints=False, plot_density=False, fill_contours=imp_cont, smooth=1,
+                contour_kwargs={'linewidths': imp_lw}, ax=sub)
     sub.set_xlabel('log $M_\mathrm{min}$', fontsize=20) 
     sub.set_ylabel('$\sigma_{\mathrm{log} M}$', fontsize=20) 
     # log M_1 vs alpha 
     sub = fig.add_subplot(122)
-
     DFM.hist2d(chain['logM1'][burnin], chain['alpha'][burnin], color='k', 
             levels=[0.68, 0.95], bins=nbin, 
             range=[[prior_min[3], prior_max[3]], [prior_min[4], prior_max[4]]], 
             plot_datapoints=False, plot_density=False, fill_contours=False, smooth=1, 
             contour_kwargs={'linewidths': 1, 'linestyles': 'dashed'}, ax=sub)
 
-    DFM.hist2d(chain['logM1'][lims_all], chain['alpha'][lims_all], weights=w_all[lims_all], 
-            color='#1F77B4', levels=[0.68, 0.95], alpha=0.1, bins=nbin, 
-            range=[[prior_min[3], prior_max[3]], [prior_min[4], prior_max[4]]], 
-            plot_datapoints=False, plot_density=False, fill_contours=False, smooth=1,
-            contour_kwargs={'linewidths': 1}, ax=sub)
-    
-    DFM.hist2d(chain['logM1'][lims_ica], chain['alpha'][lims_ica], weights=w_ica[lims_ica], 
-            color='#FF7F0E', levels=[0.68, 0.95], alpha=0.1, bins=nbin, 
-            range=[[prior_min[3], prior_max[3]], [prior_min[4], prior_max[4]]], 
-            plot_datapoints=False, plot_density=False, fill_contours=True, smooth=1,
-            contour_kwargs={'linewidths': 0.0}, ax=sub)
+    for wimp, imp_color, imp_cont, imp_lw in zip(wimps, imp_colors, imp_conts, imp_lws): 
+        wlim = np.percentile(wimp[burnin], 99.9)
+        lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
+        DFM.hist2d(chain['logM1'][lims], chain['alpha'][lims], weights=wimp[lims], 
+                color=imp_color, levels=[0.68, 0.95], alpha=0.1, bins=nbin, 
+                range=[[prior_min[3], prior_max[3]], [prior_min[4], prior_max[4]]], 
+                plot_datapoints=False, plot_density=False, fill_contours=imp_cont, smooth=1,
+                contour_kwargs={'linewidths': imp_lw}, ax=sub)
     sub.set_xlabel('log $M_1$', fontsize=20) 
     sub.set_ylabel(r'$\alpha$', fontsize=20) 
-
-    leg_sinha = mlines.Line2D([], [], ls='--', c='k', linewidth=2, 
-            label='Sinha+(2017)' )
-    leg_all = mlines.Line2D([], [], ls='-', c='#1F77B4', linewidth=2, alpha=0.5, 
-            label=r'${\bf C}^{\mathrm{all}\;\theta}$')
-    leg_ica = mlines.Line2D([], [], ls='-', c='#FF7F0E', linewidth=12, alpha=0.5,
-            label='ICA')
-    sub.legend(loc='upper right', handles=[leg_sinha, leg_all, leg_ica], 
-            frameon=False, fontsize=15)#, handletextpad=0.1)#, scatteryoffsets=[0.5])
-
+    
+    legs = []
+    legs.append(mlines.Line2D([], [], ls='--', c='k', linewidth=2, label='Sinha+(2017)'))
+    for imp_lbl, imp_color in zip(imp_lbls, imp_colors): 
+        legs.append(mlines.Line2D([], [], ls='-', c=imp_color, linewidth=5, alpha=0.5, label=imp_lbl))
+    sub.legend(loc='upper right', handles=legs, frameon=False, fontsize=15)#, handletextpad=0.1)#, scatteryoffsets=[0.5])
     fig.savefig(''.join([UT.tex_dir(), 'figs/', 
         'GMFcontours.', tag_mcmc, '.pdf']), bbox_inches='tight') 
     return None
    
 
 if __name__=="__main__": 
-    divGMF(Nref=3000, K=5, n_mc=200, n_comp_max=20)
-    for k in range(8,40)[::4]: 
-        divGMF(Nref=3000, K=k, n_mc=200, n_comp_max=20)
+    #Like_GMF()
+    GMF_contours()
+    #divGMF(Nref=3000, K=5, n_mc=200, n_comp_max=20)
+    #for k in range(8,40)[::4]: 
+    #    divGMF(Nref=3000, K=k, n_mc=200, n_comp_max=20)
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
     #Like_RSD('RSD_pca_gauss', ichain=0)
     #Like_GMF('manodeep', 'gmf_lowN_chi2')
     #Like_GMF('manodeep', 'gmf_all_chi2')
     #Like_GMF('manodeep', 'gmf_ica_chi2')
-    #GMF_contours(tag_mcmc='manodeep')
