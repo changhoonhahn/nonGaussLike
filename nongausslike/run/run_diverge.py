@@ -1,4 +1,5 @@
 import sys as Sys
+import time
 import numpy as np 
 
 from numpy.random import multivariate_normal as mvn 
@@ -7,6 +8,7 @@ from sklearn.mixture import GaussianMixture as GMix
 from sklearn.neighbors import KernelDensity as skKDE 
 
 import env 
+import util as UT 
 import nongauss as NG 
 #import paper as Pap
 # -- plotting -- 
@@ -143,7 +145,7 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
 
     f = ''.join([UT.dat_dir(), 'diverg.', obvs, str_obvs, '.', diver, '.K', str(K), str_comp, 
         '.Nref', str(Nref), '.', str_div, '.png']) 
-    np.savetxt(f, np.array(div).T) 
+    np.savetxt(f, np.array(divs).T) 
     return None
 
 
@@ -160,9 +162,11 @@ if __name__=="__main__":
     n_mc = int(Sys.argv[6])
     if 'GMM' in div: 
         ncomp = int(Sys.argv[7]) 
+    else: 
+        ncomp = 10
     
     if obvs == 'pk': 
         diverge(obvs, div, div_func='kl', Nref=Nref, K=K, n_mc=n_mc, n_comp_max=ncomp, 
             pk_mock='patchy.z1', NorS='ngc')
     elif obvs == 'gmf': 
-        diverge(obvs, div, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=ncomp) 
+        diverge(obvs, div, div_func='kl', Nref=Nref, K=K, n_mc=n_mc, n_comp_max=ncomp) 
