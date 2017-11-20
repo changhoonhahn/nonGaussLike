@@ -9,7 +9,6 @@ from scipy.stats import gaussian_kde as gkde
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KernelDensity as skKDE 
 from numpy.random import multivariate_normal as mvn 
-from scipy.stats import multivariate_normal as mGauss
 from sklearn.mixture import GaussianMixture as GMix
 # -- local -- 
 import data as Data
