@@ -45,11 +45,11 @@ mpl.rcParams['legend.frameon'] = False
 
 
 def divGMF(Nref=1000, K=5, n_mc=10, n_comp_max=10):
-    ''' compare the divergence estimates between 
+    ''' compare the renyi-alpha and KL divergence estimates between 
     D( gmfs || gauss(C_gmf) ), D( gauss(C_gmf) || gauss(C_gmf) ) and  D( gmfs || p(gmfs) GMM) 
     '''
     # read in mock GMFs from all HOD realizations (20,000 mocks)
-    gmfs_mock = NG.X_gmf_all()[:2000]
+    gmfs_mock = NG.X_gmf_all()#[:2000]
     n_mock = gmfs_mock.shape[0] # number of mocks 
     print("%i mocks" % n_mock) 
 
@@ -58,6 +58,7 @@ def divGMF(Nref=1000, K=5, n_mc=10, n_comp_max=10):
 
     C_gmf = np.cov(X_w.T) # covariance matrix
     
+    # p(gmfs) GMM
     # evaluate best-fit GMM based on Bayesian Information Criterion  
     gmms, bics = [], [] 
     for i_comp in range(1,n_comp_max+1):
@@ -71,48 +72,47 @@ def divGMF(Nref=1000, K=5, n_mc=10, n_comp_max=10):
     fig = plt.figure(figsize=(7,5))
     for i_div, div_func in enumerate(['renyi:.5', 'kl']): 
         # caluclate the divergences now 
-        div_gauss = []
-        div_gauss_ref = []
-        div_gmm = [] 
+        div_gauss_ref, div_gauss, div_gmm = [], [], [] 
         for i in range(n_mc): 
             print('%i montecarlo' % i)
             t_start = time.time() 
-            # estimate divergence between gmfs_white and a 
-            # Gaussian distribution described by C_gmf
-            div_gauss_i = NG.kNNdiv_gauss(X_w, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
-            div_gauss.append(div_gauss_i)
             # reference divergence in order to showcase the estimator's scatter
             # Gaussian distribution described by C_gmf with same n_mock mocks 
             gauss = mvn(np.zeros(gmfs_mock.shape[1]), C_gmf, size=n_mock)
             div_gauss_ref_i = NG.kNNdiv_gauss(gauss, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
             div_gauss_ref.append(div_gauss_ref_i)
-            # estimate divergence between the gmfs_white and GMM distribution estimate
-            div_gmm_i = NG.kNNdiv_Kernel(X_w, kerns, Knn=K, div_func=div_func, Nref=Nref, compwise=False) 
+            # estimate divergence between gmfs_white and a 
+            # Gaussian distribution described by C_gmf
+            div_gauss_i = NG.kNNdiv_gauss(X_w, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
+            div_gauss.append(div_gauss_i)
+            # D( gmfs || p(gmfs) GMM)
+            div_gmm_i = NG.kNNdiv_Kernel(X_w, kerns, Knn=K, div_func=div_func, Nref=Nref, 
+                    compwise=False) 
             div_gmm.append(div_gmm_i)
             print('t= %f sec' % round(time.time()-t_start,2))
 
         sub = fig.add_subplot(2,1,i_div+1)
         hrange = [-0.1, 0.25]
         nbins = 50
-        # divergence between mock GMFs and Gaussian distribution 
-        hh = np.histogram(np.array(div_gauss), normed=True, range=hrange, bins=nbins)
-        bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
-                label=r'$D(\{\zeta_i^{(m)}\}\parallel \mathcal{N}({\bf C}^{(m)}))$') 
-        y_max = bp[1].max() 
         # reference to show scatter of estimator
         hh = np.histogram(np.array(div_gauss_ref), normed=True, range=hrange, bins=nbins)
         bp = UT.bar_plot(*hh) 
         sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
         y_max = max(y_max, bp[1].max()) 
         # divergence between mock GMFs and Gaussian distribution 
+        hh = np.histogram(np.array(div_gauss), normed=True, range=hrange, bins=nbins)
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
+                label=r'$D(\{\zeta^{(m)}\}\parallel \mathcal{N}({\bf C}^{(m)}))$') 
+        y_max = bp[1].max() 
+        # divergence between mock GMFs and Gaussian distribution 
         hh = np.histogram(np.array(div_gmm), normed=True, range=hrange, bins=nbins)
         bp = UT.bar_plot(*hh) 
         sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
-                label=r'$D(\{\zeta_i^{(m)}\}\parallel p_\mathrm{GMM}(\{\zeta_i^{m}\}))$') 
+                label=r'$D(\{\zeta^{(m)}\}\parallel p_\mathrm{GMM}(\{\zeta^{(m)}\}))$') 
         y_max = max(y_max, bp[1].max()) 
         sub.set_xlim(hrange) 
-        sub.set_ylim([0., y_max*1.2]) 
+        sub.set_ylim([0., y_max*1.4]) 
         if i_div == 1: 
             sub.legend(loc='upper right', prop={'size': 15})
         # xlabels
@@ -122,8 +122,8 @@ def divGMF(Nref=1000, K=5, n_mc=10, n_comp_max=10):
         elif 'kl' in div_func: 
             sub.set_xlabel(r'KL divergence', fontsize=20)
     fig.subplots_adjust(hspace=.5)
-    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence.gmf.pdf'])
-    fig.savefig(f_fig)#, bbox_inches='tight') 
+    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence_gmf_K', str(K), '.pdf'])
+    fig.savefig(f_fig, bbox_inches='tight') 
     return None
 
 
@@ -399,7 +399,9 @@ def GMF_contours(tag_mcmc='manodeep'):
    
 
 if __name__=="__main__": 
-    divGMF(Nref=3000, K=10, n_mc=200, n_comp_max=20)
+    divGMF(Nref=3000, K=5, n_mc=200, n_comp_max=20)
+    for k in range(8,40)[::4]: 
+        divGMF(Nref=3000, K=k, n_mc=200, n_comp_max=20)
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
     #Like_RSD('RSD_pca_gauss', ichain=0)

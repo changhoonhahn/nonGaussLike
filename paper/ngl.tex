@@ -72,7 +72,7 @@ large-scale structure of universe
     \item Depending on Hogg's paper maybe a simple illustration of how the likelihood asumption 
 \end{itemize}
 
-\section{Quantifying Likelihood non-Gaussianity}
+\section{Likelihood non-Gaussianity}
 \subsection{Mock Catalogs}
 \bitem
     \item brief descriptin of the mock catalogs 
@@ -82,20 +82,33 @@ large-scale structure of universe
 \bitem
     \item \cite{poczos2012, krishnamurthy2014}
 \eitem
-\section{Estimating the Non-Gaussian Likelihood}
-\subsection{Independent Component Analysis} 
 
+\section{Estimating the Non-Gaussian Likelihood}
 \subsection{Nonparametric Likelihood Estimation}
+\bitem
+    \item Kernel Density Estimation 
+    \item Gaussian Mixture Model  
+    \item Figure illustrating both methods on highest N GMF bin 
+\eitem
+
+\subsection{Independent Component Analysis} 
+Curse of dimensionality! 2000 mocks in Beutler not enough to directly estimate 
+the 37-dimensional space, so we use independent component analysis 
+\cite{hartlap2009}
+\bitem
+    \item Similar figure to \cite{hartlap2009} that tests the independence? 
+\eitem
 
 \section{Impact on Parameter Inference}
 \bitem
-    \item explain importance sampling 
+    \item equations explaining importance sampling framework
+    \item details of each of the MCMC runs
 \eitem
 
 \section{Discussion}
 \bitem
     \item Will it matter for future surveys? 
-    \item Likelihood free inference
+    \item Likelihood free inference (cite justin's paper) 
 \eitem
 
 \section{Summary}
@@ -103,13 +116,13 @@ large-scale structure of universe
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figures 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{figure}
-%\begin{center}
-%\includegraphics[width=0.9\textwidth]{figs/}
-%\caption{}
-%\label{fig:abc_demo}
-%\end{center}
-%\end{figure}
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figs/kNN_divergence_gmf.pdf}
+\caption{}
+\label{fig:gmf_div}
+\end{center}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Acknowledgements
@@ -117,9 +130,10 @@ large-scale structure of universe
 \section*{Acknowledgements}
 It's a pleasure to thank 
     Simone~Ferraro,
-    Zachary~Slepian,
     David~W.~Hogg,
+    Emmaneul~Schaan, 
     Roman~Scoccimarro
+    Zachary~Slepian
 
 \bibliographystyle{yahapj}
 \bibliography{nongausslike}

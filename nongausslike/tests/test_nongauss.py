@@ -6,7 +6,11 @@ Tests for each step of nongauss.py
 import time 
 import numpy as np 
 from scipy.stats import gaussian_kde as gkde
+from sklearn.model_selection import GridSearchCV
+from sklearn.neighbors import KernelDensity as skKDE 
+from numpy.random import multivariate_normal as mvn 
 from scipy.stats import multivariate_normal as mGauss
+from sklearn.mixture import GaussianMixture as GMix
 # -- local -- 
 import data as Data
 import util as UT 
@@ -25,6 +29,286 @@ mpl.rcParams['ytick.labelsize'] = 'x-large'
 mpl.rcParams['ytick.major.size'] = 5
 mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
+
+
+def diverge(obvs, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, n_mocks=2000, 
+        pk_mock='patchy.z1', NorS='ngc'):
+    ''' compare the divergence estimates between 
+    D( gauss(C_X) || gauss(C_X) ),  D( mock X || gauss(C_X)), 
+    D( mock X || p(X) KDE), D( mock X || p(X) GMM), 
+    D( mock X || PI p(X^i_ICA) KDE), and D( mock X || PI p(X^i_ICA) GMM)
+    '''
+    if isinstance(Nref, float): Nref = int(Nref)
+    # read in mock data X  
+    if obvs == 'pk': 
+        X_mock = NG.X_pk_all(pk_mock, NorS=NorS, sys='fc')[:n_mocks]
+    elif obvs == 'gmf': 
+        X_mock = NG.X_gmf_all()[:n_mocks]
+    else: 
+        raise ValueError("obvs = 'pk' or 'gmf'")  
+    n_mock = X_mock.shape[0] # number of mocks 
+    print("%i mocks" % n_mock) 
+
+    X_mock_meansub, _ = NG.meansub(X_mock) # mean subtract
+    X_w, W = NG.whiten(X_mock_meansub)
+    X_ica, _ = NG.Ica(X_w)  # ICA transformation 
+    C_X = np.cov(X_w.T) # covariance matrix
+
+    # p(mock X) GMM
+    gmms, bics = [], [] 
+    for i_comp in range(1,n_comp_max+1):
+        gmm = GMix(n_components=i_comp)
+        gmm.fit(X_w) 
+        gmms.append(gmm)
+        bics.append(gmm.bic(X_w))
+    ibest = np.array(bics).argmin() 
+    kern_gmm = gmms[ibest]
+
+    # p(mock X) KDE 
+    t0 = time.time() 
+    grid = GridSearchCV(skKDE(),
+            {'bandwidth': np.linspace(0.1, 1.0, 30)},
+            cv=10) # 10-fold cross-validation
+    grid.fit(X_w)
+    kern_kde = grid.best_estimator_
+    dt = time.time() - t0 
+    print('%f sec' % dt) 
+    
+    # PI p(X^i_ICA) GMM
+    kern_gmm_ica = [] 
+    for ibin in range(X_ica.shape[1]): 
+        gmms, bics = [], [] 
+        for i_comp in range(1,n_comp_max+1):
+            gmm = GMix(n_components=i_comp)
+            gmm.fit(X_ica[:,ibin][:,None]) 
+            gmms.append(gmm)
+            bics.append(gmm.bic(X_ica[:,ibin][:,None]))
+        ibest = np.array(bics).argmin() 
+        kern_gmm_ica.append(gmms[ibest])
+    
+    # PI p(X^i_ICA) KDE  
+    kern_kde_ica = [] 
+    for ibin in range(X_ica.shape[1]): 
+        t0 = time.time() 
+        grid = GridSearchCV(skKDE(),
+                {'bandwidth': np.linspace(0.1, 1.0, 30)},
+                cv=10) # 10-fold cross-validation
+        grid.fit(X_ica[:,ibin][:,None]) 
+        kern_kde_ica.append(grid.best_estimator_) 
+        dt = time.time() - t0 
+        print('%f sec' % dt) 
+
+    # caluclate the divergences now 
+    div_gauss_ref, div_gauss = [], []
+    div_gmm, div_gmm_ica = [], [] 
+    div_kde, div_kde_ica = [], [] 
+    for i in range(n_mc): 
+        print('%i montecarlo' % i)
+        t_start = time.time() 
+        # reference divergence in order to showcase the estimator's scatter
+        # Gaussian distribution described by C_gmf with same n_mock mocks 
+        gauss = mvn(np.zeros(X_mock.shape[1]), C_X, size=n_mock)
+        div_gauss_ref_i = NG.kNNdiv_gauss(gauss, C_X, Knn=K, div_func=div_func, Nref=Nref)
+        div_gauss_ref.append(div_gauss_ref_i)
+        # estimate divergence between gmfs_white and a 
+        # Gaussian distribution described by C_gmf
+        div_gauss_i = NG.kNNdiv_gauss(X_w, C_X, Knn=K, div_func=div_func, Nref=Nref)
+        div_gauss.append(div_gauss_i)
+        # D( mock X || p(X) GMM)
+        div_gmm_i = NG.kNNdiv_Kernel(X_w, kern_gmm, Knn=K, div_func=div_func, 
+                Nref=Nref, compwise=False) 
+        div_gmm.append(div_gmm_i)
+        # D( mock X || p(X) KDE)
+        div_kde_i = NG.kNNdiv_Kernel(X_w, kern_kde, Knn=K, div_func=div_func, 
+                Nref=Nref, compwise=False) 
+        div_kde.append(div_kde_i)
+        # D( mock X || PI p(X^i_ICA) GMM), 
+        div_gmm_ica_i = NG.kNNdiv_Kernel(X_ica, kern_gmm_ica, Knn=K, div_func=div_func, 
+                Nref=Nref, compwise=True)
+        div_gmm_ica.append(div_gmm_ica_i)
+        # D( mock X || PI p(X^i_ICA) KDE), 
+        div_kde_ica_i = NG.kNNdiv_Kernel(X_ica, kern_kde_ica, Knn=K, div_func=div_func, 
+                Nref=Nref, compwise=True)
+        div_kde_ica.append(div_kde_ica_i)
+        print('t= %f sec' % round(time.time()-t_start,2))
+    
+    divs = [div_gauss_ref, div_gauss, div_gmm, div_kde, div_gmm_ica, div_kde_ica]
+    labels = ['Ref.', r'$D(\{\zeta_i^{(m)}\}\parallel \mathcal{N}({\bf C}^{(m)}))$', 
+            r'$D(\{\zeta^{(m)}\}\parallel p_\mathrm{GMM}(\{\zeta^{m}\}))$',
+            r'$D(\{\zeta^{(m)}\}\parallel p_\mathrm{KDE}(\{\zeta^{m}\}))$',
+            r'$D(\{\zeta_\mathrm{ICA}^{(m)}\}\parallel \prod_{i} p^\mathrm{GMM}(\{\zeta_{i, \mathrm{ICA}}^{m}\}))$', 
+            r'$D(\{\zeta_\mathrm{ICA}^{(m)}\}\parallel \prod_{i} p^\mathrm{KDE}(\{\zeta_{i, \mathrm{ICA}}^{m}\}))$']
+
+    fig = plt.figure(figsize=(10,5))
+    sub = fig.add_subplot(111)
+    if obvs == 'pk': 
+        x_min, x_max = 0., 0.
+        for div in divs: 
+            x_min = min(x_min, np.min(div)) 
+            x_max = max(x_max, np.max(div)) 
+        hrange = [x_min, x_max]
+    elif obvs == 'gmf':
+        hrange = [-0.15, 0.6]
+
+    nbins = 50
+    y_max = 0.
+    for div, lbl in zip(divs, labels): 
+        hh = np.histogram(np.array(div), normed=True, range=hrange, bins=nbins)
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
+                alpha=0.5, label=lbl) 
+        y_max = max(y_max, bp[1].max()) 
+        if (np.average(div) < hrange[0]) or (np.average(div) > hrange[1]): 
+            print('divergence of %s (%f) is outside range' % (lbl, np.average(div)))
+    sub.set_xlim(hrange) 
+    sub.set_ylim([0., y_max*1.2]) 
+    sub.legend(loc='upper left', prop={'size': 15})
+    # xlabels
+    if 'renyi' in div_func: 
+        alpha = float(div_func.split(':')[-1])
+        sub.set_xlabel(r'Renyi-$\alpha='+str(alpha)+'$ divergence', fontsize=20)
+    elif 'kl' in div_func: 
+        sub.set_xlabel(r'KL divergence', fontsize=20)
+    if 'renyi' in div_func: str_div = 'renyi'+str(alpha) 
+    elif div_func == 'kl': str_div = 'kl'
+    f_fig = ''.join([UT.fig_dir(), 'tests/kNN_divergence.', obvs, '.K', str(K), 
+        '.', str(n_mocks), '.', str_div, '.png'])
+    fig.savefig(f_fig, bbox_inches='tight') 
+    return None
+
+
+def divGMF(div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, n_mocks=2000):
+    ''' compare the divergence estimates between 
+    D( gauss(C_gmf) || gauss(C_gmf) ),  D( gmfs || gauss(C_gmf) ), 
+    D( gmfs || p(gmfs) KDE), D( gmfs || p(gmfs) GMM), 
+    D( gmfs || PI p(gmfs^i_ICA) KDE), and D( gmfs || PI p(gmfs^i_ICA) GMM)
+    '''
+    if isinstance(Nref, float): 
+        Nref = int(Nref)
+    # read in mock GMFs from all HOD realizations (20,000 mocks)
+    gmfs_mock = NG.X_gmf_all()[:n_mocks]
+    n_mock = gmfs_mock.shape[0] # number of mocks 
+    print("%i mocks" % n_mock) 
+
+    gmfs_mock_meansub, _ = NG.meansub(gmfs_mock) # mean subtract
+    X_w, W = NG.whiten(gmfs_mock_meansub)
+    X_ica, _ = NG.Ica(X_w)  # ICA transformation 
+
+    C_gmf = np.cov(X_w.T) # covariance matrix
+
+    # p(gmfs) GMM
+    gmms, bics = [], [] 
+    for i_comp in range(1,n_comp_max+1):
+        gmm = GMix(n_components=i_comp)
+        gmm.fit(X_w) 
+        gmms.append(gmm)
+        bics.append(gmm.bic(X_w))
+    ibest = np.array(bics).argmin() 
+    kern_gmm = gmms[ibest]
+
+    # p(gmfs) KDE 
+    t0 = time.time() 
+    grid = GridSearchCV(skKDE(),
+            {'bandwidth': np.linspace(0.1, 1.0, 30)},
+            cv=10) # 10-fold cross-validation
+    grid.fit(X_w)
+    kern_kde = grid.best_estimator_
+    dt = time.time() - t0 
+    print('%f sec' % dt) 
+    
+    # PI p(gmfs^i_ICA) GMM
+    kern_gmm_ica = [] 
+    for ibin in range(X_ica.shape[1]): 
+        gmms, bics = [], [] 
+        for i_comp in range(1,n_comp_max+1):
+            gmm = GMix(n_components=i_comp)
+            gmm.fit(X_ica[:,ibin][:,None]) 
+            gmms.append(gmm)
+            bics.append(gmm.bic(X_ica[:,ibin][:,None]))
+        ibest = np.array(bics).argmin() 
+        kern_gmm_ica.append(gmms[ibest])
+    
+    # PI p(gmfs^i_ICA) KDE  
+    kern_kde_ica = [] 
+    for ibin in range(X_ica.shape[1]): 
+        t0 = time.time() 
+        grid = GridSearchCV(skKDE(),
+                {'bandwidth': np.linspace(0.1, 1.0, 30)},
+                cv=10) # 10-fold cross-validation
+        grid.fit(X_ica[:,ibin][:,None]) 
+        kern_kde_ica.append(grid.best_estimator_) 
+        dt = time.time() - t0 
+        print('%f sec' % dt) 
+
+    # caluclate the divergences now 
+    div_gauss_ref, div_gauss = [], []
+    div_gmm, div_gmm_ica = [], [] 
+    div_kde, div_kde_ica = [], [] 
+    for i in range(n_mc): 
+        print('%i montecarlo' % i)
+        t_start = time.time() 
+        # reference divergence in order to showcase the estimator's scatter
+        # Gaussian distribution described by C_gmf with same n_mock mocks 
+        gauss = mvn(np.zeros(gmfs_mock.shape[1]), C_gmf, size=n_mock)
+        div_gauss_ref_i = NG.kNNdiv_gauss(gauss, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
+        div_gauss_ref.append(div_gauss_ref_i)
+        # estimate divergence between gmfs_white and a 
+        # Gaussian distribution described by C_gmf
+        div_gauss_i = NG.kNNdiv_gauss(X_w, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
+        div_gauss.append(div_gauss_i)
+        # D( gmfs || p(gmfs) GMM)
+        div_gmm_i = NG.kNNdiv_Kernel(X_w, kern_gmm, Knn=K, div_func=div_func, 
+                Nref=Nref, compwise=False) 
+        div_gmm.append(div_gmm_i)
+        # D( gmfs || p(gmfs) KDE)
+        div_kde_i = NG.kNNdiv_Kernel(X_w, kern_kde, Knn=K, div_func=div_func, 
+                Nref=Nref, compwise=False) 
+        div_kde.append(div_kde_i)
+        # D( gmfs || PI p(gmfs^i_ICA) GMM), 
+        div_gmm_ica_i = NG.kNNdiv_Kernel(X_ica, kern_gmm_ica, Knn=K, div_func=div_func, 
+                Nref=Nref, compwise=True)
+        div_gmm_ica.append(div_gmm_ica_i)
+        # D( gmfs || PI p(gmfs^i_ICA) KDE), 
+        div_kde_ica_i = NG.kNNdiv_Kernel(X_ica, kern_kde_ica, Knn=K, div_func=div_func, 
+                Nref=Nref, compwise=True)
+        div_kde_ica.append(div_kde_ica_i)
+        print('t= %f sec' % round(time.time()-t_start,2))
+
+    fig = plt.figure(figsize=(10,5))
+    sub = fig.add_subplot(111)
+    hrange = [-0.15, 0.6]
+    nbins = 50
+    
+    divs = [div_gauss_ref, div_gauss, div_gmm, div_kde, div_gmm_ica, div_kde_ica]
+    labels = ['Ref.', r'$D(\{\zeta_i^{(m)}\}\parallel \mathcal{N}({\bf C}^{(m)}))$', 
+            r'$D(\{\zeta^{(m)}\}\parallel p_\mathrm{GMM}(\{\zeta^{m}\}))$',
+            r'$D(\{\zeta^{(m)}\}\parallel p_\mathrm{KDE}(\{\zeta^{m}\}))$',
+            r'$D(\{\zeta_\mathrm{ICA}^{(m)}\}\parallel \prod_{i} p^\mathrm{GMM}(\{\zeta_{i, \mathrm{ICA}}^{m}\}))$', 
+            r'$D(\{\zeta_\mathrm{ICA}^{(m)}\}\parallel \prod_{i} p^\mathrm{KDE}(\{\zeta_{i, \mathrm{ICA}}^{m}\}))$']
+    y_max = 0.
+    for div, lbl in zip(divs, labels): 
+        hh = np.histogram(np.array(div), normed=True, range=hrange, bins=nbins)
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
+                alpha=0.5, label=lbl) 
+        y_max = max(y_max, bp[1].max()) 
+        if (np.average(div) < hrange[0]) or (np.average(div) > hrange[1]): 
+            print('divergence of %s (%f) is outside range' % (lbl, np.average(div)))
+    sub.set_xlim(hrange) 
+    sub.set_ylim([0., y_max*1.2]) 
+    sub.legend(loc='upper left', prop={'size': 15})
+    # xlabels
+    if 'renyi' in div_func: 
+        alpha = float(div_func.split(':')[-1])
+        sub.set_xlabel(r'Renyi-$\alpha='+str(alpha)+'$ divergence', fontsize=20)
+    elif 'kl' in div_func: 
+        sub.set_xlabel(r'KL divergence', fontsize=20)
+    if 'renyi' in div_func: str_div = 'renyi'+str(alpha) 
+    elif div_func == 'kl': str_div = 'kl'
+    f_fig = ''.join([UT.fig_dir(), 'tests/kNN_divergence.gmf.K', str(K), '.', str(n_mocks), 
+        '.', str_div, '.png'])
+    fig.savefig(f_fig, bbox_inches='tight') 
+    return None
 
 
 def GMF_p_Xw_i(ica=False, pca=False): 
@@ -649,5 +933,10 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    GMF_p_Xw_i(ica=True, pca=False)
+    diverge('pk', div_func='kl', Nref=5000, K=10, n_mc=10, n_comp_max=10, n_mocks=2000, 
+        pk_mock='patchy.z1', NorS='ngc')
+
+    #for n in [2000, 4000, 6000]: 
+    #    divGMF(n_mocks=n, div_func='kl', Nref=n*1.5, K=10, n_mc=100, n_comp_max=20)
+    #GMF_p_Xw_i(ica=True, pca=False)
     #lnL_pca_gauss('patchy.z1', ell=0, krange=[0.01, 0.15], NorS='ngc')

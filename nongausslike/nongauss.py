@@ -38,11 +38,17 @@ def kNNdiv_Kernel(X_white, kernel, Knn=3, div_func='renyi:.5', Nref=None, compwi
     if compwise: 
         ref_dist = np.zeros((Nref, X_white.shape[1])) 
         for icomp in range(X_white.shape[1]): 
-            samp, _ = kernel[icomp].sample(Nref)
-            ref_dist[:,icomp] = samp
+            samp = kernel[icomp].sample(Nref)
+            if isinstance(samp, tuple): 
+                ref_dist[:,icomp] = samp[0].flatten()
+            else: 
+                ref_dist[:,icomp] = samp.flatten()
     else: 
-        samp, _ = kernel.sample(Nref)
-        ref_dist = samp 
+        samp = kernel.sample(Nref)
+        if isinstance(samp, tuple):  
+            ref_dist = samp[0]
+        else: 
+            ref_dist = samp
     # estimate divergence  
     kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', clamp=False)
     feat = Features([X_white, ref_dist])
@@ -462,6 +468,24 @@ def X_gmf(name, n_arr=False):
     if n_arr:
         return gmfs, geemf.nbins
     return gmfs 
+
+
+def X_pk_all(mock, NorS='ngc', sys='fc', k_arr=False): 
+    ''' Construct data matrix X from P(k) measures of mock catalogs. 
+    
+    X_i = [P_0(k)_i, P_2(k)_i, P_4(k)_i] 
+
+    X has N_mock x [N_k0, N_k2, N_k4] dimensions. k ranges are equivalent
+    to the k range of Beutler et al. (2017). 
+    '''
+    pk_list = []  
+    for ell in [0, 2, 4]:
+        if ell == 4: kmax = 0.1 
+        else: kmax = 0.15
+        pk = X_pk(mock, ell=ell, NorS=NorS, sys=sys, krange=[0.01,kmax])
+        pk_list.append(pk.T)
+    pk_all = np.concatenate(pk_list) 
+    return pk_all.T
 
 
 def X_pk(mock, ell=0, krange=None, NorS='ngc', sys='fc', k_arr=False): 
