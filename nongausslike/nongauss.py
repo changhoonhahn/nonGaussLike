@@ -5,6 +5,7 @@ of the Likelihood for galaxy clustering analyses.
 
 
 '''
+import time
 import numpy as np 
 from scipy.stats import norm as Norm
 from scipy.stats import gaussian_kde as gkde
@@ -121,7 +122,7 @@ def kNNdiv_gauss(X_white, cov_X, Knn=3, div_func='renyi:.5', gauss=None, Nref=No
     return div_knns
 
 
-def lnL_pX(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit='bic'): 
+def lnL_pX(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit='bic', njobs=1): 
     ''' Given delta_X = observed X - model X, and data matrix
     X from mocks, estimate the log likelihood using a `density_method`
     (gmm or gkde) fit of p(X_mock).
@@ -137,10 +138,10 @@ def lnL_pX(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit='bic'
     X, mu_X = meansub(X_mock)
     X_w, W = whiten(X) # whiten data 
 
-    return lnp_Xw(X_w, x=delta_X, method=density_method, n_comp_max=n_comp_max, info_crit=info_crit)
+    return lnp_Xw(X_w, x=delta_X, method=density_method, n_comp_max=n_comp_max, info_crit=info_crit, njobs=njobs)
     
 
-def lnL_pXi_ICA(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit='bic'): 
+def lnL_pXi_ICA(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit='bic', njobs=1): 
     ''' Given delta_X = observed X - model X, and data matrix
     X from mocks, estimate the log likelihood using a `density_method`
     (gmm or gkde) fit of p(X_mock_i,ICA) for each componenet.
@@ -170,7 +171,8 @@ def lnL_pXi_ICA(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit=
             x_obv_i = x_obv[i]
         else: 
             x_obv_i = x_obv[:,i]
-        lnp_Xica += lnp_Xw_i(X_ica, i, x=x_obv_i, method=density_method, n_comp_max=n_comp_max)
+        lnp_Xica += lnp_Xw_i(X_ica, i, x=x_obv_i, method=density_method, n_comp_max=n_comp_max, 
+                info_crit=info_crit, njobs=njobs)
     return lnp_Xica 
 
 
@@ -322,7 +324,7 @@ def p_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10):
     return [np.exp(lnpdf) for lnpdf in lnpdfs]
 
 
-def lnp_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10):
+def lnp_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10, info_crit='bic', njobs=1):
     ''' Estimate the log pdf of X_w[:,i_bins] at x using a nonparametric 
     density estimation (either KDE or GMM). 
     
@@ -365,16 +367,19 @@ def lnp_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10):
             kern = gmms[ibest]
         elif method == 'kde': 
             # find the best fit bandwidth using cross-validation grid search  
+            t0 = time.time()
             grid = GridSearchCV(skKDE(),
                     {'bandwidth': np.linspace(0.1, 1.0, 30)},
-                    cv=10) # 10-fold cross-validation
+                    cv=10, n_jobs=njobs) # 10-fold cross-validation
             grid.fit(X_w[:,i_bin][:,None])
             kern = grid.best_estimator_
+            dt = time.time() - t0 
+            print('%f sec' % dt) 
         pdfs.append(kern.score_sample(x[ii][:,None]))  
     return pdfs 
 
 
-def lnp_Xw(X_w, x=None, method='gmm', n_comp_max=10, info_crit='bic'): 
+def lnp_Xw(X_w, x=None, method='gmm', n_comp_max=10, info_crit='bic', njobs=1): 
     ''' Estimate the multi-dimensional pdf at x for a given X_w using a 
     nonparametric density estimation (either KDE or GMM). 
     '''
@@ -398,7 +403,7 @@ def lnp_Xw(X_w, x=None, method='gmm', n_comp_max=10, info_crit='bic'):
         # find the best fit bandwidth using cross-validation grid search  
         grid = GridSearchCV(skKDE(),
                 {'bandwidth': np.linspace(0.1, 1.0, 30)},
-                cv=10) # 10-fold cross-validation
+                cv=10, njobs=njobs) # 10-fold cross-validation
         grid.fit(X_w)
         kern = grid.best_estimator_
     

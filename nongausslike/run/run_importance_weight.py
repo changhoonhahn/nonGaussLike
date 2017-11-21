@@ -26,11 +26,11 @@ def importance_weight_Pk(tag_like, ichain, zbin=1):
     return None 
 
 
-def importance_weight_Gmf(tag_like, density_method='kde', n_comp_max=20, info_crit='bic'): 
+def importance_weight_Gmf(tag_like, density_method='kde', n_comp_max=20, info_crit='bic', njobs=1): 
     ''' save importance weights for Manodeep's MCMC chain to file 
     '''
     chain = Inf.mcmc_chains('manodeep')
-    ws = Inf.W_importance(tag_like, chain, density_method=density_method)
+    ws = Inf.W_importance(tag_like, chain, density_method=density_method, info_crit=info_crit, njobs=njobs)
     
     if density_method == 'kde': 
         str_density = '.kde'
@@ -56,7 +56,8 @@ if __name__=='__main__':
     elif 'manodeep' in tag_mcmc: 
         density = Sys.argv[3]
         if density == 'kde': 
-            importance_weight_Gmf(tag_like, density_method=density) 
+            njobs = int(Sys.argv[4])
+            importance_weight_Gmf(tag_like, density_method=density, njobs=njobs) 
         elif density == 'gmm': 
             ncompmax = int(Sys.argv[4])
             infocrit = Sys.argv[5]
