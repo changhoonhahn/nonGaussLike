@@ -28,7 +28,8 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
-def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, pk_mock='patchy.z1', NorS='ngc'):
+def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, n_mocks=None, 
+        pk_mock='patchy.z1', NorS='ngc', njobs=1):
     ''' calculate the divergences: 
 
     - D( gauss(C_X) || gauss(C_X) ) 
@@ -42,11 +43,33 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
     if isinstance(Nref, float): Nref = int(Nref)
     if diver not in ['ref', 'pX_gauss', 'pX_GMM', 'pX_KDE', 'pXi_ICA_GMM', 'pXi_ICA_KDE']: 
         raise ValueError
+    str_obvs = ''
+    if obvs == 'pk': str_obvs = '.'+NorS
+    if 'renyi' in div_func: 
+        alpha = float(div_func.split(':')[-1])
+        str_div = 'renyi'+str(alpha) 
+    elif div_func == 'kl': 
+        str_div = 'kl'
+    str_comp = ''
+    if 'GMM' in diver: str_comp = '.ncomp'+str(n_comp_max) 
+
+    f_dat = ''.join([UT.dat_dir(), 'diverg.', obvs, str_obvs, '.', diver, '.K', str(K), str_comp, 
+        '.Nref', str(Nref), '.', str_div, '.dat'])
+    if os.path.isfile(f_dat): 
+        print('-- appending to -- \n %s' % f_dat)
+        f_out = open(f_dat, 'a') 
+    else: 
+        print('-- writing to -- \n %s' % f_dat)
+        f_out = open(f_dat, 'w') 
+
     # read in mock data X  
     if obvs == 'pk': 
         X_mock = NG.X_pk_all(pk_mock, NorS=NorS, sys='fc')
     elif obvs == 'gmf': 
-        X_mock = NG.X_gmf_all()
+        if n_mocks is not None: 
+            X_mock = NG.X_gmf_all()[:n_mocks]
+        else: 
+            X_mock = NG.X_gmf_all()
     else: 
         raise ValueError("obvs = 'pk' or 'gmf'")  
     n_mock = X_mock.shape[0] # number of mocks 
@@ -54,7 +77,8 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
 
     X_mock_meansub, _ = NG.meansub(X_mock) # mean subtract
     X_w, W = NG.whiten(X_mock_meansub)
-    X_ica, _ = NG.Ica(X_w)  # ICA transformation 
+    if 'ICA' in diver: 
+        X_ica, _ = NG.Ica(X_w)  # ICA transformation 
 
     if diver in ['pX_gauss', 'ref']: 
         C_X = np.cov(X_w.T) # covariance matrix
@@ -71,7 +95,7 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
         t0 = time.time() 
         grid = GridSearchCV(skKDE(),
                 {'bandwidth': np.linspace(0.1, 1.0, 30)},
-                cv=10) # 10-fold cross-validation
+                cv=10, n_jobs=njobs) # 10-fold cross-validation
         grid.fit(X_w)
         kern_kde = grid.best_estimator_
         dt = time.time() - t0 
@@ -101,24 +125,6 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
             dt = time.time() - t0 
             print('%f sec' % dt) 
     
-    str_obvs = ''
-    if obvs == 'pk': str_obvs = '.'+NorS
-
-    if 'renyi' in div_func: 
-        alpha = float(div_func.split(':')[-1])
-        str_div = 'renyi'+str(alpha) 
-    elif div_func == 'kl': 
-        str_div = 'kl'
-    str_comp = ''
-    if 'GMM' in diver: str_comp = '.ncomp'+str(n_comp_max) 
-
-    f_dat = ''.join([UT.dat_dir(), 'diverg.', obvs, str_obvs, '.', diver, '.K', str(K), str_comp, 
-        '.Nref', str(Nref), '.', str_div, '.dat'])
-    if os.path.isfile(f_dat): 
-        f = open(f_dat, 'a') 
-    else: 
-        f = open(f_dat, 'w') 
-
     # caluclate the divergences now 
     divs = []
     for i in range(n_mc): 
@@ -145,8 +151,9 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
         elif diver == 'pXi_ICA_KDE': # D( mock X || PI p(X^i_ICA) KDE), 
             div_i = NG.kNNdiv_Kernel(X_ica, kern_kde_ica, Knn=K, div_func=div_func, 
                     Nref=Nref, compwise=True)
-        f.write('%s \n' % div_i)  
-    f.close() 
+        print(div_i)
+        f_out.write('%f \n' % div_i)  
+    f_out.close() 
     return None
 
 
@@ -170,4 +177,9 @@ if __name__=="__main__":
         diverge(obvs, div, div_func='kl', Nref=Nref, K=K, n_mc=n_mc, n_comp_max=ncomp, 
             pk_mock='patchy.z1', NorS='ngc')
     elif obvs == 'gmf': 
-        diverge(obvs, div, div_func='kl', Nref=Nref, K=K, n_mc=n_mc, n_comp_max=ncomp) 
+        if 'GMM' in div: 
+            nmocks = int(Sys.argv[8]) 
+        else: 
+            nmocks = int(Sys.argv[7]) 
+            njobs = int(Sys.argv[8]) 
+        diverge(obvs, div, div_func='kl', Nref=Nref, K=K, n_mc=n_mc, n_comp_max=ncomp, n_mocks=nmocks, njobs=njobs) 
