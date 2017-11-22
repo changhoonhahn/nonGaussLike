@@ -122,7 +122,7 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
             t0 = time.time() 
             grid = GridSearchCV(skKDE(),
                     {'bandwidth': np.linspace(0.1, 1.0, 30)},
-                    cv=10) # 10-fold cross-validation
+                    cv=10, n_jobs=njobs) # 10-fold cross-validation
             grid.fit(X_ica[:,ibin][:,None]) 
             kern_kde_ica.append(grid.best_estimator_) 
             dt = time.time() - t0 
@@ -132,6 +132,7 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
     divs = []
     for i in range(n_mc): 
         print('%i montecarlo' % i)
+        t0 = time.time() 
         if diver == 'pX_gauss': 
             # estimate divergence between gmfs_white and a 
             # Gaussian distribution described by C_gmf
@@ -202,7 +203,7 @@ if __name__=="__main__":
         ncomp = int(Sys.argv[8]) 
     else: 
         ncomp = 10
-    
+   
     if obvs == 'pk': 
         diverge(obvs, div, div_func=div_func, Nref=Nref, K=K, n_mc=n_mc, n_comp_max=ncomp, 
             pk_mock='patchy.z1', NorS='ngc')
