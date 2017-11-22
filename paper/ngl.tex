@@ -1,5 +1,6 @@
 \documentclass[12pt, letterpaper, preprint]{aastex}
-\usepackage{hyperref}
+\usepackage[breaklinks,colorlinks, urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
+\usepackage{color}
 \input{vc}
 
 % typesetting shih
@@ -22,7 +23,6 @@
 \newcommand{\given}{\,|\,}
 \newcommand{\pseudo}{{\mathrm{pseudo}}}
 \newcommand{\Var}{\mathrm{Var}}
-
 % text shih
 \newcommand{\foreign}[1]{\textsl{#1}}
 \newcommand{\etal}{\foreign{et~al.}}
@@ -31,12 +31,15 @@
 \newcommand{\equationname}{equation}
 \newcommand{\bitem}{\begin{itemize}}
 \newcommand{\eitem}{\end{itemize}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\todo}[1]{{\bf \textcolor{red}{#1}}}
 
 \begin{document}\sloppy\sloppypar\frenchspacing 
 
 \title{How I Learned to Stop Worrying and Love The Central Limit Theorem}
 \date{\texttt{DRAFT~---~\githash~---~\gitdate~---~NOT READY FOR DISTRIBUTION}}
-\author{ChangHoon~Hahn\refstepcounter{footnote}\refstepcounter{footnote}, Florian~Beutler, Manodeep~Sinha}
+\author{ChangHoon~Hahn\refstepcounter{footnote}\refstepcounter{footnote}, Florian~Beutler, Manodeep~Sinha, Andreas~Berlind}
 \affil{Lawrence Berkeley National Laboratory, 1 Cyclotron Rd, Berkeley CA 94720, USA}
 \email{changhoon.hahn@lbl.gov}
 
@@ -72,27 +75,120 @@ large-scale structure of universe
     \item Depending on Hogg's paper maybe a simple illustration of how the likelihood asumption 
 \end{itemize}
 
-\section{Likelihood non-Gaussianity}
-\subsection{Mock Catalogs}
+
+\section{Mock Catalogs}
+Mock catalogs play a key role in standard cosmological anslyses of LSS 
+studies. They're extensively used for testing analysis 
+pipelines~\cite[(mock challenege papers)][]{beutler2017}, 
+testing the effect of systematics~\citep{hahn2017}, and, most relevantly 
+for this paper, for estimating the covariance matrix used in evaluating 
+the likelihood for parameter inference~\citep[cite the bunch of other papers][]{beutler2017}.
+
+Maybe a little paragraph about the advantages of covariance matrices from 
+mocks versus analytic? 
+
+Our primary goal in this paper is to test the Gaussian likelihood assumption 
+in two LSS analyses: the powerspectrum multipole full shape analysis of \cite{beutler2017} 
+and group multiplicity function analysis of \cite{sinha2017}. Throughout
+the paper we will make extensive use of the mock catalogs used in these 
+analyses. Below, in this section, we give a brief description of these mocks. 
+
+\subsection{MultiDark-PATCHY Mock Catalog} 
+In their powerspectrum multipole full shape analysis, \cite{beutler2017}
+use the MultiDark-PATCHY mock catalogs from \cite{ktaura2016}. 
+These mock catalogs have 
+
+
+%These mock catalogues have been calibrated to an N-body-based reference sample using approximate gravity solvers and analytical–statistical biasing models. The reference catalogue is extracted from one of the BigMultiDark simula- tions (Klypin et al. 2016), which used 38403 particles on a volume of (2.5 h−1 Mpc)3 assuming a  CDM cosmology
 \bitem
     \item brief descriptin of the mock catalogs 
-    \item \cite{kitaura2016, sinha2017}
+    \item \cite{kitaura2016}
+    \item 2048 mocks for both north and south 
+    \item Note that 3 mocks were fixed
 \eitem
-\subsection{$k$-NN Nonparametric Divergence Estimation}
-\bitem
-    \item \cite{poczos2012, krishnamurthy2014}
+%Halo abundance matching is used to reproduce the observed BOSS two- and three-point clustering measurements (Rodrguez- Torres et al. 2016). This technique is applied at different redshift bins to reproduce the BOSS DR12 redshift range. These mock cata- logues are combined into light cones, also accounting for selection effects and masking. In total, we have 2045 mock catalogues avail- able for the NGC and 2048 mock catalogues for the SGC.
+
+\subsection{\cite{sinha2017} Mock Catalog}
+
+${\bf X}_i = [P_0(k)_i,P_2(k)_i,P_4(k)_i]$
+${\bf X}_i = \zeta(N)_i$
+
+
+\section{Likelihood non-Gaussianity}
+\subsection{Quantifying the non-Gaussianity}
+In \cite{sellentin2017}
+One way of quantifying the non-Gaussianity of the likelihood is to 
+calculate the divergence between the distribution $p(x)$, which generated
+the observable, and $q(x)$ a multivariate Gaussian described by the average
+of the mocks and the covariance matrix ${\bf C}$.
+
+Take for instance, the R\'enyi-$\alpha$ divergence between $p(x)$ and $q(x)$ 
+\beq
+D_{R-\alpha} ( p \parallel q ) = \frac{1}{\alpha -1} \log \int p^\alpha(x) q^{1 -\alpha}(x)\,{\rm d}x. 
+\eeq
+We note that in the limit as $\alpha$ approaches 1, the R\'enyi-$\alpha$ 
+divergence is KL divergence.
+To evaluate the R\'enyi divergence, we need to evaluate the following
+kernel function
+\beq \label{eq:d_alpha_beta}
+D_{\alpha, \beta} ( p \parallel q ) = \int p^\alpha(x) q^\beta(x)\,{\rm d}x. 
+\eeq
+
+Of course, in our case, we do not know $p(x)$. If we did, we would simply 
+use that instead of bothering with the covariance matrix or this paper. We can,
+however, still estimate the divergence by using nonparametric estimators of 
+\cite{poczos2012} and \cite{krishnamurthy2014}. The estimator presented in 
+\cite{poczos2012}, which is based on $k$th nearest neighbor density estimators, 
+allows us to estimate the kernel function $D_{\alpha, \beta}(p \parallel q)$~(Eq.~\ref{eq:d_alpha_beta}) 
+directly from samples $X_{1:n} = \{ X_1, ... X_n \}$ and $Y_{1:m} = \{ Y_1, ... Y_m \}$ 
+drawn from $p$ and $q$ respectively: $\hat{D}_{\alpha, \beta}(X_{1:n} \parallel Y_{1:m})$. 
+
+Let $\rho_k(x)$ denote the Euclidean distance of the $k$th nearest neighbor 
+of $x$ in the sample $X_{1:n}$ and $\nu_k(x)$ denote the Euclidean distance 
+of the $k$th nearest neighbor of $x$ in the sample $Y_{1:m}$. Then 
+$D_{\alpha, \beta}(p \parallel q)$ can be estimated as 
+\beq
+\hat{D}_{\alpha, \beta}(X_{1:n} \parallel Y_{1:m}) = \frac{B_{k,\alpha,\beta}}{n (n-1)^\alpha m^\beta} \sum\limits_{i=1}^{n} \rho_k^{-d \alpha}(X_i)\,\nu_k^{-d \beta}(X_i)
+\eeq
+where $B_{k, \alpha, \beta} = \frac{\Gamma(k)^2}{\Gamma(k-\alpha)\Gamma(k-\beta)}$. 
+\cite{poczos2012} proves that this estimator is asymptotically unbias, \emph{i.e.} 
+\beq
+\lim_{N, M \rightarrow \infty} \mathbb{E} \big[ \hat{D}_{\alpha, \beta} (X_{1:N} \parallel Y_{1:M}) \big] = D_{\alpha, \beta} (p \parallel q). 
+\eeq
+This divergence estimate has been applied to Support Vector Machines and used 
+extensively in the machine learning and astronomical literature with great success 
+\todo{elaborate a lot more} 
+\bitem 
+    \item Compile papers that use this divergence, \cite{ntampaka2015, ntampaka2016}
+\eitem
+For more details on the non-parametric divergence estimators, we refer readers to 
+\cite{poczos2012} and \cite{krishnamurthy2014}.
+
+In Figure~\ref{fig:div_nongauss} we compare the R\'enyi-$\alpha$ 
+(top) and $KL$ (bottom) divergences
+$D_{R\alpha}({\bf X}^\mathrm{mock} \parallel {\bf Y}^\mathrm{ref})$ and 
+$D_{KL}({\bf X}^\mathrm{mock} \parallel {\bf Y}^\mathrm{ref})$
+between the mock data ${\bf X}^\mathrm{mock}$ and a reference sample 
+${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (left) and $\zeta(N)$ (right) analyses.
+${\bf Y}^\mathrm{ref}$ is drawn from a multivariate Gaussian distribution 
+described by the covariance matrix ${\bf C}$ --- 
+${\bf Y}^\mathrm{ref} \sim \mathcal{N}({\bf C})$. 
+\bitem 
+    \item Describe the discrepancy. 
+    \item Figure that compare $D_{R\alpha}({\bf X}^\mathrm{mock} \parallel {\bf Y}^\mathrm{ref})$
 \eitem
 
-\section{Estimating the Non-Gaussian Likelihood}
-\subsection{Nonparametric Likelihood Estimation}
+\subsection{Estimating the Non-Gaussian Likelihood: Nonparametric Density Estimation}
+%\subsection{Nonparametric Likelihood Estimation}
 \bitem
     \item Kernel Density Estimation 
-    \item Gaussian Mixture Model  
+    \item Gaussian Mixture Model (algorithm used for optimizing) 
+    \item Bayesian Information Criteria 
     \item Figure illustrating both methods on highest N GMF bin 
 \eitem
 
 \subsection{Independent Component Analysis} 
-Curse of dimensionality! 2000 mocks in Beutler not enough to directly estimate 
+Curse of dimensionality! $2048$ mocks in Beutler not enough to directly estimate 
 the 37-dimensional space, so we use independent component analysis 
 \cite{hartlap2009}
 \bitem
@@ -100,9 +196,14 @@ the 37-dimensional space, so we use independent component analysis
 \eitem
 
 \section{Impact on Parameter Inference}
+\subsection{MCMC}
+\bitem
+    \item details of each of the MCMC runs
+\eitem
+
+\subsection{Importance Sampling} 
 \bitem
     \item equations explaining importance sampling framework
-    \item details of each of the MCMC runs
 \eitem
 
 \section{Discussion}
@@ -118,9 +219,9 @@ the 37-dimensional space, so we use independent component analysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\textwidth]{figs/kNN_divergence_gmf.pdf}
-\caption{}
-\label{fig:gmf_div}
+\includegraphics[width=0.9\textwidth]{figs/kNNdiverg_nonGauss.pdf}
+\caption{R\'enyi-$\alpha$ and KL divergence}
+\label{fig:div_nongauss}
 \end{center}
 \end{figure}
 

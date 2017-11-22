@@ -23,7 +23,7 @@ import util as UT
 import data as Data
 
 
-def kNNdiv_Kernel(X_white, kernel, Knn=3, div_func='renyi:.5', Nref=None, compwise=True):  
+def kNNdiv_Kernel(X_white, kernel, Knn=3, div_func='renyi:.5', Nref=None, compwise=True, njobs=1):
     ''' `div_func` kNN divergence estimate between some data X_white and a distribution specified by Kernel.
     '''
     if isinstance(Knn, int): 
@@ -51,7 +51,8 @@ def kNNdiv_Kernel(X_white, kernel, Knn=3, div_func='renyi:.5', Nref=None, compwi
         else: 
             ref_dist = samp
     # estimate divergence  
-    kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', clamp=False)
+    kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', 
+            clamp=False, n_jobs=njobs)
     feat = Features([X_white, ref_dist])
     div_knn = kNN.fit_transform(feat)
     if len(Knns) ==1: 
@@ -62,40 +63,7 @@ def kNNdiv_Kernel(X_white, kernel, Knn=3, div_func='renyi:.5', Nref=None, compwi
     return div_knns
 
 
-def kNNdiv_ICA(X_white, ica_kernel, Knn=3, div_func='renyi:.5', Nref=None, compwise=True, density_method='gkde', 
-        n_comp_max=10): 
-    ''' `div_func` kNN divergence estimate between some data X_white and an ICA 
-    distribution.
-    '''
-    if isinstance(Knn, int): 
-        Knns = [Knn]
-    elif isinstance(Knn, list): 
-        Knns = Knn
-
-    if compwise: 
-        if X_white.shape[1] != len(ica_kernel): raise ValueError
-
-    if compwise: 
-        ica_dist = np.zeros((Nref, X_ica.shape[1])) 
-        for icomp in range(X_ica.shape[1]): 
-            samp, _ = ica_kernel[icomp].sample(Nref)
-            ica_dist[:,icomp] = samp
-    else: 
-        samp, _ = ica_kernel.sample(Nref)
-        ica_dist = samp 
-   
-    kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', clamp=False)
-    feat = Features([X_white, ica_dist])
-    div_knn = kNN.fit_transform(feat)
-    if len(Knns) ==1: 
-        return div_knn[0][0][0][1]
-    div_knns = np.zeros(len(Knns))
-    for i in range(len(Knns)): 
-        div_knns[i] = div_knn[0][i][0][1]
-    return div_knns
-
-
-def kNNdiv_gauss(X_white, cov_X, Knn=3, div_func='renyi:.5', gauss=None, Nref=None): 
+def kNNdiv_gauss(X_white, cov_X, Knn=3, div_func='renyi:.5', gauss=None, Nref=None, njobs=1): 
     ''' `div_func` kNN divergence estimate between X_white and a 
     reference Gaussian with covariance matrix cov_X.
     '''
@@ -111,7 +79,8 @@ def kNNdiv_gauss(X_white, cov_X, Knn=3, div_func='renyi:.5', gauss=None, Nref=No
     elif isinstance(Knn, list): 
         Knns = Knn
 
-    kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', clamp=False)
+    kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', clamp=False, 
+            n_jobs=njobs)
     feat = Features([X_white, gauss])
     div_knn = kNN.fit_transform(feat)
     if len(Knns) ==1: 
