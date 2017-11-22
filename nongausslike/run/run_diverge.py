@@ -2,6 +2,7 @@ import sys as Sys
 import os 
 import time
 import numpy as np 
+import scipy as sp 
 
 from numpy.random import multivariate_normal as mvn 
 from sklearn.model_selection import GridSearchCV
@@ -81,7 +82,8 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
     X_mock_meansub, _ = NG.meansub(X_mock) # mean subtract
     X_w, W = NG.whiten(X_mock_meansub)
     if 'ICA' in diver: 
-        X_ica, _ = NG.Ica(X_w)  # ICA transformation 
+        X_ica, W_ica = NG.Ica(X_w)  # ICA transformation 
+        W_ica_inv = sp.linalg.pinv(W_ica.T) 
 
     if diver in ['pX_gauss', 'ref']: 
         C_X = np.cov(X_w.T) # covariance matrix
@@ -147,7 +149,7 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
                     Nref=Nref, compwise=False, njobs=njobs) 
         elif diver == 'pX_GMM_ref': # D( sample from p(X) GMM || p(X) GMM)
             samp = kern_gmm.sample(n_mock) 
-            div_i = NG.kNNdiv_Kernel(X_w, kern_gmm, Knn=K, div_func=div_func, 
+            div_i = NG.kNNdiv_Kernel(samp[0], kern_gmm, Knn=K, div_func=div_func, 
                     Nref=Nref, compwise=False, njobs=njobs) 
         elif diver == 'pX_KDE': # D( mock X || p(X) KDE)
             div_i = NG.kNNdiv_Kernel(X_w, kern_kde, Knn=K, div_func=div_func, 
@@ -155,29 +157,33 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
             divs.append(div_i)
         elif diver == 'pX_KDE_ref': # D( sample from p(X) KDE || p(X) KDE)
             samp = kern_kde.sample(n_mock) 
-            div_i = NG.kNNdiv_Kernel(X_w, kern_kde, Knn=K, div_func=div_func, 
+            div_i = NG.kNNdiv_Kernel(samp, kern_kde, Knn=K, div_func=div_func, 
                     Nref=Nref, compwise=False, njobs=njobs) 
             divs.append(div_i)
         elif diver == 'pXi_ICA_GMM': # D( mock X || PI p(X^i_ICA) GMM), 
-            div_i = NG.kNNdiv_Kernel(X_ica, kern_gmm_ica, Knn=K, div_func=div_func, 
-                    Nref=Nref, compwise=True, njobs=njobs)
+            div_i = NG.kNNdiv_Kernel(X_w, kern_gmm_ica, Knn=K, div_func=div_func, 
+                    Nref=Nref, compwise=True, njobs=njobs, W_ica_inv=W_ica_inv)
+            #div_i = NG.kNNdiv_Kernel(X_ica, kern_gmm_ica, Knn=K, div_func=div_func, 
+            #        Nref=Nref, compwise=True, njobs=njobs)
         elif diver == 'pXi_ICA_GMM_ref': # D( ref. sample || PI p(X^i_ICA) GMM), 
             samp = np.zeros((n_mock, X_ica.shape[1]))
             for icomp in range(X_ica.shape[1]): 
                 samp_i = kern_gmm_ica[icomp].sample(n_mock)
                 samp[:,icomp] = samp_i[0].flatten()
+            samp = np.dot(samp, W_ica_inv.T)
             div_i = NG.kNNdiv_Kernel(samp, kern_gmm_ica, Knn=K, div_func=div_func, 
-                    Nref=Nref, compwise=True, njobs=njobs)
+                    Nref=Nref, compwise=True, njobs=njobs, W_ica_inv=W_ica_inv)
         elif diver == 'pXi_ICA_KDE': # D( mock X || PI p(X^i_ICA) KDE), 
-            div_i = NG.kNNdiv_Kernel(X_ica, kern_kde_ica, Knn=K, div_func=div_func, 
-                    Nref=Nref, compwise=True, njobs=njobs)
+            div_i = NG.kNNdiv_Kernel(X_w, kern_kde_ica, Knn=K, div_func=div_func, 
+                    Nref=Nref, compwise=True, njobs=njobs, W_ica_inv=W_ica_inv)
         elif diver == 'pXi_ICA_KDE_ref': # D( ref sample || PI p(X^i_ICA) KDE), 
             samp = np.zeros((n_mock, X_ica.shape[1]))
             for icomp in range(X_ica.shape[1]): 
                 samp_i = kern_kde_ica[icomp].sample(n_mock)
                 samp[:,icomp] = samp_i.flatten()
+            samp = np.dot(samp, W_ica_inv.T)
             div_i = NG.kNNdiv_Kernel(samp, kern_kde_ica, Knn=K, div_func=div_func, 
-                    Nref=Nref, compwise=True, njobs=njobs)
+                    Nref=Nref, compwise=True, njobs=njobs, W_ica_inv=W_ica_inv)
         print(div_i)
         f_out = open(f_dat, 'a') 
         f_out.write('%f \n' % div_i)  

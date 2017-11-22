@@ -23,7 +23,7 @@ import util as UT
 import data as Data
 
 
-def kNNdiv_Kernel(X_white, kernel, Knn=3, div_func='renyi:.5', Nref=None, compwise=True, njobs=1):
+def kNNdiv_Kernel(X_white, kernel, Knn=3, div_func='renyi:.5', Nref=None, compwise=True, njobs=1, W_ica_inv=None):
     ''' `div_func` kNN divergence estimate between some data X_white and a distribution specified by Kernel.
     '''
     if isinstance(Knn, int): 
@@ -50,6 +50,8 @@ def kNNdiv_Kernel(X_white, kernel, Knn=3, div_func='renyi:.5', Nref=None, compwi
             ref_dist = samp[0]
         else: 
             ref_dist = samp
+    if W_ica_inv is not None: 
+        ref_dist = np.dot(ref_dist, W_ica_inv.T) 
     # estimate divergence  
     kNN = KNNDivergenceEstimator(div_funcs=[div_func], Ks=Knns, version='slow', 
             clamp=False, n_jobs=njobs)

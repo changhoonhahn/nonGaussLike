@@ -35,6 +35,8 @@
 \newcommand{\eeq}{\end{equation}}
 \newcommand{\todo}[1]{{\bf \textcolor{red}{#1}}}
 
+\newcommand{\patchy}{{\fontshape\scdefault\selectfont patchy}}
+
 \begin{document}\sloppy\sloppypar\frenchspacing 
 
 \title{How I Learned to Stop Worrying and Love The Central Limit Theorem}
@@ -93,23 +95,33 @@ and group multiplicity function analysis of \cite{sinha2017}. Throughout
 the paper we will make extensive use of the mock catalogs used in these 
 analyses. Below, in this section, we give a brief description of these mocks. 
 
-\subsection{MultiDark-PATCHY Mock Catalog} 
+\subsection{MultiDark-\patchy~Mock Catalog} 
 In their powerspectrum multipole full shape analysis, \cite{beutler2017}
-use the MultiDark-PATCHY mock catalogs from \cite{ktaura2016}. 
-These mock catalogs have 
+use the MultiDark-\patchy~mock catalogs from \cite{kitaura2016}. 
+
+
+The dark matter fields for these mocks are generated using approxiate
+gravity solvers on a mesh. 
+
+
+\todo{something about the approximate gravity solver} 
+These mock catalogs have been calibrated to high fidelity BigMultiDark 
+simulations~\citep{rodriguez-torres2016, klypin2016}
+
+In total \cite{beutler2017} 
+
 
 
 %These mock catalogues have been calibrated to an N-body-based reference sample using approximate gravity solvers and analytical–statistical biasing models. The reference catalogue is extracted from one of the BigMultiDark simula- tions (Klypin et al. 2016), which used 38403 particles on a volume of (2.5 h−1 Mpc)3 assuming a  CDM cosmology
+%Halo abundance matching is used to reproduce the observed BOSS two- and three-point clustering measurements (Rodrguez- Torres et al. 2016). This technique is applied at different redshift bins to reproduce the BOSS DR12 redshift range. These mock cata- logues are combined into light cones, also accounting for selection effects and masking. In total, we have 2045 mock catalogues avail- able for the NGC and 2048 mock catalogues for the SGC.
 \bitem
-    \item brief descriptin of the mock catalogs 
-    \item \cite{kitaura2016}
     \item 2048 mocks for both north and south 
     \item Note that 3 mocks were fixed
 \eitem
-%Halo abundance matching is used to reproduce the observed BOSS two- and three-point clustering measurements (Rodrguez- Torres et al. 2016). This technique is applied at different redshift bins to reproduce the BOSS DR12 redshift range. These mock cata- logues are combined into light cones, also accounting for selection effects and masking. In total, we have 2045 mock catalogues avail- able for the NGC and 2048 mock catalogues for the SGC.
 
 \subsection{\cite{sinha2017} Mock Catalog}
 
+\subsection{}
 ${\bf X}_i = [P_0(k)_i,P_2(k)_i,P_4(k)_i]$
 ${\bf X}_i = \zeta(N)_i$
 
@@ -178,7 +190,7 @@ ${\bf Y}^\mathrm{ref} \sim \mathcal{N}({\bf C})$.
     \item Figure that compare $D_{R\alpha}({\bf X}^\mathrm{mock} \parallel {\bf Y}^\mathrm{ref})$
 \eitem
 
-\subsection{Estimating the Non-Gaussian Likelihood: Nonparametric Density Estimation}
+\subsection{Estimating the Non-Gaussian Likelihood}
 %\subsection{Nonparametric Likelihood Estimation}
 \bitem
     \item Kernel Density Estimation 
@@ -193,6 +205,7 @@ the 37-dimensional space, so we use independent component analysis
 \cite{hartlap2009}
 \bitem
     \item Similar figure to \cite{hartlap2009} that tests the independence? 
+    \item Figure that compares 
 \eitem
 
 \section{Impact on Parameter Inference}

@@ -98,8 +98,9 @@ def div_nonGauss(K=10):
     return None
 
 
-def divPk(pk_mock='patchy.z1', NorS='ngc', K=10, Nref=10000):
-    ''' compare the renyi-alpha and KL divergence for the following  
+def delta_div(K=10, Nref=2000):
+    ''' compare the KL divergence for the following with their
+    reference divergence counterpart
 
     - D( gauss(C_X) || gauss(C_X) ) 
     - D( mock X || gauss(C_X))
@@ -108,47 +109,104 @@ def divPk(pk_mock='patchy.z1', NorS='ngc', K=10, Nref=10000):
     - D( mock X || PI p(X^i_ICA) KDE)
     - D( mock X || PI p(X^i_ICA) GMM)
     '''
-    # read in divergences 
-    # D( gauss(C_X) || gauss(C_X) ) 
-    # D( mock X || gauss(C_X))
-    fs = [
-            'ref.K'+str(K), 
-            'pX_gauss.K'+str(K), 
-            'pX_KDE.K'+str(K), 
-            'pX_KDE_ref.K'+str(K), 
-            'pX_GMM.K'+str(K)+'.ncomp30', 
-            'pX_GMM_ref.K'+str(K)+'.ncomp30'#, 'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp20'
-            ] 
-    lbls = [
-            'Ref.', 
-            r'$D( P(k) \parallel \mathcal{N}({\bf C}))$',
+    f_refs = ['ref.K'+str(K), 'pX_KDE_ref.K'+str(K), 'pX_GMM_ref.K'+str(K)+'.ncomp30', 
+            'pXi_ICA_KDE_ref.K'+str(K), 'pXi_ICA_GMM_ref.K'+str(K)+'.ncomp30']
+    fs = ['pX_gauss.K'+str(K), 'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp30', 
+            'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
+    lbls = [r'$D( P(k) \parallel \mathcal{N}({\bf C}))$',
             r'$D( P(k) \parallel p_\mathrm{KDE}(P(k)))$',
-            r'$D( ref \parallel p_\mathrm{KDE}(P(k)))$',
             r'$D( P(k) \parallel p_\mathrm{GMM}(P(k)))$',
-            r'$D( ref \parallel p_\mathrm{GMM}(P(k)))$'#, r'$D( P(k) \parallel \prod_i p_\mathrm{KDE}(P(k)_i^\mathrm{ICA}))$', r'$D( P(k) \parallel \prod_i p_\mathrm{GMM}(P(k)_i^\mathrm{ICA}))$'
-            ]
+            r'$D( P(k) \parallel \prod_i p_\mathrm{KDE}(P(k)_i^\mathrm{ICA}))$', 
+            r'$D( P(k) \parallel \prod_i p_\mathrm{GMM}(P(k)_i^\mathrm{ICA}))$']
 
-    divs = []  
-    for f in fs: 
+    divs, divs_ref = [], [] 
+    for f, f_ref in zip(fs, f_refs): 
         f_div = ''.join([UT.dat_dir(), 'diverg.pk.ngc.', f, '.Nref', str(Nref), '.kl.dat']) 
+        f_div_ref = ''.join([UT.dat_dir(), 'diverg.pk.ngc.', f_ref, '.Nref', str(Nref), '.kl.dat']) 
         div = np.loadtxt(f_div)
+        div_ref = np.loadtxt(f_div_ref)
         divs.append(div) 
+        divs_ref.append(div_ref) 
  
-    hrange = [5., 7.]#[-0.5, 0.5]#7.]
+    hranges = [[-0.5, 0.5], [-0.5, 7.], [-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]##7.]
     nbins = 50
-    y_max = 0. 
-    fig = plt.figure(figsize=(7,4))
-    sub = fig.add_subplot(111)
-    for div, lbl in zip(divs, lbls): 
-        print np.min(div), np.max(div)
-        hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
+    fig = plt.figure(figsize=(20,4))
+    bkgd = fig.add_subplot(111, frameon=False)
+    for i_div, div, div_ref, lbl in zip(range(len(divs)), divs, divs_ref, lbls): 
+        sub = fig.add_subplot(1,5,i_div+1)
+
+        y_max = 0. 
+        hh = np.histogram(div_ref, normed=True, range=hranges[i_div], bins=nbins)
         bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', label=lbl) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
         y_max = max(y_max, bp[1].max()) 
-    sub.set_xlim(hrange) 
-    sub.set_ylim([0., y_max*1.4]) 
-    sub.legend(loc='upper right', prop={'size': 15})
-    sub.set_xlabel(r'KL divergence', fontsize=20)
+
+        hh = np.histogram(div, normed=True, range=hranges[i_div], bins=nbins)
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
+        y_max = max(y_max, bp[1].max()) 
+        print np.mean(div) - np.mean(div_ref)
+
+        sub.set_xlim(hranges[i_div])  
+        sub.set_ylim([0., y_max*1.4]) 
+        sub.set_title(lbl) 
+
+    bkgd.set_xlabel(r'KL divergence', fontsize=20, labelpad=20)
+    bkgd.set_xticklabels([])
+    bkgd.set_yticklabels([])
+    fig.subplots_adjust(wspace=.15)
+    f_fig = ''.join([UT.tex_dir(), 'figs/', 'delta_kNNdiverg.Pk', 
+        '.K', str(K), '.Nref', str(Nref), '.pdf'])
+    fig.savefig(f_fig, bbox_inches='tight') 
+    return None
+
+
+def divPk(pk_mock='patchy.z1', NorS='ngc', K=10, Nref=2000):
+    ''' compare the renyi-alpha and KL divergence for the following  
+
+    - reference D( gauss(C_X) || gauss(C_X) ) 
+    - D( mock X || gauss(C_X))
+    - D( mock X || p(X) KDE)
+    - D( mock X || p(X) GMM) 
+    - D( mock X || PI p(X^i_ICA) KDE)
+    - D( mock X || PI p(X^i_ICA) GMM)
+    '''
+    fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp30', 
+            'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
+    lbls = [None, 
+            r'$D( \textbf{X}^\mathrm{mock} \parallel \mathcal{N}({\bf C}))$',
+            r'$D( \textbf{X}^\mathrm{mock} \parallel p_\mathrm{KDE}(\textbf{X}^\mathrm{mock}))$', 
+            r'$D( \textbf{X}^\mathrm{mock} \parallel p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$', 
+            r'$D( \textbf{X}^\mathrm{mock} \parallel \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$',
+            r'$D( \textbf{X}^\mathrm{mock} \parallel \prod p_\mathrm{GMM}(\textbf{X}_i^\mathrm{ICA}))$']
+
+    fig = plt.figure(figsize=(10,4))
+    for i_obv, obv in enumerate(['pk.ngc', 'pk.ngc']): 
+        divs = []  
+        for f in fs: 
+            f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.kl.dat']) 
+            div = np.loadtxt(f_div)
+            divs.append(div) 
+     
+        hrange = [-0.5, 0.5] #[ 5., 7.]
+        nbins = 50
+        y_max = 0. 
+        sub = fig.add_subplot(2,1,i_obv+1)
+        for div, lbl in zip(divs, lbls): 
+            hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
+            bp = UT.bar_plot(*hh) 
+            if lbl is None: 
+                sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
+            else: 
+                sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', alpha=0.5, label=lbl) 
+            y_max = max(y_max, bp[1].max()) 
+        sub.set_xlim(hrange) 
+        sub.set_ylim([0., y_max*1.4]) 
+        if i_obv == 1: 
+            sub.set_xlabel(r'KL divergence', fontsize=20)
+        else: 
+            sub.legend(loc='upper left', ncol=2, prop={'size': 15})
+    fig.subplots_adjust(hspace=.3)
     f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg.Pk', 
         '.K', str(K), '.Nref', str(Nref), '.pdf'])
     fig.savefig(f_fig, bbox_inches='tight') 
@@ -494,6 +552,7 @@ def GMF_contours(tag_mcmc='manodeep'):
 if __name__=="__main__": 
     #div_nonGauss(K=10)
     divPk(pk_mock='patchy.z1', NorS='ngc', K=10, Nref=2000)
+    #delta_div(K=10, Nref=2000)
     #Like_GMF()
     #GMF_contours()
     #divGMF(Nref=3000, K=5, n_mc=200, n_comp_max=20)
