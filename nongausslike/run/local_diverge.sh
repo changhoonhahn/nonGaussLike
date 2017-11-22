@@ -3,19 +3,21 @@
 
 #div="renyi:.5"
 div="kl"
-
 # --- P(k) --- 
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div ref 2000 10 100 -1
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div pX_gauss 2000 10 100 -1
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div pX_GMM 2000 10 100 -1 30
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div pX_GMM_ref 2000 10 100 -1 30
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div pX_KDE 2000 10 100 -1
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div pX_KDE_ref 2000 10 100 -1
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div pXi_ICA_GMM 2000 10 100 -1 30
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div pXi_ICA_GMM_ref 2000 10 100 -1 30
-python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div pXi_ICA_KDE 2000 10 100 6 30
-python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py pk $div pXi_ICA_KDE_ref 2000 10 100 6 30
-
+#obv="pk"
+#Nref=2000
 # --- gmf --- 
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py gmf $div ref 10000 10 100 -1 20000
-#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py gmf $div pX_gauss 10000 10 100 -1 20000
+obv="gmf"
+Nref=10000
+
+
+#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div ref $Nref 10 100 -1
+#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div pX_gauss $Nref 10 100 -1
+#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div pX_GMM $Nref 10 100 -1 30
+#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div pX_GMM_ref $Nref 10 100 -1 30
+#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div pX_KDE $Nref 10 100 -1
+python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div pX_KDE_ref $Nref 10 100 -1
+#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div pXi_ICA_GMM $Nref 10 100 -1 30
+#python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div pXi_ICA_GMM_ref $Nref 10 100 -1 30
+python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div pXi_ICA_KDE $Nref 10 100 6 30
+python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py $obv $div pXi_ICA_KDE_ref $Nref 10 100 6 30

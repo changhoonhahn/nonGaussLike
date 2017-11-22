@@ -134,40 +134,49 @@ calculate the divergence between the distribution $p(x)$, which generated
 the observable, and $q(x)$ a multivariate Gaussian described by the average
 of the mocks and the covariance matrix ${\bf C}$.
 
-Take for instance, the R\'enyi-$\alpha$ divergence between $p(x)$ and $q(x)$ 
-\beq
+One of the most commonly used divergence is the Kullback-Leibler 
+(hereafter KL) divergence: 
+\beq \label{eq:kl} 
+D_{KL} ( p \parallel q ) = \int p(x)\,\log \frac{p(x)}{q(x)}\,{\rm d}x. 
+\eeq
+Another is the R\'enyi-$\alpha$ divergence between $p(x)$ and $q(x)$:
+\beq \label{eq:renyi}
 D_{R-\alpha} ( p \parallel q ) = \frac{1}{\alpha -1} \log \int p^\alpha(x) q^{1 -\alpha}(x)\,{\rm d}x. 
 \eeq
 We note that in the limit as $\alpha$ approaches 1, the R\'enyi-$\alpha$ 
 divergence is KL divergence.
-To evaluate the R\'enyi divergence, we need to evaluate the following
+To evaluate the R\'enyi-$\alpha$ divergence, we need to evaluate the following
 kernel function
-\beq \label{eq:d_alpha_beta}
-D_{\alpha, \beta} ( p \parallel q ) = \int p^\alpha(x) q^\beta(x)\,{\rm d}x. 
+\beq \label{eq:d_alpha}
+D_{\alpha} ( p \parallel q ) = \int p^\alpha(x) q^{1-\alpha}(x)\,{\rm d}x. 
 \eeq
 
 Of course, in our case, we do not know $p(x)$. If we did, we would simply 
 use that instead of bothering with the covariance matrix or this paper. We can,
-however, still estimate the divergence by using nonparametric estimators of 
-\cite{poczos2012} and \cite{krishnamurthy2014}. The estimator presented in 
+however, still estimate the divergence by using nonparametric estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
+The estimator presented in 
 \cite{poczos2012}, which is based on $k$th nearest neighbor density estimators, 
-allows us to estimate the kernel function $D_{\alpha, \beta}(p \parallel q)$~(Eq.~\ref{eq:d_alpha_beta}) 
+allows us to estimate the kernel function Eq.~\ref{eq:d_alpha} 
 directly from samples $X_{1:n} = \{ X_1, ... X_n \}$ and $Y_{1:m} = \{ Y_1, ... Y_m \}$ 
-drawn from $p$ and $q$ respectively: $\hat{D}_{\alpha, \beta}(X_{1:n} \parallel Y_{1:m})$. 
+drawn from $p$ and $q$ respectively: $\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m})$. 
 
 Let $\rho_k(x)$ denote the Euclidean distance of the $k$th nearest neighbor 
 of $x$ in the sample $X_{1:n}$ and $\nu_k(x)$ denote the Euclidean distance 
 of the $k$th nearest neighbor of $x$ in the sample $Y_{1:m}$. Then 
-$D_{\alpha, \beta}(p \parallel q)$ can be estimated as 
-\beq
-\hat{D}_{\alpha, \beta}(X_{1:n} \parallel Y_{1:m}) = \frac{B_{k,\alpha,\beta}}{n (n-1)^\alpha m^\beta} \sum\limits_{i=1}^{n} \rho_k^{-d \alpha}(X_i)\,\nu_k^{-d \beta}(X_i)
+$D_{\alpha}(p \parallel q)$ can be estimated as 
+\beq \label{eq:d_alpha_est}
+\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m}) = \frac{B_{k,\alpha}}{n} \left(\frac{n-1}{m}\right)^{1-\alpha}
+\sum\limits_{i=1}^{n} \left(\frac{\rho_k^{d}(X_i)}{\nu_k^{d}(X_i)} \right)^{1-\alpha},
 \eeq
-where $B_{k, \alpha, \beta} = \frac{\Gamma(k)^2}{\Gamma(k-\alpha)\Gamma(k-\beta)}$. 
+where $B_{k, \alpha} = \frac{\Gamma(k)^2}{\Gamma(k-\alpha+1)\Gamma(k+\alpha-1)}$. 
 \cite{poczos2012} proves that this estimator is asymptotically unbias, \emph{i.e.} 
 \beq
-\lim_{N, M \rightarrow \infty} \mathbb{E} \big[ \hat{D}_{\alpha, \beta} (X_{1:N} \parallel Y_{1:M}) \big] = D_{\alpha, \beta} (p \parallel q). 
+\lim_{n, m \rightarrow \infty} \mathbb{E} \big[ \hat{D}_{\alpha} (X_{1:n} \parallel Y_{1:m}) \big] = D_{\alpha} (p \parallel q). 
 \eeq
-This divergence estimate has been applied to Support Vector Machines and used 
+Plugging $\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m})$ into Eq.~\ref{eq:renyi},
+we can estimate the R\'enyi-$\alpha$ divergence. A similar estimator~\citep{wang2009} 
+can also be used to estimate the KL divergence~(Eq.~\ref{eq:kl}). 
+These divergence estimates have been applied to Support Vector Machines and used 
 extensively in the machine learning and astronomical literature with great success 
 \todo{elaborate a lot more} 
 \bitem 
@@ -177,7 +186,7 @@ For more details on the non-parametric divergence estimators, we refer readers t
 \cite{poczos2012} and \cite{krishnamurthy2014}.
 
 In Figure~\ref{fig:div_nongauss} we compare the R\'enyi-$\alpha$ 
-(top) and $KL$ (bottom) divergences
+(top) and $KL$ (bottom) divergence estimates 
 $D_{R\alpha}({\bf X}^\mathrm{mock} \parallel {\bf Y}^\mathrm{ref})$ and 
 $D_{KL}({\bf X}^\mathrm{mock} \parallel {\bf Y}^\mathrm{ref})$
 between the mock data ${\bf X}^\mathrm{mock}$ and a reference sample 
@@ -194,7 +203,9 @@ ${\bf Y}^\mathrm{ref} \sim \mathcal{N}({\bf C})$.
 %\subsection{Nonparametric Likelihood Estimation}
 \bitem
     \item Kernel Density Estimation 
-    \item Gaussian Mixture Model (algorithm used for optimizing) 
+    \item Gaussian Mixture Model 
+    \item expectation maximization algorithm \cite{dempster1977}
+% Expectation-maximization is a well-founded statistical algorithm to get around this problem by an iterative process. First one assumes random components (randomly centered on data points, learned from k-means, or even just normally distributed around the origin) and computes for each point a probability of being generated by each component of the model. Then, one tweaks the parameters to maximize the likelihood of the data given those assignments. Repeating this process is guaranteed to always converge to a local optimum.
     \item Bayesian Information Criteria 
     \item Figure illustrating both methods on highest N GMF bin 
 \eitem
@@ -232,11 +243,22 @@ the 37-dimensional space, so we use independent component analysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\textwidth]{figs/kNNdiverg_nonGauss.pdf}
-\caption{R\'enyi-$\alpha$ and KL divergence}
+\includegraphics[width=0.9\textwidth]{figs/kNNdiverg_Gauss.pdf}
+\caption{R\'enyi-$\alpha$ and KL divergence estimates, ($D_{R\alpha}$ and $D_{KL}$), 
+between the mock data ${\bf X}^\mathrm{mock}$ and a reference sample 
+${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (left) and $\zeta(N)$ (right) analyses.}
 \label{fig:div_nongauss}
 \end{center}
 \end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figs/kNNdiverg_nonGauss.pdf}
+\caption{}
+\label{fig:div_nongauss}
+\end{center}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Acknowledgements

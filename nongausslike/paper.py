@@ -44,7 +44,7 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
-def div_nonGauss(K=10):
+def div_Gauss(K=10):
     ''' compare the renyi-alpha and KL divergence for the following  
     - D( gauss(C_X) || gauss(C_X) ) 
     - D( mock X || gauss(C_X))
@@ -93,75 +93,12 @@ def div_nonGauss(K=10):
                     sub.text(0.075, 0.85, r'$\zeta(N)$', ha='left', va='top', 
                             transform=sub.transAxes, fontsize=20)
     fig.subplots_adjust(wspace=.15)
-    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg_nonGauss.pdf'])
+    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg_Gauss.pdf'])
     fig.savefig(f_fig, bbox_inches='tight') 
     return None
 
 
-def delta_div(K=10, Nref=2000):
-    ''' compare the KL divergence for the following with their
-    reference divergence counterpart
-
-    - D( gauss(C_X) || gauss(C_X) ) 
-    - D( mock X || gauss(C_X))
-    - D( mock X || p(X) KDE)
-    - D( mock X || p(X) GMM) 
-    - D( mock X || PI p(X^i_ICA) KDE)
-    - D( mock X || PI p(X^i_ICA) GMM)
-    '''
-    f_refs = ['ref.K'+str(K), 'pX_KDE_ref.K'+str(K), 'pX_GMM_ref.K'+str(K)+'.ncomp30', 
-            'pXi_ICA_KDE_ref.K'+str(K), 'pXi_ICA_GMM_ref.K'+str(K)+'.ncomp30']
-    fs = ['pX_gauss.K'+str(K), 'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp30', 
-            'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
-    lbls = [r'$D( P(k) \parallel \mathcal{N}({\bf C}))$',
-            r'$D( P(k) \parallel p_\mathrm{KDE}(P(k)))$',
-            r'$D( P(k) \parallel p_\mathrm{GMM}(P(k)))$',
-            r'$D( P(k) \parallel \prod_i p_\mathrm{KDE}(P(k)_i^\mathrm{ICA}))$', 
-            r'$D( P(k) \parallel \prod_i p_\mathrm{GMM}(P(k)_i^\mathrm{ICA}))$']
-
-    divs, divs_ref = [], [] 
-    for f, f_ref in zip(fs, f_refs): 
-        f_div = ''.join([UT.dat_dir(), 'diverg.pk.ngc.', f, '.Nref', str(Nref), '.kl.dat']) 
-        f_div_ref = ''.join([UT.dat_dir(), 'diverg.pk.ngc.', f_ref, '.Nref', str(Nref), '.kl.dat']) 
-        div = np.loadtxt(f_div)
-        div_ref = np.loadtxt(f_div_ref)
-        divs.append(div) 
-        divs_ref.append(div_ref) 
- 
-    hranges = [[-0.5, 0.5], [-0.5, 7.], [-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]##7.]
-    nbins = 50
-    fig = plt.figure(figsize=(20,4))
-    bkgd = fig.add_subplot(111, frameon=False)
-    for i_div, div, div_ref, lbl in zip(range(len(divs)), divs, divs_ref, lbls): 
-        sub = fig.add_subplot(1,5,i_div+1)
-
-        y_max = 0. 
-        hh = np.histogram(div_ref, normed=True, range=hranges[i_div], bins=nbins)
-        bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
-        y_max = max(y_max, bp[1].max()) 
-
-        hh = np.histogram(div, normed=True, range=hranges[i_div], bins=nbins)
-        bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
-        y_max = max(y_max, bp[1].max()) 
-        print np.mean(div) - np.mean(div_ref)
-
-        sub.set_xlim(hranges[i_div])  
-        sub.set_ylim([0., y_max*1.4]) 
-        sub.set_title(lbl) 
-
-    bkgd.set_xlabel(r'KL divergence', fontsize=20, labelpad=20)
-    bkgd.set_xticklabels([])
-    bkgd.set_yticklabels([])
-    fig.subplots_adjust(wspace=.15)
-    f_fig = ''.join([UT.tex_dir(), 'figs/', 'delta_kNNdiverg.Pk', 
-        '.K', str(K), '.Nref', str(Nref), '.pdf'])
-    fig.savefig(f_fig, bbox_inches='tight') 
-    return None
-
-
-def divPk(pk_mock='patchy.z1', NorS='ngc', K=10, Nref=2000):
+def div_nonGauss(K=10):
     ''' compare the renyi-alpha and KL divergence for the following  
 
     - reference D( gauss(C_X) || gauss(C_X) ) 
@@ -171,127 +108,72 @@ def divPk(pk_mock='patchy.z1', NorS='ngc', K=10, Nref=2000):
     - D( mock X || PI p(X^i_ICA) KDE)
     - D( mock X || PI p(X^i_ICA) GMM)
     '''
-    fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp30', 
-            'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
-    lbls = [None, 
-            r'$D( \textbf{X}^\mathrm{mock} \parallel \mathcal{N}({\bf C}))$',
-            r'$D( \textbf{X}^\mathrm{mock} \parallel p_\mathrm{KDE}(\textbf{X}^\mathrm{mock}))$', 
-            r'$D( \textbf{X}^\mathrm{mock} \parallel p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$', 
-            r'$D( \textbf{X}^\mathrm{mock} \parallel \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$',
-            r'$D( \textbf{X}^\mathrm{mock} \parallel \prod p_\mathrm{GMM}(\textbf{X}_i^\mathrm{ICA}))$']
+    pretty_colors = prettycolors() 
+    fig = plt.figure(figsize=(12,5))
+    for i_obv, obv in enumerate(['pk.ngc', 'gmf']): 
+        if obv == 'pk.ngc': 
+            Nref, ncomp, hrange = 2000, 30, [-0.5, 0.5] #[ 5., 7.]
+            #r'$D( \textbf{X}^\mathrm{mock} \parallel p_\mathrm{KDE}(\textbf{X}^\mathrm{mock}))$', 
+            #r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$', 
+            #r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \mathcal{N}({\bf C}))$',
+            lbls = [None, None,
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$',
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{GMM}(\textbf{X}_i^\mathrm{ICA}))$']
+            #'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp), 
+            fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
+            hatches = [None, None, '//', '//']
 
-    fig = plt.figure(figsize=(10,4))
-    for i_obv, obv in enumerate(['pk.ngc', 'pk.ngc']): 
-        divs = []  
-        for f in fs: 
-            f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.kl.dat']) 
-            div = np.loadtxt(f_div)
-            divs.append(div) 
-     
-        hrange = [-0.5, 0.5] #[ 5., 7.]
-        nbins = 50
-        y_max = 0. 
-        sub = fig.add_subplot(2,1,i_obv+1)
-        for div, lbl in zip(divs, lbls): 
-            hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
-            bp = UT.bar_plot(*hh) 
-            if lbl is None: 
-                sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
-            else: 
-                sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', alpha=0.5, label=lbl) 
-            y_max = max(y_max, bp[1].max()) 
-        sub.set_xlim(hrange) 
-        sub.set_ylim([0., y_max*1.4]) 
-        if i_obv == 1: 
-            sub.set_xlabel(r'KL divergence', fontsize=20)
-        else: 
-            sub.legend(loc='upper left', ncol=2, prop={'size': 15})
-    fig.subplots_adjust(hspace=.3)
-    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg.Pk', 
-        '.K', str(K), '.Nref', str(Nref), '.pdf'])
-    fig.savefig(f_fig, bbox_inches='tight') 
-    return None
+        elif obv == 'gmf': 
+            Nref, ncomp, hrange = 10000, 20, [-0.1, 0.25]
+            # r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \mathcal{N}({\bf C}))$',
+            lbls = [None, None,
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel p_\mathrm{KDE}(\textbf{X}^\mathrm{mock}))$', 
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$'] 
+            # 'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
+            fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp)]
+            hatches = [None, None, '//', '//']
 
+        for i_div, div_func in enumerate(['kl', 'kl']): 
+            divs = []  
+            for f in fs: 
+                f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.', div_func, '.dat']) 
+                try: 
+                    div = np.loadtxt(f_div)
+                except IOError: 
+                    continue 
+                divs.append(div) 
+         
+            nbins = 50
+            y_max = 0. 
+            sub = fig.add_subplot(2,2,2*i_obv+i_div+1)
+            for ii, div, lbl in zip(range(len(divs)), divs, lbls): 
+                hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
+                bp = UT.bar_plot(*hh) 
+                if lbl is None: 
+                    sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
+                else: 
+                    sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], 
+                            facecolor='none', edgecolor=pretty_colors[2*ii], linewidth=2,
+                            alpha=0.75, hatch=hatches[ii], label=lbl) 
+                            #edgecolor='none'
+                y_max = max(y_max, bp[1].max()) 
+            sub.set_xlim(hrange) 
+            sub.set_ylim([0., y_max*1.4]) 
 
-def divGMF(Nref=1000, K=5, n_mc=10, n_comp_max=10):
-    ''' compare the renyi-alpha and KL divergence estimates between 
-    D( gmfs || gauss(C_gmf) ), D( gauss(C_gmf) || gauss(C_gmf) ) and  D( gmfs || p(gmfs) GMM) 
-    '''
-    # read in mock GMFs from all HOD realizations (20,000 mocks)
-    gmfs_mock = NG.X_gmf_all()#[:2000]
-    n_mock = gmfs_mock.shape[0] # number of mocks 
-    print("%i mocks" % n_mock) 
-
-    gmfs_mock_meansub, _ = NG.meansub(gmfs_mock) # mean subtract
-    X_w, W = NG.whiten(gmfs_mock_meansub)
-
-    C_gmf = np.cov(X_w.T) # covariance matrix
-    
-    # p(gmfs) GMM
-    # evaluate best-fit GMM based on Bayesian Information Criterion  
-    gmms, bics = [], [] 
-    for i_comp in range(1,n_comp_max+1):
-        gmm = GMix(n_components=i_comp)
-        gmm.fit(X_w) 
-        gmms.append(gmm)
-        bics.append(gmm.bic(X_w))
-    ibest = np.array(bics).argmin() 
-    kerns = gmms[ibest]
-    
-    fig = plt.figure(figsize=(7,5))
-    for i_div, div_func in enumerate(['renyi:.5', 'kl']): 
-        # caluclate the divergences now 
-        div_gauss_ref, div_gauss, div_gmm = [], [], [] 
-        for i in range(n_mc): 
-            print('%i montecarlo' % i)
-            t_start = time.time() 
-            # reference divergence in order to showcase the estimator's scatter
-            # Gaussian distribution described by C_gmf with same n_mock mocks 
-            gauss = mvn(np.zeros(gmfs_mock.shape[1]), C_gmf, size=n_mock)
-            div_gauss_ref_i = NG.kNNdiv_gauss(gauss, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
-            div_gauss_ref.append(div_gauss_ref_i)
-            # estimate divergence between gmfs_white and a 
-            # Gaussian distribution described by C_gmf
-            div_gauss_i = NG.kNNdiv_gauss(X_w, C_gmf, Knn=K, div_func=div_func, Nref=Nref)
-            div_gauss.append(div_gauss_i)
-            # D( gmfs || p(gmfs) GMM)
-            div_gmm_i = NG.kNNdiv_Kernel(X_w, kerns, Knn=K, div_func=div_func, Nref=Nref, 
-                    compwise=False) 
-            div_gmm.append(div_gmm_i)
-            print('t= %f sec' % round(time.time()-t_start,2))
-
-        sub = fig.add_subplot(2,1,i_div+1)
-        hrange = [-0.1, 0.25]
-        nbins = 50
-        # reference to show scatter of estimator
-        hh = np.histogram(np.array(div_gauss_ref), normed=True, range=hrange, bins=nbins)
-        bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
-        y_max = max(y_max, bp[1].max()) 
-        # divergence between mock GMFs and Gaussian distribution 
-        hh = np.histogram(np.array(div_gauss), normed=True, range=hrange, bins=nbins)
-        bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
-                label=r'$D(\{\zeta^{(m)}\}\parallel \mathcal{N}({\bf C}^{(m)}))$') 
-        y_max = bp[1].max() 
-        # divergence between mock GMFs and Gaussian distribution 
-        hh = np.histogram(np.array(div_gmm), normed=True, range=hrange, bins=nbins)
-        bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', 
-                label=r'$D(\{\zeta^{(m)}\}\parallel p_\mathrm{GMM}(\{\zeta^{(m)}\}))$') 
-        y_max = max(y_max, bp[1].max()) 
-        sub.set_xlim(hrange) 
-        sub.set_ylim([0., y_max*1.4]) 
-        if i_div == 1: 
-            sub.legend(loc='upper right', prop={'size': 15})
-        # xlabels
-        if 'renyi' in div_func: 
-            alpha = float(div_func.split(':')[-1])
-            sub.set_xlabel(r'Renyi-$\alpha='+str(alpha)+'$ divergence', fontsize=20)
-        elif 'kl' in div_func: 
-            sub.set_xlabel(r'KL divergence', fontsize=20)
-    fig.subplots_adjust(hspace=.5)
-    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNN_divergence_gmf_K', str(K), '.pdf'])
+            if i_obv == 0: 
+                if i_div == 1: sub.legend(loc='upper right', ncol=2, prop={'size': 15})
+                else: 
+                    sub.text(0.075, 0.85, r'$P_\ell(k)$', ha='left', va='top', 
+                        transform=sub.transAxes, fontsize=20)
+            elif i_obv == 1: 
+                if div_func == 'kl': sub.set_xlabel(r'KL divergence', fontsize=20)
+                elif div_func == 'renyi0.5': 
+                    sub.set_xlabel(r'R\'enyi-$\alpha$ divergence', 
+                        fontsize=20)
+                    sub.text(0.075, 0.85, r'$\zeta(N)$', ha='left', va='top', 
+                            transform=sub.transAxes, fontsize=20)
+    fig.subplots_adjust(wspace=.15, hspace=.2)
+    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg_nonGauss.pdf'])
     fig.savefig(f_fig, bbox_inches='tight') 
     return None
 
@@ -550,14 +432,10 @@ def GMF_contours(tag_mcmc='manodeep'):
    
 
 if __name__=="__main__": 
-    #div_nonGauss(K=10)
-    divPk(pk_mock='patchy.z1', NorS='ngc', K=10, Nref=2000)
-    #delta_div(K=10, Nref=2000)
+    #div_Gauss(K=10)
+    div_nonGauss(K=10)
     #Like_GMF()
     #GMF_contours()
-    #divGMF(Nref=3000, K=5, n_mc=200, n_comp_max=20)
-    #for k in range(8,40)[::4]: 
-    #    divGMF(Nref=3000, K=k, n_mc=200, n_comp_max=20)
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
     #Like_RSD('RSD_pca_gauss', ichain=0)

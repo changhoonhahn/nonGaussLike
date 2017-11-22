@@ -30,6 +30,79 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
+def delta_div(K=10):
+    ''' compare the KL divergence for the following with their
+    reference divergence counterpart
+
+    - D( gauss(C_X) || gauss(C_X) ) 
+    - D( mock X || gauss(C_X))
+    - D( mock X || p(X) KDE)
+    - D( mock X || p(X) GMM) 
+    - D( mock X || PI p(X^i_ICA) KDE)
+    - D( mock X || PI p(X^i_ICA) GMM)
+    '''
+    f_refs = ['ref.K'+str(K), 'pX_KDE_ref.K'+str(K), 'pX_GMM_ref.K'+str(K)+'.ncomp30', 
+            'pXi_ICA_KDE_ref.K'+str(K), 'pXi_ICA_GMM_ref.K'+str(K)+'.ncomp30']
+    fs = ['pX_gauss.K'+str(K), 'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp30', 
+            'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
+    lbls = [r'$D( P(k) \parallel \mathcal{N}({\bf C}))$',
+            r'$D( P(k) \parallel p_\mathrm{KDE}(P(k)))$',
+            r'$D( P(k) \parallel p_\mathrm{GMM}(P(k)))$',
+            r'$D( P(k) \parallel \prod_i p_\mathrm{KDE}(P(k)_i^\mathrm{ICA}))$', 
+            r'$D( P(k) \parallel \prod_i p_\mathrm{GMM}(P(k)_i^\mathrm{ICA}))$']
+
+    fig = plt.figure(figsize=(20,4))
+    for i_obv, obv in enumerate(['pk.ngc', 'pk.ngc']):
+        if obv == 'pk.ngc': 
+            Nref = 2000
+            hranges = [[-0.5, 0.5], [-0.5, 7.], [-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]##7.]
+        elif obv == 'gmf': 
+            Nref = 10000
+            hranges = [[-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]##7.]
+
+        divs, divs_ref = [], [] 
+        for f, f_ref in zip(fs, f_refs): 
+            f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.kl.dat']) 
+            f_div_ref = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f_ref, '.Nref', str(Nref), '.kl.dat']) 
+            div = np.loadtxt(f_div)
+            div_ref = np.loadtxt(f_div_ref)
+            divs.append(div) 
+            divs_ref.append(div_ref) 
+     
+        nbins = 50
+        bkgd = fig.add_subplot(2,1,i_obv+1, frameon=False)
+        for i_div, div, div_ref, lbl in zip(range(len(divs)), divs, divs_ref, lbls): 
+            sub = fig.add_subplot(2,5,len(divs)*i_obv+i_div+1)
+
+            y_max = 0. 
+            hh = np.histogram(div_ref, normed=True, range=hranges[i_div], bins=nbins)
+            bp = UT.bar_plot(*hh) 
+            sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
+            y_max = max(y_max, bp[1].max()) 
+
+            hh = np.histogram(div, normed=True, range=hranges[i_div], bins=nbins)
+            bp = UT.bar_plot(*hh) 
+            sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
+            y_max = max(y_max, bp[1].max()) 
+            print np.mean(div) - np.mean(div_ref)
+
+            sub.set_xlim(hranges[i_div])  
+            sub.set_ylim([0., y_max*1.4]) 
+            if i_obv == 0: 
+                sub.set_title(lbl) 
+
+        bkgd.set_xlabel(r'KL divergence', fontsize=20, labelpad=20)
+        bkgd.set_xticklabels([])
+        bkgd.set_yticklabels([])
+        bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+
+    fig.subplots_adjust(wspace=.15, hspace=0.3)
+    f_fig = ''.join([UT.fig_dir(), 'tests/delta_kNNdiverg.Pk', 
+        '.K', str(K), '.Nref', str(Nref), '.pdf'])
+    fig.savefig(f_fig, bbox_inches='tight') 
+    return None
+
+
 def diverge(obvs, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, n_mocks=2000, 
         pk_mock='patchy.z1', NorS='ngc'):
     ''' compare the divergence estimates between 
@@ -932,8 +1005,9 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    diverge('pk', div_func='kl', Nref=5000, K=10, n_mc=10, n_comp_max=10, n_mocks=2000, 
-        pk_mock='patchy.z1', NorS='ngc')
+    delta_div(K=10)
+    #diverge('pk', div_func='kl', Nref=5000, K=10, n_mc=10, n_comp_max=10, n_mocks=2000, 
+    #    pk_mock='patchy.z1', NorS='ngc')
 
     #for n in [2000, 4000, 6000]: 
     #    divGMF(n_mocks=n, div_func='kl', Nref=n*1.5, K=10, n_mc=100, n_comp_max=20)

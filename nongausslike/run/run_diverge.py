@@ -29,7 +29,7 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
-def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, n_mocks=None, 
+def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, n_mocks=20000, 
         pk_mock='patchy.z1', NorS='ngc', njobs=1):
     ''' calculate the divergences: 
 
@@ -39,7 +39,6 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
     - D( mock X || p(X) GMM) 
     - D( mock X || PI p(X^i_ICA) KDE)
     - D( mock X || PI p(X^i_ICA) GMM)
-
     '''
     if isinstance(Nref, float): Nref = int(Nref)
     if diver not in ['ref', 'pX_gauss', 
@@ -163,8 +162,6 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
         elif diver == 'pXi_ICA_GMM': # D( mock X || PI p(X^i_ICA) GMM), 
             div_i = NG.kNNdiv_Kernel(X_w, kern_gmm_ica, Knn=K, div_func=div_func, 
                     Nref=Nref, compwise=True, njobs=njobs, W_ica_inv=W_ica_inv)
-            #div_i = NG.kNNdiv_Kernel(X_ica, kern_gmm_ica, Knn=K, div_func=div_func, 
-            #        Nref=Nref, compwise=True, njobs=njobs)
         elif diver == 'pXi_ICA_GMM_ref': # D( ref. sample || PI p(X^i_ICA) GMM), 
             samp = np.zeros((n_mock, X_ica.shape[1]))
             for icomp in range(X_ica.shape[1]): 
@@ -214,8 +211,4 @@ if __name__=="__main__":
         diverge(obvs, div, div_func=div_func, Nref=Nref, K=K, n_mc=n_mc, n_comp_max=ncomp, 
             pk_mock='patchy.z1', NorS='ngc')
     elif obvs == 'gmf': 
-        if 'GMM' in div: 
-            nmocks = int(Sys.argv[9]) 
-        else: 
-            nmocks = int(Sys.argv[8]) 
-        diverge(obvs, div, div_func=div_func, Nref=Nref, K=K, n_mc=n_mc, n_comp_max=ncomp, n_mocks=nmocks, njobs=njobs) 
+        diverge(obvs, div, div_func=div_func, Nref=Nref, K=K, n_mc=n_mc, n_comp_max=ncomp, njobs=njobs) 
