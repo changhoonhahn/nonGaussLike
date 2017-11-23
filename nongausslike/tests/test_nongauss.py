@@ -42,9 +42,9 @@ def delta_div(K=10):
     - D( mock X || PI p(X^i_ICA) GMM)
     '''
     f_refs = ['ref.K'+str(K), 'pX_KDE_ref.K'+str(K), 'pX_GMM_ref.K'+str(K)+'.ncomp30', 
-            'pXi_ICA_KDE_ref.K'+str(K), 'pXi_ICA_GMM_ref.K'+str(K)+'.ncomp30']
+            'pXi_ICA_scottKDE_ref.K'+str(K), 'pXi_ICA_GMM_ref.K'+str(K)+'.ncomp30']
     fs = ['pX_gauss.K'+str(K), 'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp30', 
-            'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
+            'pXi_ICA_scottKDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
     lbls = [r'$D( P(k) \parallel \mathcal{N}({\bf C}))$',
             r'$D( P(k) \parallel p_\mathrm{KDE}(P(k)))$',
             r'$D( P(k) \parallel p_\mathrm{GMM}(P(k)))$',
@@ -52,27 +52,30 @@ def delta_div(K=10):
             r'$D( P(k) \parallel \prod_i p_\mathrm{GMM}(P(k)_i^\mathrm{ICA}))$']
 
     fig = plt.figure(figsize=(20,4))
-    for i_obv, obv in enumerate(['pk.ngc', 'pk.ngc']):
+    for i_obv, obv in enumerate(['pk.ngc', 'gmf']):
         if obv == 'pk.ngc': 
             Nref = 2000
             hranges = [[-0.5, 0.5], [-0.5, 7.], [-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]##7.]
         elif obv == 'gmf': 
             Nref = 10000
-            hranges = [[-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]##7.]
+            hranges = [[-0.1, 0.4], [-0.1, 0.4], [-0.1, 0.4], [-0.1, 0.4], [-0.1, 0.4]]##7.]
 
         divs, divs_ref = [], [] 
         for f, f_ref in zip(fs, f_refs): 
             f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.kl.dat']) 
             f_div_ref = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f_ref, '.Nref', str(Nref), '.kl.dat']) 
-            div = np.loadtxt(f_div)
-            div_ref = np.loadtxt(f_div_ref)
+            try: 
+                div = np.loadtxt(f_div)
+                div_ref = np.loadtxt(f_div_ref)
+            except IOError: 
+                continue 
             divs.append(div) 
             divs_ref.append(div_ref) 
      
         nbins = 50
         bkgd = fig.add_subplot(2,1,i_obv+1, frameon=False)
-        for i_div, div, div_ref, lbl in zip(range(len(divs)), divs, divs_ref, lbls): 
-            sub = fig.add_subplot(2,5,len(divs)*i_obv+i_div+1)
+        for i_div, div, div_ref, lbl in zip(range(len(fs)), divs, divs_ref, lbls): 
+            sub = fig.add_subplot(2,5,len(fs)*i_obv+i_div+1)
 
             y_max = 0. 
             hh = np.histogram(div_ref, normed=True, range=hranges[i_div], bins=nbins)

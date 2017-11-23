@@ -120,7 +120,7 @@ def div_nonGauss(K=10):
                     r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$',
                     r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{GMM}(\textbf{X}_i^\mathrm{ICA}))$']
             #'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp), 
-            fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
+            fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pXi_ICA_scottKDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
             hatches = [None, None, '//', '//']
 
         elif obv == 'gmf': 

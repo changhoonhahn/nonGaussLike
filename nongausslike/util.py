@@ -7,6 +7,19 @@ import os
 import sys
 import numpy as np
 from scipy import interpolate
+from scipy.stats import gaussian_kde as gKDE
+
+
+class KayDE(gKDE): 
+    def __init__(self, X): 
+        ''' wrapper for gKDE to behave more like 
+        sklearn.mixture.GaussianMixutre
+        '''
+        super(KayDE, self).__init__(X.T)
+
+    def sample(self, N): 
+        samp = super(KayDE, self).resample(N) 
+        return samp.T
 
 
 def code_dir(): 
