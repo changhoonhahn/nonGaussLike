@@ -167,81 +167,6 @@ def div_nonGauss(K=10):
     return None
 
 
-"""
-    def div_nonGauss(K=10):
-        ''' compare the renyi-alpha and KL divergence for the following  
-
-        - reference D( gauss(C_X) || gauss(C_X) ) 
-        - D( mock X || gauss(C_X))
-        - D( mock X || p(X) KDE)
-        - D( mock X || p(X) GMM) 
-        - D( mock X || PI p(X^i_ICA) KDE)
-        - D( mock X || PI p(X^i_ICA) GMM)
-        '''
-        pretty_colors = prettycolors() 
-        fig = plt.figure(figsize=(12,5))
-        for i_obv, obv in enumerate(['pk.ngc', 'gmf']): 
-            if obv == 'pk.ngc': Nref, ncomp, hrange = 2000, 30, [-0.5, 0.5] 
-            elif obv == 'gmf': Nref, ncomp, hrange = 10000, 30, [-0.1, 0.25]
-            lbls = [None, None, 
-                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{KDE}(\textbf{X}^\mathrm{mock}))$', 
-                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$', 
-                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$',
-                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{GMM}(\textbf{X}_i^\mathrm{ICA}))$']
-
-            fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_scottKDE.K'+str(K), 
-                    'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp),
-                    'pXi_ICA_scottKDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
-            hatches = [None, None, '//', '//', '//', '//']
-            # 'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
-            #fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), ]
-
-            for i_div, div_func in enumerate(['renyi0.5', 'kl']): 
-                divs = []  
-                for f in fs: 
-                    f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.', div_func, '.dat']) 
-                    try: 
-                        div = np.loadtxt(f_div)
-                    except IOError: 
-                        print f_div
-                        continue 
-                    divs.append(div) 
-             
-                nbins = 50
-                y_max = 0. 
-                sub = fig.add_subplot(2,2,2*i_obv+i_div+1)
-                for ii, div, lbl in zip(range(len(divs)), divs, lbls): 
-                    hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
-                    bp = UT.bar_plot(*hh) 
-                    if lbl is None: 
-                        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
-                    else: 
-                        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], 
-                                facecolor='none', edgecolor=pretty_colors[2*ii], linewidth=2,
-                                alpha=0.75, hatch=hatches[ii], label=lbl) 
-                                #edgecolor='none'
-                    y_max = max(y_max, bp[1].max()) 
-                sub.set_xlim(hrange) 
-                sub.set_ylim([0., y_max*1.4]) 
-
-                if i_obv == 0: 
-                    if i_div == 1: sub.legend(loc='upper right', ncol=2, prop={'size': 15})
-                    else: 
-                        sub.text(0.075, 0.85, r'$P_\ell(k)$', ha='left', va='top', 
-                            transform=sub.transAxes, fontsize=20)
-                elif i_obv == 1: 
-                    if div_func == 'kl': sub.set_xlabel(r'KL divergence', fontsize=20)
-                    elif div_func == 'renyi0.5': 
-                        sub.set_xlabel(r'R\'enyi-$\alpha$ divergence', 
-                            fontsize=20)
-                        sub.text(0.075, 0.85, r'$\zeta(N)$', ha='left', va='top', 
-                                transform=sub.transAxes, fontsize=20)
-        fig.subplots_adjust(wspace=.15, hspace=.2)
-        f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg_nonGauss.pdf'])
-        fig.savefig(f_fig, bbox_inches='tight') 
-        return None
-"""
-
 def Corner_updatedLike(tag_mcmc, tag_like, ichain): 
     ''' Corner plot with corrected likelihoods. Comparison between the 
     parameter constraints from the pseudo Gaussian likelihood versus the 
@@ -508,7 +433,83 @@ def GMF_contours(tag_mcmc='manodeep'):
     fig.savefig(''.join([UT.tex_dir(), 'figs/', 
         'GMFcontours_', tag_mcmc, '.pdf']), bbox_inches='tight') 
     return None
-   
+
+
+"""
+    def div_nonGauss(K=10):
+        ''' compare the renyi-alpha and KL divergence for the following  
+
+        - reference D( gauss(C_X) || gauss(C_X) ) 
+        - D( mock X || gauss(C_X))
+        - D( mock X || p(X) KDE)
+        - D( mock X || p(X) GMM) 
+        - D( mock X || PI p(X^i_ICA) KDE)
+        - D( mock X || PI p(X^i_ICA) GMM)
+        '''
+        pretty_colors = prettycolors() 
+        fig = plt.figure(figsize=(12,5))
+        for i_obv, obv in enumerate(['pk.ngc', 'gmf']): 
+            if obv == 'pk.ngc': Nref, ncomp, hrange = 2000, 30, [-0.5, 0.5] 
+            elif obv == 'gmf': Nref, ncomp, hrange = 10000, 30, [-0.1, 0.25]
+            lbls = [None, None, 
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{KDE}(\textbf{X}^\mathrm{mock}))$', 
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$', 
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$',
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{GMM}(\textbf{X}_i^\mathrm{ICA}))$']
+
+            fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_scottKDE.K'+str(K), 
+                    'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp),
+                    'pXi_ICA_scottKDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
+            hatches = [None, None, '//', '//', '//', '//']
+            # 'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
+            #fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), ]
+
+            for i_div, div_func in enumerate(['renyi0.5', 'kl']): 
+                divs = []  
+                for f in fs: 
+                    f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.', div_func, '.dat']) 
+                    try: 
+                        div = np.loadtxt(f_div)
+                    except IOError: 
+                        print f_div
+                        continue 
+                    divs.append(div) 
+             
+                nbins = 50
+                y_max = 0. 
+                sub = fig.add_subplot(2,2,2*i_obv+i_div+1)
+                for ii, div, lbl in zip(range(len(divs)), divs, lbls): 
+                    hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
+                    bp = UT.bar_plot(*hh) 
+                    if lbl is None: 
+                        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
+                    else: 
+                        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], 
+                                facecolor='none', edgecolor=pretty_colors[2*ii], linewidth=2,
+                                alpha=0.75, hatch=hatches[ii], label=lbl) 
+                                #edgecolor='none'
+                    y_max = max(y_max, bp[1].max()) 
+                sub.set_xlim(hrange) 
+                sub.set_ylim([0., y_max*1.4]) 
+
+                if i_obv == 0: 
+                    if i_div == 1: sub.legend(loc='upper right', ncol=2, prop={'size': 15})
+                    else: 
+                        sub.text(0.075, 0.85, r'$P_\ell(k)$', ha='left', va='top', 
+                            transform=sub.transAxes, fontsize=20)
+                elif i_obv == 1: 
+                    if div_func == 'kl': sub.set_xlabel(r'KL divergence', fontsize=20)
+                    elif div_func == 'renyi0.5': 
+                        sub.set_xlabel(r'R\'enyi-$\alpha$ divergence', 
+                            fontsize=20)
+                        sub.text(0.075, 0.85, r'$\zeta(N)$', ha='left', va='top', 
+                                transform=sub.transAxes, fontsize=20)
+        fig.subplots_adjust(wspace=.15, hspace=.2)
+        f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg_nonGauss.pdf'])
+        fig.savefig(f_fig, bbox_inches='tight') 
+        return None
+"""
+
 
 if __name__=="__main__": 
     #div_Gauss(K=10)
