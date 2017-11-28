@@ -103,59 +103,46 @@ def div_nonGauss(K=10):
 
     - reference D( gauss(C_X) || gauss(C_X) ) 
     - D( mock X || gauss(C_X))
-    - D( mock X || p(X) KDE)
     - D( mock X || p(X) GMM) 
-    - D( mock X || PI p(X^i_ICA) KDE)
-    - D( mock X || PI p(X^i_ICA) GMM)
     '''
     pretty_colors = prettycolors() 
     fig = plt.figure(figsize=(12,5))
     for i_obv, obv in enumerate(['pk.ngc', 'gmf']): 
-        if obv == 'pk.ngc': 
-            Nref, ncomp, hrange = 2000, 30, [-0.5, 0.5] #[ 5., 7.]
-            #r'$D( \textbf{X}^\mathrm{mock} \parallel p_\mathrm{KDE}(\textbf{X}^\mathrm{mock}))$', 
-            #r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$', 
-            #r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \mathcal{N}({\bf C}))$',
-            lbls = [None, None,
-                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$',
-                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{GMM}(\textbf{X}_i^\mathrm{ICA}))$']
-            #'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp), 
-            fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pXi_ICA_scottKDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
-            hatches = [None, None, '//', '//']
+        if obv == 'pk.ngc': Nref, ncomp, hrange = 2000, 30, [-0.5, 0.4] 
+        elif obv == 'gmf': Nref, ncomp, hrange = 10000, 30, [-0.1, 0.2]
+        lbls = [None, None, 
+                r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$', 
+                r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$']
 
-        elif obv == 'gmf': 
-            Nref, ncomp, hrange = 10000, 20, [-0.1, 0.25]
-            # r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \mathcal{N}({\bf C}))$',
-            lbls = [None, None,
-                    r'$D( \textbf{X}^\mathrm{mock} \parallel p_\mathrm{KDE}(\textbf{X}^\mathrm{mock}))$', 
-                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$'] 
-            # 'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
-            fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_KDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp)]
-            hatches = [None, None, '//', '//']
+        fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp), 'pXi_ICA_scottKDE.K'+str(K)]
 
-        for i_div, div_func in enumerate(['kl', 'kl']): 
+        for i_div, div_func in enumerate(['renyi0.5', 'kl']): 
             divs = []  
             for f in fs: 
                 f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.', div_func, '.dat']) 
                 try: 
                     div = np.loadtxt(f_div)
                 except IOError: 
+                    print f_div
                     continue 
                 divs.append(div) 
          
-            nbins = 50
+            nbins = [50, 100]
             y_max = 0. 
             sub = fig.add_subplot(2,2,2*i_obv+i_div+1)
             for ii, div, lbl in zip(range(len(divs)), divs, lbls): 
-                hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
+                hh = np.histogram(div, normed=True, range=hrange, bins=nbins[i_obv])
                 bp = UT.bar_plot(*hh) 
-                if lbl is None: 
-                    sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
-                else: 
+                if ii == 2: 
+                    _lbls = [lbl, None]
                     sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], 
-                            facecolor='none', edgecolor=pretty_colors[2*ii], linewidth=2,
-                            alpha=0.75, hatch=hatches[ii], label=lbl) 
-                            #edgecolor='none'
+                            facecolor='none', hatch='//', edgecolor=pretty_colors[0], label=_lbls[i_obv]) 
+                elif ii == 3: 
+                    _lbls = [None, lbl]
+                    sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], 
+                            facecolor=pretty_colors[5], alpha=0.75, label=_lbls[i_obv]) 
+                else: 
+                    sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
                 y_max = max(y_max, bp[1].max()) 
             sub.set_xlim(hrange) 
             sub.set_ylim([0., y_max*1.4]) 
@@ -166,7 +153,9 @@ def div_nonGauss(K=10):
                     sub.text(0.075, 0.85, r'$P_\ell(k)$', ha='left', va='top', 
                         transform=sub.transAxes, fontsize=20)
             elif i_obv == 1: 
-                if div_func == 'kl': sub.set_xlabel(r'KL divergence', fontsize=20)
+                if div_func == 'kl': 
+                    sub.set_xlabel(r'KL divergence', fontsize=20)
+                    sub.legend(loc='upper right', prop={'size': 15})
                 elif div_func == 'renyi0.5': 
                     sub.set_xlabel(r'R\'enyi-$\alpha$ divergence', 
                         fontsize=20)
@@ -177,6 +166,81 @@ def div_nonGauss(K=10):
     fig.savefig(f_fig, bbox_inches='tight') 
     return None
 
+
+"""
+    def div_nonGauss(K=10):
+        ''' compare the renyi-alpha and KL divergence for the following  
+
+        - reference D( gauss(C_X) || gauss(C_X) ) 
+        - D( mock X || gauss(C_X))
+        - D( mock X || p(X) KDE)
+        - D( mock X || p(X) GMM) 
+        - D( mock X || PI p(X^i_ICA) KDE)
+        - D( mock X || PI p(X^i_ICA) GMM)
+        '''
+        pretty_colors = prettycolors() 
+        fig = plt.figure(figsize=(12,5))
+        for i_obv, obv in enumerate(['pk.ngc', 'gmf']): 
+            if obv == 'pk.ngc': Nref, ncomp, hrange = 2000, 30, [-0.5, 0.5] 
+            elif obv == 'gmf': Nref, ncomp, hrange = 10000, 30, [-0.1, 0.25]
+            lbls = [None, None, 
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{KDE}(\textbf{X}^\mathrm{mock}))$', 
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$', 
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$',
+                    r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{GMM}(\textbf{X}_i^\mathrm{ICA}))$']
+
+            fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_scottKDE.K'+str(K), 
+                    'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp),
+                    'pXi_ICA_scottKDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
+            hatches = [None, None, '//', '//', '//', '//']
+            # 'pXi_ICA_KDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp'+str(ncomp)] 
+            #fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), ]
+
+            for i_div, div_func in enumerate(['renyi0.5', 'kl']): 
+                divs = []  
+                for f in fs: 
+                    f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.', div_func, '.dat']) 
+                    try: 
+                        div = np.loadtxt(f_div)
+                    except IOError: 
+                        print f_div
+                        continue 
+                    divs.append(div) 
+             
+                nbins = 50
+                y_max = 0. 
+                sub = fig.add_subplot(2,2,2*i_obv+i_div+1)
+                for ii, div, lbl in zip(range(len(divs)), divs, lbls): 
+                    hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
+                    bp = UT.bar_plot(*hh) 
+                    if lbl is None: 
+                        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
+                    else: 
+                        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], 
+                                facecolor='none', edgecolor=pretty_colors[2*ii], linewidth=2,
+                                alpha=0.75, hatch=hatches[ii], label=lbl) 
+                                #edgecolor='none'
+                    y_max = max(y_max, bp[1].max()) 
+                sub.set_xlim(hrange) 
+                sub.set_ylim([0., y_max*1.4]) 
+
+                if i_obv == 0: 
+                    if i_div == 1: sub.legend(loc='upper right', ncol=2, prop={'size': 15})
+                    else: 
+                        sub.text(0.075, 0.85, r'$P_\ell(k)$', ha='left', va='top', 
+                            transform=sub.transAxes, fontsize=20)
+                elif i_obv == 1: 
+                    if div_func == 'kl': sub.set_xlabel(r'KL divergence', fontsize=20)
+                    elif div_func == 'renyi0.5': 
+                        sub.set_xlabel(r'R\'enyi-$\alpha$ divergence', 
+                            fontsize=20)
+                        sub.text(0.075, 0.85, r'$\zeta(N)$', ha='left', va='top', 
+                                transform=sub.transAxes, fontsize=20)
+        fig.subplots_adjust(wspace=.15, hspace=.2)
+        f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg_nonGauss.pdf'])
+        fig.savefig(f_fig, bbox_inches='tight') 
+        return None
+"""
 
 def Corner_updatedLike(tag_mcmc, tag_like, ichain): 
     ''' Corner plot with corrected likelihoods. Comparison between the 
@@ -309,46 +373,57 @@ def Like_GMF():
     w_pX = np.loadtxt(f_pX, skiprows=1, unpack=True, usecols=[2]) 
 
     wimps = [w_all, w_pX]
-    like_lbls = [r'$\mathcal{N}({\bf C}^{all})', r'$p_\mathrm{GMM}(\{\zeta^{m}\})$']
+    like_lbls = [r"$\mathcal{N}\left(\,\overline{\zeta},\,{\bf C}^{'} \right)$", 
+            r'$p_\mathrm{GMM}\left(\{\zeta^\mathrm{mock}\}\right)$']
 
     labels = ['logMmin', 'sig_logM', 'logM0', 'logM1', 'alpha']
     lbltex = [r'$\log M_\mathrm{min}$', r'$\sigma_{\log M}$', r'$\log M_0$', r'$\log M_1$', r'$\alpha$'] 
     prior_min = [11.2, 0.001, 6., 12.2, 0.6]
     prior_max = [12.2, 1., 14., 13., 1.2]
-    yrange = [[0.,4.], [0., 2.], [0., 0.3], [0., 7], [0., 10]]
-    nbin = 40 
+    yrange = [[0., 4.], [0., 2.], [0., 0.3], [0., 7], [0., 10]]
+    yticks = [[0.,2.,4.], [0., 0.5, 1., 1.5, 2.], [0., 0.1, 0.2, 0.3], [0., 2., 4., 6., 8.], [0., 4., 8., 12]]
+    nbin = 20 
     
-    fig = plt.figure(figsize=(5*len(labels), 4.5)) 
+    f_out = open(''.join([UT.tex_dir(), 'dat/gmf_likelihood.dat']), 'w') 
+    fig = plt.figure(figsize=(5*len(labels), 4)) 
     for i in range(len(labels)): 
         sub = fig.add_subplot(1, len(labels), i+1) 
         # original Beutler et al.(2017) constraints
         hh = np.histogram(chain[labels[i]][burnin], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
         bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], facecolor='k', alpha=0.5, edgecolor='none', 
-                label='Sinha et al.(2017)') 
+        lbls = [None, None, 'Sinha et al.(2017)', None, None]
+        sub.plot(bp[0], bp[1], c='k', lw=1, ls=':', label=lbls[i])  
+        low, med, high = np.percentile(chain[labels[i]][burnin], [15.86555, 50, 84.13445])
+        f_out.write(''.join(['# ', labels[i], ' Sinha et al. (2017)', '\n']))
+        f_out.write('\t'.join([str(round(low,5)), str(round(med,5)), str(round(high,5)), '\n']))
 
-        for wimp, like_lbl in zip(wimps, like_lbls): 
+        for iw, wimp, like_lbl in zip(range(len(wimps)), wimps, like_lbls): 
             wlim = np.percentile(wimp[burnin], 99.9)
             lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
             # importance weighted constraints
             hh = np.histogram(chain[labels[i]][lims], weights=wimp[lims],normed=True, bins=nbin, 
                     range=[prior_min[i], prior_max[i]])
             bp = UT.bar_plot(*hh) 
-            sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none', label=like_lbl+' (imp. sampl.)') 
-            # constraints 
-            low, med, high = np.percentile(chain[labels[i]], [15.86555, 50, 84.13445])
+            if iw == 0: lbls = [None, None, None, like_lbl, None]
+            else: lbls = [None, None, None, None, like_lbl]
+
+            sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none', label=lbls[i]) 
             low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
 
-            txt = ''.join(['S2017: $', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$; ', 
-                like_lbl, ': $', str(round(med_w,3)), '^{+', str(round(high_w-med_w,3)), '}_{-', str(round(med_w-low_w,3)), '}$']) 
-            sub.set_title(txt)
+            f_out.write(''.join(['# ', labels[i], ' ', like_lbl, '\n']))
+            f_out.write('\t'.join([str(round(low_w,5)), str(round(med_w,5)), str(round(high_w,5)), '\n']))
 
-        if i == 0: sub.legend(loc='upper right', prop={'size': 15})  # legend
+        f_out.write('\n') 
+        if i > 1: sub.legend(loc='upper right', prop={'size': 20})  # legend
         # x-axis 
         sub.set_xlim([prior_min[i], prior_max[i]]) 
-        sub.set_xlabel(lbltex[i], fontsize=25)
+        sub.set_xlabel(lbltex[i], labelpad=10, fontsize=25)
         # y-axis
         sub.set_ylim(yrange[i]) 
+        sub.set_yticks(yticks[i]) 
+
+    f_out.close() 
+    fig.subplots_adjust(wspace=.2)
     fig.savefig(''.join([UT.tex_dir(), 'figs/', 'Like_GMF_comparison.pdf']), bbox_inches='tight') 
     return None
    
@@ -372,10 +447,11 @@ def GMF_contours(tag_mcmc='manodeep'):
     w_pX = np.loadtxt(f_pX, skiprows=1, unpack=True, usecols=[2]) 
 
     wimps = [w_all, w_pX]
-    imp_lbls = [r'$\mathcal{N}({\bf C}^{\mathrm{all}\;\theta})$', r'$p_\mathrm{GMM}(\{\zeta^{m}\})$']
+    imp_lbls = [r"$\mathcal{N} \left(\,\overline{\zeta}, \,{\bf C}^{'} \right)$", #\mathrm{all}\;\theta})$', 
+            r'$p_\mathrm{GMM} \left(\{\zeta^\mathrm{mock}\} \right)$']
     imp_colors = ['#1F77B4', '#FF7F0E']
     imp_conts = [False, True]
-    imp_lws = [1, 0]
+    imp_lws = [1.25, 0]
 
     labels = ['logMmin', 'sig_logM', 'logM0', 'logM1', 'alpha']
     lbltex = [r'$\log M_\mathrm{min}$', r'$\sigma_{\log M}$', r'$\log M_0$', r'$\log M_1$', r'$\alpha$'] 
@@ -391,7 +467,7 @@ def GMF_contours(tag_mcmc='manodeep'):
             levels=[0.68, 0.95], bins=nbin, 
             range=[[prior_min[0], prior_max[0]], [prior_min[1], prior_max[1]]], 
             plot_datapoints=False, plot_density=False, fill_contours=False, smooth=1, 
-            contour_kwargs={'linewidths': 1, 'linestyles': 'dashed'}, ax=sub)
+            contour_kwargs={'linewidths': 0.5, 'linestyles': 'dotted'}, ax=sub)
     for wimp, imp_color, imp_cont, imp_lw in zip(wimps, imp_colors, imp_conts, imp_lws): 
         wlim = np.percentile(wimp[burnin], 99.9)
         lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
@@ -400,15 +476,16 @@ def GMF_contours(tag_mcmc='manodeep'):
                 range=[[prior_min[0], prior_max[0]], [prior_min[1], prior_max[1]]], 
                 plot_datapoints=False, plot_density=False, fill_contours=imp_cont, smooth=1,
                 contour_kwargs={'linewidths': imp_lw}, ax=sub)
-    sub.set_xlabel('log $M_\mathrm{min}$', fontsize=20) 
-    sub.set_ylabel('$\sigma_{\mathrm{log} M}$', fontsize=20) 
+    sub.set_xticks([11., 11.5, 12.])
+    sub.set_xlabel('log $M_\mathrm{min}$', labelpad=10, fontsize=20) 
+    sub.set_ylabel('$\sigma_{\mathrm{log} M}$', fontsize=25) 
     # log M_1 vs alpha 
     sub = fig.add_subplot(122)
     DFM.hist2d(chain['logM1'][burnin], chain['alpha'][burnin], color='k', 
             levels=[0.68, 0.95], bins=nbin, 
             range=[[prior_min[3], prior_max[3]], [prior_min[4], prior_max[4]]], 
             plot_datapoints=False, plot_density=False, fill_contours=False, smooth=1, 
-            contour_kwargs={'linewidths': 1, 'linestyles': 'dashed'}, ax=sub)
+            contour_kwargs={'linewidths': 0.5, 'linestyles': 'dotted'}, ax=sub)
 
     for wimp, imp_color, imp_cont, imp_lw in zip(wimps, imp_colors, imp_conts, imp_lws): 
         wlim = np.percentile(wimp[burnin], 99.9)
@@ -418,23 +495,25 @@ def GMF_contours(tag_mcmc='manodeep'):
                 range=[[prior_min[3], prior_max[3]], [prior_min[4], prior_max[4]]], 
                 plot_datapoints=False, plot_density=False, fill_contours=imp_cont, smooth=1,
                 contour_kwargs={'linewidths': imp_lw}, ax=sub)
-    sub.set_xlabel('log $M_1$', fontsize=20) 
-    sub.set_ylabel(r'$\alpha$', fontsize=20) 
+    sub.set_xlabel('log $M_1$', labelpad=10, fontsize=20) 
+    sub.set_yticks([0.5, 1., 1.5])
+    sub.set_ylabel(r'$\alpha$', fontsize=25) 
     
     legs = []
-    legs.append(mlines.Line2D([], [], ls='--', c='k', linewidth=2, label='Sinha+(2017)'))
+    legs.append(mlines.Line2D([], [], ls='--', c='k', linewidth=2, label='Sinha et al.(2017)'))
     for imp_lbl, imp_color in zip(imp_lbls, imp_colors): 
         legs.append(mlines.Line2D([], [], ls='-', c=imp_color, linewidth=5, alpha=0.5, label=imp_lbl))
     sub.legend(loc='upper right', handles=legs, frameon=False, fontsize=15)#, handletextpad=0.1)#, scatteryoffsets=[0.5])
+    fig.subplots_adjust(wspace=.275)
     fig.savefig(''.join([UT.tex_dir(), 'figs/', 
-        'GMFcontours.', tag_mcmc, '.pdf']), bbox_inches='tight') 
+        'GMFcontours_', tag_mcmc, '.pdf']), bbox_inches='tight') 
     return None
    
 
 if __name__=="__main__": 
     #div_Gauss(K=10)
-    div_nonGauss(K=10)
-    #Like_GMF()
+    #div_nonGauss(K=10)
+    Like_GMF()
     #GMF_contours()
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
