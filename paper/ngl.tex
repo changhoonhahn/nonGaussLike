@@ -111,7 +111,6 @@ simulations~\citep{rodriguez-torres2016, klypin2016}
 In total \cite{beutler2017} 
 
 
-
 %These mock catalogues have been calibrated to an N-body-based reference sample using approximate gravity solvers and analytical–statistical biasing models. The reference catalogue is extracted from one of the BigMultiDark simula- tions (Klypin et al. 2016), which used 38403 particles on a volume of (2.5 h−1 Mpc)3 assuming a  CDM cosmology
 %Halo abundance matching is used to reproduce the observed BOSS two- and three-point clustering measurements (Rodrguez- Torres et al. 2016). This technique is applied at different redshift bins to reproduce the BOSS DR12 redshift range. These mock cata- logues are combined into light cones, also accounting for selection effects and masking. In total, we have 2045 mock catalogues avail- able for the NGC and 2048 mock catalogues for the SGC.
 \bitem
@@ -130,37 +129,41 @@ ${\bf X} = \{{\bf X}_i\}$
 \section{Quantifying the Likelihood non-Gaussianity}
 In \cite{sellentin2017} \todo{discuss how sellentin and hartlap's stuff is an attempt to quantify the divergence} 
 
-One way of quantifying the non-Gaussianity of the likelihood is to 
-calculate the divergence between the distribution $p(x)$, which generated
-the observable, and $q(x)$ a multivariate Gaussian described by the average
-of the mocks and the covariance matrix ${\bf C}$.
-
-One of the most commonly used divergence is the Kullback-Leibler 
-(hereafter KL) divergence: 
+A more direct approach can be taken to quantify the non-Gaussianity of 
+the likelihood. We can calculate the divergence between the distribution 
+of our observable, $p(x)$, and $q(x)$ a multivariate Gaussian described 
+by the average of the mocks and the covariance matrix ${\bf C}$.
+The following are two of the most commonly used divergences: 
+the Kullback-Leibler (hereafter KL) divergence
 \beq \label{eq:kl} 
-D_{KL} ( p \parallel q ) = \int p(x)\,\log \frac{p(x)}{q(x)}\,{\rm d}x. 
+D_{KL} ( p \parallel q ) = \int p(x)\,\log \frac{p(x)}{q(x)}\,{\rm d}x
 \eeq
-Another is the R\'enyi-$\alpha$ divergence between $p(x)$ and $q(x)$:
+and the R\'enyi-$\alpha$ divergence
 \beq \label{eq:renyi}
 D_{R-\alpha} ( p \parallel q ) = \frac{1}{\alpha -1} \log \int p^\alpha(x) q^{1 -\alpha}(x)\,{\rm d}x. 
 \eeq
-We note that in the limit as $\alpha$ approaches 1, the R\'enyi-$\alpha$ 
-divergence is KL divergence.
-To evaluate the R\'enyi-$\alpha$ divergence, we need to evaluate the following
-kernel function
+In the limit as $\alpha$ approaches 1, the R\'enyi-$\alpha$ divergence is
+equivalent to the KL divergence.
+%To evaluate the R\'enyi-$\alpha$ divergence, we need to evaluate the following
+%kernel function
+%\beq \label{eq:d_alpha}
+%D_{\alpha} ( p \parallel q ) = \int p^\alpha(x) q^{1-\alpha}(x)\,{\rm d}x. 
+%\eeq
+
+Of course, in our case, we don't know $p(x)$ --- \emph{i.e.} the distribution of
+our observable. If we did, we would simply use that instead of bothering with 
+the covariance matrix or this paper. We can, however, still estimate the 
+divergence using nonparametric estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
+These estimators, allows us to estimate the divergence directly from 
+samples $X_{1:n} = \{ X_1, ... X_n \}$ and $Y_{1:m} = \{ Y_1, ... Y_m \}$ 
+drawn from $p$ and $q$ respectively: $\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m})$. 
+
+For instance, the estimator presented in \cite{poczos2012} allows us to estimate the kernel function 
+of the R\'enyi-$\alpha$ divergence,
 \beq \label{eq:d_alpha}
 D_{\alpha} ( p \parallel q ) = \int p^\alpha(x) q^{1-\alpha}(x)\,{\rm d}x. 
 \eeq
-
-Of course, in our case, we do not know $p(x)$. If we did, we would simply 
-use that instead of bothering with the covariance matrix or this paper. We can,
-however, still estimate the divergence by using nonparametric estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
-The estimator presented in 
-\cite{poczos2012}, which is based on $k$th nearest neighbor density estimators, 
-allows us to estimate the kernel function Eq.~\ref{eq:d_alpha} 
-directly from samples $X_{1:n} = \{ X_1, ... X_n \}$ and $Y_{1:m} = \{ Y_1, ... Y_m \}$ 
-drawn from $p$ and $q$ respectively: $\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m})$. 
-
+using $k$th nearest neighbor density estimators.
 Let $\rho_k(x)$ denote the Euclidean distance of the $k$th nearest neighbor 
 of $x$ in the sample $X_{1:n}$ and $\nu_k(x)$ denote the Euclidean distance 
 of the $k$th nearest neighbor of $x$ in the sample $Y_{1:m}$. Then 
@@ -170,13 +173,18 @@ $D_{\alpha}(p \parallel q)$ can be estimated as
 \sum\limits_{i=1}^{n} \left(\frac{\rho_k^{d}(X_i)}{\nu_k^{d}(X_i)} \right)^{1-\alpha},
 \eeq
 where $B_{k, \alpha} = \frac{\Gamma(k)^2}{\Gamma(k-\alpha+1)\Gamma(k+\alpha-1)}$. 
-\cite{poczos2012} proves that this estimator is asymptotically unbias, \emph{i.e.} 
+\cite{poczos2012} goes to further prove that this estimated kernel function
+is asymptotically unbias,
 \beq
-\lim_{n, m \rightarrow \infty} \mathbb{E} \big[ \hat{D}_{\alpha} (X_{1:n} \parallel Y_{1:m}) \big] = D_{\alpha} (p \parallel q). 
+\lim_{n, m \rightarrow \infty} \mathbb{E} \big[ \hat{D}_{\alpha} (X_{1:n} \parallel Y_{1:m}) \big] = D_{\alpha} (p \parallel q).
 \eeq
 Plugging $\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m})$ into Eq.~\ref{eq:renyi},
-we can estimate the R\'enyi-$\alpha$ divergence. A similar estimator~\citep{wang2009} 
-can also be used to estimate the KL divergence~(Eq.~\ref{eq:kl}). 
+we get an estimator for the R\'enyi-$\alpha$ divergence. A similar estimator~\citep{wang2009} 
+can also be derived for the KL divergence~(Eq.~\ref{eq:kl}). 
+We note that while the divergence estimators converge to the true divergence with a large
+enough samples, with a limited number of samples from the distribution, 
+the estimators are noisy. 
+
 These divergence estimates have been applied to Support Vector Machines and used 
 extensively in the machine learning and astronomical literature with great success 
 \todo{elaborate a lot more} 
@@ -186,18 +194,34 @@ extensively in the machine learning and astronomical literature with great succe
 For more details on the non-parametric divergence estimators, we refer readers to 
 \cite{poczos2012} and \cite{krishnamurthy2014}.
 
-In Figure~\ref{fig:div_nongauss} we compare the R\'enyi-$\alpha$ 
-(top) and $KL$ (bottom) divergence estimates 
-$D_{R\alpha}({\bf X}^\mathrm{mock} \parallel {\bf Y}^\mathrm{ref})$ and 
-$D_{KL}({\bf X}^\mathrm{mock} \parallel {\bf Y}^\mathrm{ref})$
+Now we can use the divergence estimators above to quantify the non-Gaussianity 
+of the likelihood. More specifically, we're intersted in the divergence between
+the distribution $p(x)$ sampled by the mock observables (${\bf X}^\mathrm{mock}$)
+and the multivariate Gaussian distribution assumed in standard analyses,
+which is solely described by the mean and covariance calculated from the mocks 
+($\mathcal{N}(\overline{{\bf X}^\mathrm{mock}}, {\bf C})$). Since
+${\bf X}^\mathrm{mock}$ is a sample from $p(x)$, we draw a reference sample 
+${\bf Y}^\mathrm{ref}$ from $\mathcal{N}(\overline{{\bf X}^\mathrm{mock}}, {\bf C}$ 
+to use in the estimators. Similar to the experiments detailed in \cite{poczos2012}, 
+we construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as ${\bf X}^\mathrm{mock}$:  
+$2000$ and $10,000$ for the $P_\ell$ and $\zeta$ analyses respectively. 
+
+
+In Figure~\ref{fig:div_nongauss} we compare the distribution of 
+R\'enyi-$\alpha$ (left) and $KL$ (right) divergence estimates (orange)
+$\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$
 between the mock data ${\bf X}^\mathrm{mock}$ and a reference sample 
-${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (left) and $\zeta(N)$ (right) analyses.
-${\bf Y}^\mathrm{ref}$ is drawn from a multivariate Gaussian distribution 
-described by the covariance matrix ${\bf C}$ --- 
-${\bf Y}^\mathrm{ref} \sim \mathcal{N}({\bf C})$. 
+${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (top) and $\zeta(N)$ (bottom) analyses.
+As a reference point for the comparison, we include in Figure~\ref{fig:div_nongauss} 
+(blue) the distribution of R\'enyi-$\alpha$ and $KL$ divergence estimates if 
+${\bf X}^\mathrm{mock}$ were actually sampled from $\mathcal{N}(\overline{{\bf X}^\mathrm{mock}}, {\bf C})$ 
+and ${\bf Y}^\mathrm{ref}$. All distributions were constructed using $100$ 
+divergence estimates. 
+
+The discrepancy between the blue and orange distributions illustrates the
+non-Gaussianity of $p(x)$ sampled by ${\bf X}^\mathrm{mock}$. 
 \bitem 
     \item Describe the discrepancy. 
-    \item Figure that compare $D_{R\alpha}({\bf X}^\mathrm{mock} \parallel {\bf Y}^\mathrm{ref})$
 \eitem
 
 \section{A More Accurate Likelihood} 
