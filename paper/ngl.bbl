@@ -2,6 +2,84 @@
 \providecommand\natexlab[1]{#1}
 \providecommand\JournalTitle[1]{#1}
 
+\bibitem[{Alam {et~al.}(2017)Alam, Ata, Bailey, Beutler, Bizyaev, Blazek,
+  Bolton, Brownstein, Burden, Chuang, Comparat, Cuesta, Dawson, Eisenstein,
+  Escoffier, Gil-Mar{\'\i}n, Grieb, Hand, Ho, Kinemuchi, Kirkby, Kitaura,
+  Malanushenko, Malanushenko, Maraston, McBride, Nichol, Olmstead, Oravetz,
+  Padmanabhan, Palanque-Delabrouille, Pan, Pellejero-Ibanez, Percival,
+  Petitjean, Prada, Price-Whelan, Reid, Rodr{\'\i}guez-Torres, Roe, Ross, Ross,
+  Rossi, Rubi{\~n}o-Mart{\'\i}n, Saito, Salazar-Albornoz, Samushia,
+  S{\'a}nchez, Satpathy, Schlegel, Schneider, Sc{\'o}ccola, Seo, Sheldon,
+  Simmons, Slosar, Strauss, Swanson, Thomas, Tinker, Tojeiro, Maga{\~n}a,
+  Vazquez, Verde, Wake, Wang, Weinberg, White, Wood-Vasey, Y{\`e}che, Zehavi,
+  Zhai, \& Zhao}]{alam2017}
+Alam, S., Ata, M., Bailey, S., {et~al.} 2017,
+  \href{http://dx.doi.org/10.1093/mnras/stx721}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 470, 2617}
+
+\bibitem[{Beutler {et~al.}(2017)Beutler, Seo, Saito, Chuang, Cuesta,
+  Eisenstein, Gil-Mar{\'\i}n, Grieb, Hand, Kitaura, Modi, Nichol, Olmstead,
+  Percival, Prada, S{\'a}nchez, Rodriguez-Torres, Ross, Ross, Schneider,
+  Tinker, Tojeiro, \& Vargas-Maga{\~n}a}]{beutler2017}
+Beutler, F., Seo, H.-J., Saito, S., {et~al.} 2017,
+  \href{http://dx.doi.org/10.1093/mnras/stw3298}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 466, 2242}
+
+\bibitem[{Dempster {et~al.}(1977)Dempster, Laird, \& Rubin}]{dempster1977}
+Dempster, A.~P., Laird, N.~M., \& Rubin, D.~B. 1977, \JournalTitle{Journal of
+  the Royal Statistical Society. Series B (Methodological)}, 39, 1
+
+\bibitem[{Grieb {et~al.}(2017)Grieb, S{\'a}nchez, Salazar-Albornoz,
+  Scoccimarro, Crocce, Dalla~Vecchia, Montesano, Gil-Mar{\'\i}n, Ross, Beutler,
+  Rodr{\'\i}guez-Torres, Chuang, Prada, Kitaura, Cuesta, Eisenstein, Percival,
+  Vargas-Maga{\~n}a, Tinker, Tojeiro, Brownstein, Maraston, Nichol, Olmstead,
+  Samushia, Seo, Streblyanska, \& Zhao}]{grieb2017}
+Grieb, J.~N., S{\'a}nchez, A.~G., Salazar-Albornoz, S., {et~al.} 2017,
+  \href{http://dx.doi.org/10.1093/mnras/stw3384}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 467, 2085}
+
+\bibitem[{Guo {et~al.}(2012)Guo, Zehavi, \& Zheng}]{guo2012}
+Guo, H., Zehavi, I., \& Zheng, Z. 2012,
+  \href{http://dx.doi.org/10.1088/0004-637X/756/2/127}{\JournalTitle{The
+  Astrophysical Journal}, 756, 127}
+
+\bibitem[{Hahn {et~al.}(2017)Hahn, Scoccimarro, Blanton, Tinker, \&
+  Rodr{\'\i}guez-Torres}]{hahn2017}
+Hahn, C., Scoccimarro, R., Blanton, M.~R., Tinker, J.~L., \&
+  Rodr{\'\i}guez-Torres, S.~A. 2017,
+  \href{http://dx.doi.org/10.1093/mnras/stx185}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 467, 1940}
+
+\bibitem[{Hartlap {et~al.}(2009)Hartlap, Schrabback, Simon, \&
+  Schneider}]{hartlap2009}
+Hartlap, J., Schrabback, T., Simon, P., \& Schneider, P. 2009,
+  \href{http://dx.doi.org/10.1051/0004-6361/200911697}{\JournalTitle{Astronomy
+  and Astrophysics}, 504, 689}
+
+\bibitem[{Kazin {et~al.}(2014)Kazin, Koda, Blake, Padmanabhan, Brough, Colless,
+  Contreras, Couch, Croom, Croton, Davis, Drinkwater, Forster, Gilbank,
+  Gladders, Glazebrook, Jelliffe, Jurek, Li, Madore, Martin, Pimbblet, Poole,
+  Pracy, Sharp, Wisnioski, Woods, Wyder, \& Yee}]{kazin2014}
+Kazin, E.~A., Koda, J., Blake, C., {et~al.} 2014,
+  \href{http://dx.doi.org/10.1093/mnras/stu778}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 441, 3524}
+
+\bibitem[{Kitaura {et~al.}(2015)Kitaura, Gil-Mar{\'\i}n, Sc{\'o}ccola, Chuang,
+  M{\"u}ller, Yepes, \& Prada}]{kitaura2015}
+Kitaura, F.-S., Gil-Mar{\'\i}n, H., Sc{\'o}ccola, C.~G., {et~al.} 2015,
+  \href{http://dx.doi.org/10.1093/mnras/stv645}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 450, 1836}
+
+\bibitem[{Kitaura \& He{\ss}(2013)}]{kitaura2013}
+Kitaura, F.-S., \& He{\ss}, S. 2013,
+  \href{http://dx.doi.org/10.1093/mnrasl/slt101}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 435, L78}
+
+\bibitem[{Kitaura {et~al.}(2014)Kitaura, Yepes, \& Prada}]{kitaura2014}
+Kitaura, F.-S., Yepes, G., \& Prada, F. 2014,
+  \href{http://dx.doi.org/10.1093/mnrasl/slt172}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 439, L21}
+
 \bibitem[{Kitaura {et~al.}(2016)Kitaura, Rodr{\'\i}guez-Torres, Chuang, Zhao,
   Prada, Gil-Mar{\'\i}n, Guo, Yepes, Klypin, Sc{\'o}ccola, Tinker, McBride,
   Reid, S{\'a}nchez, Salazar-Albornoz, Grieb, Vargas-Magana, Cuesta, Neyrinck,
@@ -10,6 +88,12 @@ Kitaura, F.-S., Rodr{\'\i}guez-Torres, S., Chuang, C.-H., {et~al.} 2016,
   \href{http://dx.doi.org/10.1093/mnras/stv2826}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 456, 4156}
 
+\bibitem[{Klypin {et~al.}(2016)Klypin, Yepes, Gottl{\"o}ber, Prada, \&
+  He{\ss}}]{klypin2016}
+Klypin, A., Yepes, G., Gottl{\"o}ber, S., Prada, F., \& He{\ss}, S. 2016,
+  \href{http://dx.doi.org/10.1093/mnras/stw248}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 457, 4340}
+
 \bibitem[{Krishnamurthy {et~al.}(2014)Krishnamurthy, Kandasamy, Poczos, \&
   Wasserman}]{krishnamurthy2014}
 Krishnamurthy, A., Kandasamy, K., Poczos, B., \& Wasserman, L. 2014,
@@ -17,10 +101,71 @@ Krishnamurthy, A., Kandasamy, K., Poczos, B., \& Wasserman, L. 2014,
   \href{http://arxiv.org/abs/1402.2966}{{\sffamily arXiv:1402.2966 [math,
   stat]}}
 
-\bibitem[{Poczos {et~al.}(2012)Poczos, Xiong, \& Schneider}]{poczos2012}
-Poczos, B., Xiong, L., \& Schneider, J. 2012, \JournalTitle{arXiv:1202.3758
-  [cs, stat]}, \href{http://arxiv.org/abs/1202.3758}{{\sffamily arXiv:1202.3758
-  [cs, stat]}}
+\bibitem[{Mohammed {et~al.}(2017)Mohammed, Seljak, \& Vlah}]{mohammed2017}
+Mohammed, I., Seljak, U., \& Vlah, Z. 2017,
+  \href{http://dx.doi.org/10.1093/mnras/stw3196}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 466, 780}
+
+\bibitem[{Norberg {et~al.}(2009)Norberg, Baugh, Gazta{\~n}aga, \&
+  Croton}]{norberg2009}
+Norberg, P., Baugh, C.~M., Gazta{\~n}aga, E., \& Croton, D.~J. 2009,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2009.14389.x}{\JournalTitle{Monthly
+  Notices of the Royal Astronomical Society}, 396, 19}
+
+\bibitem[{Ntampaka {et~al.}(2015)Ntampaka, Trac, Sutherland, Battaglia, Poczos,
+  \& Schneider}]{ntampaka2015}
+Ntampaka, M., Trac, H., Sutherland, D.~J., {et~al.} 2015,
+  \href{http://dx.doi.org/10.1088/0004-637X/803/2/50}{\JournalTitle{The
+  Astrophysical Journal}, 803, 50}
+
+\bibitem[{Ntampaka {et~al.}(2016)Ntampaka, Trac, Sutherland, Fromenteau,
+  Poczos, \& Schneider}]{ntampaka2016}
+---. 2016,
+  \href{http://dx.doi.org/10.3847/0004-637X/831/2/135}{\JournalTitle{The
+  Astrophysical Journal}, 831, 135}
+
+\bibitem[{Parkinson {et~al.}(2012)Parkinson, Riemer-S{\o}rensen, Blake, Poole,
+  Davis, Brough, Colless, Contreras, Couch, Croom, Croton, Drinkwater, Forster,
+  Gilbank, Gladders, Glazebrook, Jelliffe, Jurek, Li, Madore, Martin, Pimbblet,
+  Pracy, Sharp, Wisnioski, Woods, Wyder, \& Yee}]{parkinson2012}
+Parkinson, D., Riemer-S{\o}rensen, S., Blake, C., {et~al.} 2012,
+  \href{http://dx.doi.org/10.1103/PhysRevD.86.103518}{\JournalTitle{Physical
+  Review D}, 86, 103518}
+
+\bibitem[{Pinol {et~al.}(2017)Pinol, Cahn, Hand, Seljak, \& White}]{pinol2017}
+Pinol, L., Cahn, R.~N., Hand, N., Seljak, U., \& White, M. 2017,
+  \href{http://dx.doi.org/10.1088/1475-7516/2017/04/008}{\JournalTitle{Journal
+  of Cosmology and Astroparticle Physics}, 2017, 008}
+
+\bibitem[{P{\'o}czos {et~al.}(2012)P{\'o}czos, Xiong, Sutherland, \&
+  Schneider}]{poczos2012}
+P{\'o}czos, B., Xiong, L., Sutherland, D.~J., \& Schneider, J. 2012,
+  \href{http://dx.doi.org/10.1109/CVPR.2012.6248028}{in 2012 {{IEEE
+  Conference}} on {{Computer Vision}} and {{Pattern Recognition}}}, 2989
+
+\bibitem[{Rodr{\'\i}guez-Torres {et~al.}(2016)Rodr{\'\i}guez-Torres, Chuang,
+  Prada, Guo, Klypin, Behroozi, Hahn, Comparat, Yepes, Montero-Dorta,
+  Brownstein, Maraston, McBride, Tinker, Gottl{\"o}ber, Favole, Shu, Kitaura,
+  Bolton, Scoccimarro, Samushia, Schlegel, Schneider, \&
+  Thomas}]{rodriguez-torres2016}
+Rodr{\'\i}guez-Torres, S.~A., Chuang, C.-H., Prada, F., {et~al.} 2016,
+  \href{http://dx.doi.org/10.1093/mnras/stw1014}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 460, 1173}
+
+\bibitem[{Ross {et~al.}(2017)Ross, Beutler, Chuang, Pellejero-Ibanez, Seo,
+  Vargas-Maga{\~n}a, Cuesta, Percival, Burden, S{\'a}nchez, Grieb, Reid,
+  Brownstein, Dawson, Eisenstein, Ho, Kitaura, Nichol, Olmstead, Prada,
+  Rodr{\'\i}guez-Torres, Saito, Salazar-Albornoz, Schneider, Thomas, Tinker,
+  Tojeiro, Wang, White, \& Zhao}]{ross2017}
+Ross, A.~J., Beutler, F., Chuang, C.-H., {et~al.} 2017,
+  \href{http://dx.doi.org/10.1093/mnras/stw2372}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 464, 1168}
+
+\bibitem[{Sellentin {et~al.}(2017)Sellentin, Jaffe, \& Heavens}]{sellentin2017}
+Sellentin, E., Jaffe, A.~H., \& Heavens, A.~F. 2017,
+  \JournalTitle{arXiv:1709.03452 [astro-ph, stat]},
+  \href{http://arxiv.org/abs/1709.03452}{{\sffamily arXiv:1709.03452 [astro-ph,
+  stat]}}
 
 \bibitem[{Sinha {et~al.}(2017)Sinha, Berlind, McBride, Scoccimarro, Piscionere,
   \& Wibking}]{sinha2017}
@@ -28,5 +173,33 @@ Sinha, M., Berlind, A.~A., McBride, C.~K., {et~al.} 2017,
   \JournalTitle{arXiv:1708.04892 [astro-ph]},
   \href{http://arxiv.org/abs/1708.04892}{{\sffamily arXiv:1708.04892
   [astro-ph]}}
+
+\bibitem[{Slepian {et~al.}(2017)Slepian, Eisenstein, Brownstein, Chuang,
+  Gil-Mar{\'\i}n, Ho, Kitaura, Percival, Ross, Rossi, Seo, Slosar, \&
+  Vargas-Maga{\~n}a}]{slepian2017}
+Slepian, Z., Eisenstein, D.~J., Brownstein, J.~R., {et~al.} 2017,
+  \href{http://dx.doi.org/10.1093/mnras/stx488}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 469, 1738}
+
+\bibitem[{Tinker \& {et al.}(in preparation)}]{tinkerinpreparation}
+Tinker, J.~L., \& {et al.} in preparation
+
+\bibitem[{Vargas-Maga{\~n}a {et~al.}(2014)Vargas-Maga{\~n}a, Ho, Xu,
+  S{\'a}nchez, O'Connell, Eisenstein, Cuesta, Percival, Ross, Aubourg,
+  Brownstein, Escoffier, Kirkby, Manera, Schneider, Tinker, \&
+  Weaver}]{vargas-magana2014}
+Vargas-Maga{\~n}a, M., Ho, S., Xu, X., {et~al.} 2014,
+  \href{http://dx.doi.org/10.1093/mnras/stu1681}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 445, 2}
+
+\bibitem[{Wang {et~al.}(2009)Wang, Sanjeev, \& Sergio}]{wang2009}
+Wang, Q., Sanjeev, K., \& Sergio, V. 2009, \JournalTitle{IEEE TRANSACTIONS ON
+  INFORMATION THEORY}, 55, 2392
+
+\bibitem[{Zhao {et~al.}(2015)Zhao, Kitaura, Chuang, Prada, Yepes, \&
+  Tao}]{zhao2015}
+Zhao, C., Kitaura, F.-S., Chuang, C.-H., {et~al.} 2015,
+  \href{http://dx.doi.org/10.1093/mnras/stv1262}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 451, 4266}
 
 \end{thebibliography}

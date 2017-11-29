@@ -79,52 +79,72 @@ large-scale structure of universe
 
 
 \section{Mock Catalogs}
-Mock catalogs play a key role in standard cosmological anslyses of LSS 
-studies. They're extensively used for testing analysis 
-pipelines~\cite[(mock challenege papers)][]{beutler2017}, 
-testing the effect of systematics~\citep{hahn2017}, and, most relevantly 
-for this paper, for estimating the covariance matrix used in evaluating 
-the likelihood for parameter inference~\citep[cite the bunch of other papers][]{beutler2017}.
+Mock catalogs are play an indispensable role in standard cosmological 
+anslyses of LSS studies. They're used for testing analysis 
+pipelines~\citep[][]{beutler2017, grieb2017, tinkerinpreparation}, 
+testing the effect of systematics~\citep{guo2012, vargas-magana2014, hahn2017, pinol2017, ross2017}, 
+and, most relevantly for this paper, estimating the covariance 
+matrix~\citep[][]{parkinson2012, kazin2014, grieb2017, alam2017, beutler2017, sinha2017}. 
+In fact, nearly all current state-of-the-art LSS analyses use
+covariance matrices estimated from mocks to evaluate the likelihood 
+for parameter inference. 
 
-Maybe a little paragraph about the advantages of covariance matrices from 
-mocks versus analytic? 
+While some argue for analytic estimates of the covariance 
+matrix~\citep[e.g.][]{mohammed2017} or estimates directly from data
+by subsampling~\citep[e.g.][]{norberg2009}, covariance matrices 
+estimated from mocks have a number of advantages. Mock catalogs
+allow us to incorporate detailed systematic errors present in the 
+data and variance beyond the volume of the data. Even for analytic 
+estimates, large ensembles of mocks are crucial for validataion~\citep{slepian2017}. 
+Moreover, as we show later in this paper, mock catalogs allow us to 
+quantify the non-Gaussianity of the likelihood and construct a 
+more accurate estimate of the true likelihood. 
 
-Our primary goal in this paper is to test the Gaussian likelihood assumption 
-in two LSS analyses: the powerspectrum multipole full shape analysis of \cite{beutler2017} 
-and group multiplicity function analysis of \cite{sinha2017}. Throughout
-the paper we will make extensive use of the mock catalogs used in these 
-analyses. Below, in this section, we give a brief description of these mocks. 
+In this paper, we we focus on two LSS analyses: the powerspectrum 
+multipole full shape analysis of \cite{beutler2017} and group multiplicity 
+function analysis of \cite{sinha2017}. Throughout the paper we will 
+make extensive use of same the mock catalogs used in these analyses. 
+Below, in this section, we give a brief description of these mocks. 
 
 \subsection{MultiDark-PATCHY~Mock Catalog} 
 In their powerspectrum multipole full shape analysis, \cite{beutler2017}
 use the MultiDark-\patchy~mock catalogs from \cite{kitaura2016}. 
+These mocks are generated using the \patchy~code \citep{kitaura2014,kitaura2015}. 
+They rely on large-scale density fields generated using augmented
+Lagrangian Perturbation Theory~\citep[ALPT][]{kitaura2013} on a mesh.
+This mesh is then populated with galaxies based on a combined non-linear
+deterministic and stochastic biases. The mocks from the \patchy code 
+are then calibrated to reproduce the galaxy clustering in the 
+high-fidelity BigMultiDark $N$-body simulation~\citep{rodriguez-torres2016, klypin2016}. 
+
+The galaxies are then assigned stellar masses using the 
+{\fontshape\scdefault\selectfont hadron}~code~\citep{zhao2015}.
+And the {\fontshape\scdefault\selectfont sugar}~code~\citep{rodriguez-torres2016} 
+is applied to combine different boxes, incorporate selection
+effects and masking to produce mock light-cone galaxy catalogs. 
+The statistics of the resultng mocks are then compared to 
+observations and the process is iterated to reach desired 
+accuracy. We refer readers to~\cite{kitaura2016} for further 
+details. 
+
+In total, \cite{kitaura2016} generated a 12,228 mock light-cone 
+galaxy catalogs for BOSS Data Release 12: 2048 for each southern 
+and northern galactic caps of LOWZ, CMASS, combined samples. 
+In \cite{beutler2017}, they use 2045 and 2048 for the northern 
+galactic cap (NGC) and souther galactic cap (SGC) of the LOWZ+CMASS
+combined sample. \cite{beutler2017} excluded 3 mock realizations, 
+due to notable issues, which have been since been addressed. Therefore, 
+in our analysis we use all 2048 mocks for both the NGC and SGC of 
+the LOWZ+CMASS combined sample.
+
+\subsection{\cite{sinha2017} Mocks}
 
 
-The dark matter fields for these mocks are generated using approxiate
-gravity solvers on a mesh. 
-
-
-\todo{something about the approximate gravity solver} 
-These mock catalogs have been calibrated to high fidelity BigMultiDark 
-simulations~\citep{rodriguez-torres2016, klypin2016}
-
-In total \cite{beutler2017} 
-
-
-%These mock catalogues have been calibrated to an N-body-based reference sample using approximate gravity solvers and analytical–statistical biasing models. The reference catalogue is extracted from one of the BigMultiDark simula- tions (Klypin et al. 2016), which used 38403 particles on a volume of (2.5 h−1 Mpc)3 assuming a  CDM cosmology
-%Halo abundance matching is used to reproduce the observed BOSS two- and three-point clustering measurements (Rodrguez- Torres et al. 2016). This technique is applied at different redshift bins to reproduce the BOSS DR12 redshift range. These mock cata- logues are combined into light cones, also accounting for selection effects and masking. In total, we have 2045 mock catalogues avail- able for the NGC and 2048 mock catalogues for the SGC.
-\bitem
-    \item 2048 mocks for both north and south 
-    \item Note that 3 mocks were fixed
-\eitem
-
-\subsection{\cite{sinha2017} Mock Catalog}
-
-\subsection{}
+\subsection{${\bf X}^\mathrm{mock}$ and }
+\todo{talk about the data whitening and what we mean by covariance matrix for GMF}
 ${\bf X}_i = [P_0(k)_i,P_2(k)_i,P_4(k)_i]$ \\
 ${\bf X}_i = \zeta(N)_i$ \\ 
 ${\bf X} = \{{\bf X}_i\}$
-
 
 \section{Quantifying the Likelihood non-Gaussianity}
 In \cite{sellentin2017} \todo{discuss how sellentin and hartlap's stuff is an attempt to quantify the divergence} 
