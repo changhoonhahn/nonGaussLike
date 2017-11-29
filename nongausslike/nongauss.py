@@ -109,10 +109,12 @@ def lnL_pX(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit='bic'
     X, mu_X = meansub(X_mock)
     X_w, W = whiten(X) # whiten data 
 
-    return lnp_Xw(X_w, x=delta_X, method=density_method, n_comp_max=n_comp_max, info_crit=info_crit, njobs=njobs)
+    return lnp_Xw(X_w, x=delta_X, method=density_method, n_comp_max=n_comp_max, 
+            info_crit=info_crit, njobs=njobs)
     
 
-def lnL_pXi_ICA(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit='bic', njobs=1): 
+def lnL_pXi_ICA(delta_X, X_mock, ica_algorithm='deflation', 
+        density_method='gmm', n_comp_max=20, info_crit='bic', njobs=1): 
     ''' Given delta_X = observed X - model X, and data matrix
     X from mocks, estimate the log likelihood using a `density_method`
     (gmm or gkde) fit of p(X_mock_i,ICA) for each componenet.
@@ -126,7 +128,8 @@ def lnL_pXi_ICA(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit=
     '''
     X, mu_X = meansub(X_mock) # mean subtract
     X_w, W = whiten(X) # whitened data
-    X_ica, W_ica = Ica(X_w) # get ICA transformation 
+    # get ICA transformation using specified algorithm
+    X_ica, W_ica = Ica(X_w, algorithm=ica_algorithm) 
 
     if len(delta_X.shape) == 1: 
         x_obv = np.dot(np.dot(delta_X, W), W_ica) # whiten, and ica transform observd pk
@@ -145,72 +148,6 @@ def lnL_pXi_ICA(delta_X, X_mock, density_method='gmm', n_comp_max=20, info_crit=
         lnp_Xica += lnp_Xw_i(X_ica, i, x=x_obv_i, method=density_method, n_comp_max=n_comp_max, 
                 info_crit=info_crit, njobs=njobs)
     return lnp_Xica 
-
-
-def lnL_ica(delta_pk, Pk, component_wise=True, density_method='gkde', n_comp_max=10):
-    ''' Given 'observed' delta P(k) (a.k.a. P(k) observed - model P(k)) 
-    and mock P(k) data, calculate the ICA log likelihood estimate.
-    '''
-    X, mu_X = meansub(Pk) # mean subtract
-    X_w, W = whiten(X) # whitened data
-    X_ica, W_ica = Ica(X_w) # get ICA transformation 
-    
-    if len(delta_pk.shape) == 1: 
-        x_obv = np.dot(np.dot(delta_pk, W), W_ica) # whiten, and ica transform observd pk
-        if component_wise: p_Xica = 0. 
-    else: 
-        x_obv = np.zeros(delta_pk.shape)
-        for i_obv in range(delta_pk.shape[0]):
-            x_obv[i_obv,:] = np.dot(np.dot(delta_pk[i_obv,:], W), W_ica)
-        if component_wise: p_Xica = np.zeros(delta_pk.shape[0]) 
-
-    if component_wise: 
-        for i in range(X_ica.shape[1]):
-            if len(delta_pk.shape) == 1: 
-                x_obv_i = x_obv[i]
-            else: 
-                x_obv_i = x_obv[:,i]
-            p_Xica += np.log(p_Xw_i(X_ica, i, x=x_obv_i, method=density_method, n_comp_max=n_comp_max))
-    else: 
-        p_Xica = np.log(p_Xw(X_ica, x=x_obv, method=density_method, n_comp_max=n_comp_max))
-    return p_Xica
-
-
-def lnL_pca(delta_pk, Pk, component_wise=True, density_method='gkde', n_comp_max=10): 
-    ''' Gaussian pseudo-likelihood calculated using PCA decomposition -- 
-    i.e. the data vector is decomposed in PCA components so that
-    L = p(x_pca,0)p(x_pca,1)...p(x_pca,n). Each p(x_pca,i) is estimated by 
-    gaussian KDE of the PCA transformed mock data. 
-    
-    Notes
-    -----
-    - This estimates the Gaussian functional pseudo-likelihood. Its main 
-    use is to quantify the impact of the nonparametric density estimation 
-    (e.g. the KDE).
-    '''
-    X, mu_X = meansub(Pk) # mean subtract
-    X_pca, W_pca = whiten(X, method='pca') # whitened data
-    
-    if len(delta_pk.shape) == 1: 
-        # PCA transform delta_pk 
-        x_obv = np.dot(delta_pk, W_pca) 
-        if component_wise: p_Xpca = 0. 
-    else: 
-        x_obv = np.zeros(delta_pk.shape)
-        for i_obv in range(delta_pk.shape[0]):
-            x_obv[i_obv,:] = np.dot(delta_pk[i_obv,:], W_pca)
-        if component_wise: p_Xpca = np.zeros(delta_pk.shape[0]) 
-    
-    if component_wise: 
-        for i in range(X_pca.shape[1]):
-            if len(delta_pk.shape) == 1: 
-                x_obv_i = x_obv[i]
-            else: 
-                x_obv_i = x_obv[:,i]
-            p_Xpca += np.log(p_Xw_i(X_pca, i, x=x_obv_i, method=density_method, n_comp_max=n_comp_max))
-    else: 
-        p_Xpca = np.log(p_Xw(X_pca, x=x_obv, method=density_method, n_comp_max=n_comp_max))
-    return p_Xpca
 
 
 def lnL_pca_gauss(delta_pk, Pk): 
@@ -242,49 +179,22 @@ def lnL_pca_gauss(delta_pk, Pk):
     return np.log(ggg.pdf(x_obv))
 
 
-def lnL_gauss(pk_obv, Pk): 
-    ''' *** Some silly issues with the offset that I don't want to deal with...***
-    Given 'observed' P(k)  and mock P(k) data, calculate the log pseudo-likelihood 
-    *with* Gaussian functional form assumption. 
-    '''
-    X, mu_X = meansub(Pk) # mean subtract
-
-    C_X = np.cov(X) 
-    
-    ggg = multinorm(np.zeros(len(mu_X)), C_X)
-
-    #offset = 0.5 * np.float(pk_obv.shape[0]) * np.log(2.*np.pi) + 0.5 * np.log(np.linalg.det(C_X))
-    
-    if len(pk_obv.shape) == 1: 
-        return np.log(ggg.pdf(pk_obv - mu_X))
-        #return -0.5 * np.sum(np.dot(x, np.linalg.solve(C_X, x))) - offset
-    else: 
-        lnL = np.zeros(pk_obv.shape[1])
-        for i in range(pk_obv.shape[1]):
-            lnL[i] = np.log(ggg.pdf(pk_obv[:,i] - mu_X))
-            #lnL[i] = -0.5 * np.sum(np.dot(x, np.linalg.solve(C_X, x)))
-        return lnL #- offset
-
-
 def Ica(X, algorithm='deflation', whiten=False, **ica_kwargs): 
     ''' Given mean subtracted and whitened data (presumably non-whitened data should work), 
     input data should be in N_mock x N_k form. returns ICA transformed data and unmixing matrix.
+
+    Reference 
+    --------- 
+    - Hyvarinen A. (2001)
+    - Hyvarinen A., Oja E. (2000)
     '''
     n_comp = X.shape[1] # number of ICA components 
 
-    ica = FastICA(n_components=n_comp, algorithm=algorithm, whiten=whiten, **ica_kwargs)
+    ica = FastICA(n_components=n_comp, algorithm=algorithm, whiten=whiten, max_iter=1000, 
+            **ica_kwargs)
     X_ica = ica.fit_transform(X)
     # X_ica = np.dot(X, ica.components_.T) 
     return X_ica, ica.components_.T
-
-
-def MISE(Xis, b=0.1): 
-    ''' Compare histogram of Xi's to normal distribution by calculating the 
-    Mean integrated squared error (just L2) from Sellentin & Heavens. 
-    '''
-    nbin = int(10./b)
-    hb_Xi, Xi_edges = np.histogram(Xis, bins=nbin, range=[-5., 5.], normed=True) 
-    return np.sum((hb_Xi - UT.gauss(0.5*(Xi_edges[1:] + Xi_edges[:-1]), 1., 0.))**2)/np.float(nbin)
 
 
 def p_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10): 
@@ -321,7 +231,7 @@ def lnp_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10, info_crit='bic', 
             if len(i_bins) != len(x): raise ValueError 
     else: x = [x] 
 
-    pdfs = []
+    lnpdfs = []
     for ii, i_bin in enumerate(i_bins): 
         if method == 'gmm': 
             # find best fit component using information criteria (BIC/AIC)
@@ -336,7 +246,9 @@ def lnp_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10, info_crit='bic', 
                     ics.append(gmm.aic(X_w[:,i_bin]))
             ibest = np.array(ics).argmin() # lower the better!
             kern = gmms[ibest]
-        elif method == 'kde': 
+        elif method == 'kde': # simple scott's rule KDE 
+            kern = UT.KayDE(X_w[:,i_bin])
+        elif method == 'gkde': 
             # find the best fit bandwidth using cross-validation grid search  
             t0 = time.time()
             grid = GridSearchCV(skKDE(),
@@ -346,8 +258,11 @@ def lnp_Xw_i(X_w, i_bins, x=None, method='kde', n_comp_max=10, info_crit='bic', 
             kern = grid.best_estimator_
             dt = time.time() - t0 
             print('%f sec' % dt) 
-        pdfs.append(kern.score_sample(x[ii][:,None]))  
-    return pdfs 
+        lnpdfs.append(kern.score_sample(x[ii][:,None]))  
+    if len(i_bins) == 1: 
+        return np.array(lnpdfs[0])
+    else: 
+        return np.array(lnpdfs)
 
 
 def lnp_Xw(X_w, x=None, method='gmm', n_comp_max=10, info_crit='bic', njobs=1): 
@@ -371,6 +286,8 @@ def lnp_Xw(X_w, x=None, method='gmm', n_comp_max=10, info_crit='bic', njobs=1):
         ibest = np.array(ics).argmin() # lower the better!
         kern = gmms[ibest]
     elif method == 'kde': 
+        kern = UT.KayDE(X_w)
+    elif method == 'gkde': 
         # find the best fit bandwidth using cross-validation grid search  
         grid = GridSearchCV(skKDE(),
                 {'bandwidth': np.linspace(0.1, 1.0, 30)},
@@ -382,25 +299,6 @@ def lnp_Xw(X_w, x=None, method='gmm', n_comp_max=10, info_crit='bic', njobs=1):
         return kern.score_samples(x[:,None]) 
     else: 
         return kern.score_samples(x) 
-
-
-def GMM_pdf(gmm_obj): 
-    ''' Return a function that will evaluate the pdf of the GMM 
-    given sklearn.mixture.GaussianMixture object
-    '''
-    ws = gmm_obj.weights_
-    mus = gmm_obj.means_
-    cov = gmm_obj.covariances_
-
-    ndim = mus[0].shape[0] # number of dimensions
-    ncomp = mus.shape[0]
-
-    def pdf(xx):  
-        pdfx = 0.
-        for icomp in range(ncomp):
-            pdfx += ws[icomp]*multinorm.pdf(xx, mean=mus[icomp], cov=cov[icomp])
-        return pdfx
-    return pdf 
 
 
 def whiten(X, method='choletsky', hartlap=False): 

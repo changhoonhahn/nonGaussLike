@@ -46,8 +46,11 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
             'pX_KDE', 'pX_KDE_ref', 
             'pX_scottKDE', 'pX_scottKDE_ref', 
             'pXi_ICA_GMM', 'pXi_ICA_GMM_ref', 
+            'pXi_parICA_GMM', 'pXi_parICA_GMM_ref', 
             'pXi_ICA_KDE', 'pXi_ICA_KDE_ref',
-            'pXi_ICA_scottKDE', 'pXi_ICA_scottKDE_ref']: 
+            'pXi_parICA_KDE', 'pXi_parICA_KDE_ref',
+            'pXi_ICA_scottKDE', 'pXi_ICA_scottKDE_ref',
+            'pXi_parICA_scottKDE', 'pXi_parICA_scottKDE_ref']: 
         raise ValueError
     str_obvs = ''
     if obvs == 'pk': str_obvs = '.'+NorS
@@ -59,7 +62,8 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
     str_comp = ''
     if 'GMM' in diver: str_comp = '.ncomp'+str(n_comp_max) 
 
-    f_dat = ''.join([UT.dat_dir(), 'diverg.', obvs, str_obvs, '.', diver, '.K', str(K), str_comp, 
+    f_dat = ''.join([UT.dat_dir(), 'diverg/', 
+        'diverg.', obvs, str_obvs, '.', diver, '.K', str(K), str_comp, 
         '.Nref', str(Nref), '.', str_div, '.dat'])
     if not os.path.isfile(f_dat): 
         print('-- writing to -- \n %s' % f_dat)
@@ -82,8 +86,12 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
 
     X_mock_meansub, _ = NG.meansub(X_mock) # mean subtract
     X_w, W = NG.whiten(X_mock_meansub)
-    if 'ICA' in diver: 
+    if '_ICA' in diver: 
         X_ica, W_ica = NG.Ica(X_w)  # ICA transformation 
+        W_ica_inv = sp.linalg.pinv(W_ica.T) 
+    elif '_parICA' in diver: 
+        # FastICA transformation using parallel algorithm
+        X_ica, W_ica = NG.Ica(X_w, algorithm='parallel')  
         W_ica_inv = sp.linalg.pinv(W_ica.T) 
 
     if diver in ['pX_gauss', 'ref']: 
@@ -112,7 +120,7 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
         kern_kde = UT.KayDE(X_w)
         dt = time.time() - t0 
         print('%f sec' % dt) 
-    elif diver in ['pXi_ICA_GMM', 'pXi_ICA_GMM_ref']:
+    elif diver in ['pXi_ICA_GMM', 'pXi_ICA_GMM_ref', 'pXi_parICA_GMM', 'pXi_parICA_GMM_ref']:
         # PI p(X^i_ICA) GMM
         kern_gmm_ica = [] 
         for ibin in range(X_ica.shape[1]): 
@@ -124,7 +132,8 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
                 bics.append(gmm.bic(X_ica[:,ibin][:,None]))
             ibest = np.array(bics).argmin() 
             kern_gmm_ica.append(gmms[ibest])
-    elif diver in ['pXi_ICA_KDE', 'pXi_ICA_KDE_ref']:
+    elif diver in ['pXi_ICA_KDE', 'pXi_ICA_KDE_ref', 
+            'pXi_parICA_KDE', 'pXi_parICA_KDE_ref']:
         # PI p(X^i_ICA) KDE  
         kern_kde_ica = [] 
         for ibin in range(X_ica.shape[1]): 
@@ -136,7 +145,8 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
             kern_kde_ica.append(grid.best_estimator_) 
             dt = time.time() - t0 
             print('%f sec' % dt) 
-    elif diver in ['pXi_ICA_scottKDE', 'pXi_ICA_scottKDE_ref']:
+    elif diver in ['pXi_ICA_scottKDE', 'pXi_ICA_scottKDE_ref',
+            'pXi_parICA_scottKDE', 'pXi_parICA_scottKDE_ref']:
         # PI p(X^i_ICA) KDE  
         kern_kde_ica = [] 
         for ibin in range(X_ica.shape[1]): 
@@ -173,10 +183,11 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
             div_i = NG.kNNdiv_Kernel(samp, kern_kde, Knn=K, div_func=div_func, 
                     Nref=Nref, compwise=False, njobs=njobs) 
             divs.append(div_i)
-        elif diver == 'pXi_ICA_GMM': # D( mock X || PI p(X^i_ICA) GMM), 
+        elif diver in ['pXi_ICA_GMM', 'pXi_parICA_GMM']: # D( mock X || PI p(X^i_ICA) GMM), 
             div_i = NG.kNNdiv_Kernel(X_w, kern_gmm_ica, Knn=K, div_func=div_func, 
                     Nref=Nref, compwise=True, njobs=njobs, W_ica_inv=W_ica_inv)
-        elif diver == 'pXi_ICA_GMM_ref': # D( ref. sample || PI p(X^i_ICA) GMM), 
+        elif diver in ['pXi_ICA_GMM_ref', 'pXi_parICA_GMM_ref']: 
+            # D( ref. sample || PI p(X^i_ICA) GMM), 
             samp = np.zeros((n_mock, X_ica.shape[1]))
             for icomp in range(X_ica.shape[1]): 
                 samp_i = kern_gmm_ica[icomp].sample(n_mock)
@@ -184,10 +195,13 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
             samp = np.dot(samp, W_ica_inv.T)
             div_i = NG.kNNdiv_Kernel(samp, kern_gmm_ica, Knn=K, div_func=div_func, 
                     Nref=Nref, compwise=True, njobs=njobs, W_ica_inv=W_ica_inv)
-        elif diver in ['pXi_ICA_KDE', 'pXi_ICA_scottKDE']: # D( mock X || PI p(X^i_ICA) KDE), 
+        elif diver in ['pXi_ICA_KDE', 'pXi_ICA_scottKDE', 
+                'pXi_parICA_KDE', 'pXi_parICA_scottKDE']: # D( mock X || PI p(X^i_ICA) KDE), 
             div_i = NG.kNNdiv_Kernel(X_w, kern_kde_ica, Knn=K, div_func=div_func, 
                     Nref=Nref, compwise=True, njobs=njobs, W_ica_inv=W_ica_inv)
-        elif diver in ['pXi_ICA_KDE_ref', 'pXi_ICA_scottKDE_ref']: # D( ref sample || PI p(X^i_ICA) KDE), 
+        elif diver in ['pXi_ICA_KDE_ref', 'pXi_ICA_scottKDE_ref', 
+                'pXi_parICA_KDE_ref', 'pXi_parICA_scottKDE_ref']: 
+            # D( ref sample || PI p(X^i_ICA) KDE), 
             samp = np.zeros((n_mock, X_ica.shape[1]))
             for icomp in range(X_ica.shape[1]): 
                 samp_i = kern_kde_ica[icomp].sample(n_mock)

@@ -30,6 +30,139 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
+def div_ICA(obv='pk.ngc', K=10, div_func='kl'):
+    ''' compare the KL or Renyi divergence for different ICA decomposition algorithms 
+    FastICA deflation, FastICA parallel, Infomax ICA 
+    - D( mock X || PI p(X^i_ICA) KDE)
+    - D( mock X || PI p(X^i_ICA) GMM)
+    '''
+    if obv == 'pk.ngc':  str_obv = 'P(k)'
+    elif obv == 'gmf': str_obv = '\zeta(N)'
+    lbls = [r'$D( '+str_obv+' \parallel \prod_i p_\mathrm{KDE}(P(k)_i^\mathrm{ICA}))$', 
+            r'$D( '+str_obv+' \parallel \prod_i p_\mathrm{GMM}(P(k)_i^\mathrm{ICA}))$']
+
+    icas = ['ICA', 'parICA'] 
+
+    if obv == 'pk.ngc': 
+        Nref = 2000
+        hrange = [-0.5, 0.5]
+    elif obv == 'gmf': 
+        Nref = 10000
+        hranges = [-0.1, 0.4]
+
+    fig = plt.figure(figsize=(10,4))
+    bkgd = fig.add_subplot(111, frameon=False)
+    for i_div, str_div in enumerate(['scottKDE.K'+str(K), 'GMM.K'+str(K)+'.ncomp30']): 
+
+        divs = []
+        for ica in icas: 
+            f_div = ''.join([UT.dat_dir(), 'diverg.', obv, 
+                '.pXi_', ica, '_', str_div, '.Nref', str(Nref), '.', div_func, '.dat']) 
+            try: 
+                div = np.loadtxt(f_div)
+            except IOError: 
+                print f_div
+                continue 
+            divs.append(div) 
+
+        nbins = 50
+        sub = fig.add_subplot(1,2,i_div+1)
+        y_max = 0. 
+        for div, ica in zip(divs, icas): 
+            print np.mean(div)
+            hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
+            bp = UT.bar_plot(*hh) 
+            sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', label=ica) 
+            y_max = max(y_max, bp[1].max()) 
+        if i_div == 0: sub.legend(loc='upper left', prop={'size': 20}) 
+        sub.set_xlim(hrange)  
+        sub.set_ylim([0., y_max*1.4]) 
+        sub.set_title(lbls[i_div]) 
+
+    if div_func == 'kl': 
+        bkgd.set_xlabel(r'KL divergence', fontsize=20, labelpad=20)
+    elif div_func == 'renyi0.5': 
+        bkgd.set_xlabel(r'R\'enyi-$\alpha$ divergence', fontsize=20, labelpad=20)
+    bkgd.set_xticklabels([])
+    bkgd.set_yticklabels([])
+    bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+
+    fig.subplots_adjust(wspace=.15, hspace=0.3)
+    f_fig = ''.join([UT.fig_dir(), 'tests/',
+        'ICA_kNNdiverg.', obv, '.K', str(K), '.', div_func, '.png'])
+    fig.savefig(f_fig, bbox_inches='tight') 
+    return None
+
+
+def div_K(div_func='kl'):
+    ''' compare the KL or Renyi divergence for the following with their using different K values 
+    - D( gauss(C_X) || gauss(C_X) ) 
+    - D( mock X || gauss(C_X))
+    - D( mock X || p(X) KDE)
+    - D( mock X || p(X) GMM) 
+    - D( mock X || PI p(X^i_ICA) KDE)
+    - D( mock X || PI p(X^i_ICA) GMM)
+    '''
+    lbls = [r'$D( P(k) \parallel \mathcal{N}({\bf C}))$',
+            r'$D( P(k) \parallel p_\mathrm{KDE}(P(k)))$',
+            r'$D( P(k) \parallel p_\mathrm{GMM}(P(k)))$',
+            r'$D( P(k) \parallel \prod_i p_\mathrm{KDE}(P(k)_i^\mathrm{ICA}))$', 
+            r'$D( P(k) \parallel \prod_i p_\mathrm{GMM}(P(k)_i^\mathrm{ICA}))$']
+
+    fig = plt.figure(figsize=(20,4))
+    for i_obv, obv in enumerate(['pk.ngc', 'gmf']):
+        if obv == 'pk.ngc': 
+            Nref = 2000
+            if div_func == 'kl': hranges = [[-0.5, 0.5], [-0.5, 7.], [-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]##7.]
+            else: hranges = [[-0.5, 0.5] for i in range(5)]
+            Ks = [5, 10, 15] 
+        elif obv == 'gmf': 
+            Nref = 10000
+            hranges = [[-0.1, 0.4], [-0.1, 0.4], [-0.1, 0.4], [-0.1, 0.4], [-0.1, 0.4]]##7.]
+            Ks = [10] 
+
+        for K in Ks: 
+            fs = ['pX_gauss.K'+str(K), 'pX_scottKDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp30', 
+                'pXi_ICA_scottKDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
+            divs, divs_ref = [], [] 
+            for f in fs: 
+                f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.', 
+                    div_func, '.dat']) 
+                try: 
+                    div = np.loadtxt(f_div)
+                except IOError: 
+                    print f_div
+                    continue 
+                divs.append(div) 
+         
+            nbins = 50
+            bkgd = fig.add_subplot(2,1,i_obv+1, frameon=False)
+            for i_div, div, lbl in zip(range(len(fs)), divs, lbls): 
+                sub = fig.add_subplot(2,5,len(fs)*i_obv+i_div+1)
+                y_max = 0. 
+                hh = np.histogram(div, normed=True, range=hranges[i_div], bins=nbins)
+                bp = UT.bar_plot(*hh) 
+                sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
+                y_max = max(y_max, bp[1].max()) 
+                sub.set_xlim(hranges[i_div])  
+                sub.set_ylim([0., y_max*1.4]) 
+                if i_obv == 0: 
+                    sub.set_title(lbl) 
+    
+        if div_func == 'kl': 
+            bkgd.set_xlabel(r'KL divergence', fontsize=20, labelpad=20)
+        elif div_func == 'renyi0.5': 
+            bkgd.set_xlabel(r'R\'enyi-$\alpha$ divergence', fontsize=20, labelpad=20)
+        bkgd.set_xticklabels([])
+        bkgd.set_yticklabels([])
+        bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+
+    fig.subplots_adjust(wspace=.15, hspace=0.3)
+    f_fig = ''.join([UT.fig_dir(), 'tests/Ktest_kNNdiverg.', div_func, '.png'])
+    fig.savefig(f_fig, bbox_inches='tight') 
+    return None
+
+
 def delta_div(K=10, div_func='kl'):
     ''' compare the KL divergence for the following with their
     reference divergence counterpart
@@ -42,9 +175,9 @@ def delta_div(K=10, div_func='kl'):
     - D( mock X || PI p(X^i_ICA) GMM)
     '''
     f_refs = ['ref.K'+str(K), 'pX_scottKDE_ref.K'+str(K), 'pX_GMM_ref.K'+str(K)+'.ncomp30', 
-            'pXi_ICA_scottKDE_ref.K'+str(K), 'pXi_ICA_GMM_ref.K'+str(K)+'.ncomp30']
+            'pXi_parICA_scottKDE_ref.K'+str(K), 'pXi_parICA_GMM_ref.K'+str(K)+'.ncomp30']
     fs = ['pX_gauss.K'+str(K), 'pX_scottKDE.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp30', 
-            'pXi_ICA_scottKDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
+            'pXi_parICA_scottKDE.K'+str(K), 'pXi_ICA_GMM.K'+str(K)+'.ncomp30'] 
     lbls = [r'$D( P(k) \parallel \mathcal{N}({\bf C}))$',
             r'$D( P(k) \parallel p_\mathrm{KDE}(P(k)))$',
             r'$D( P(k) \parallel p_\mathrm{GMM}(P(k)))$',
@@ -112,8 +245,7 @@ def delta_div(K=10, div_func='kl'):
         bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
 
     fig.subplots_adjust(wspace=.15, hspace=0.3)
-    f_fig = ''.join([UT.fig_dir(), 'tests/delta_kNNdiverg.Pk', 
-        '.K', str(K), '.', div_func, '.pdf'])
+    f_fig = ''.join([UT.fig_dir(), 'tests/delta_kNNdiverg.K', str(K), '.', div_func, '.png'])
     fig.savefig(f_fig, bbox_inches='tight') 
     return None
 
@@ -1020,8 +1152,13 @@ def invC(mock, ell=0, rebin=None):
 
 
 if __name__=="__main__": 
-    delta_div(K=10, div_func='kl')
-    delta_div(K=10, div_func='renyi0.5')
+    #for k in [5,10,15]: 
+    #    div_ICA(obv='pk.ngc', K=k, div_func='k')
+    #    div_ICA(obv='pk.ngc', K=k, div_func='renyi0.5')
+    div_K(div_func='renyi0.5')
+    div_K(div_func='kl')
+    #delta_div(K=10, div_func='kl')
+    #delta_div(K=10, div_func='renyi0.5')
     #diverge('pk', div_func='kl', Nref=5000, K=10, n_mc=10, n_comp_max=10, n_mocks=2000, 
     #    pk_mock='patchy.z1', NorS='ngc')
 

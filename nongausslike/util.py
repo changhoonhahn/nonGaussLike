@@ -21,6 +21,12 @@ class KayDE(gKDE):
         samp = super(KayDE, self).resample(N) 
         return samp.T
 
+    def score_sample(self, x):  
+        if len(x.shape) == 2: 
+            if x.shape[1] == 1: 
+                x = x[:,0]
+        return super(KayDE, self).logpdf(x) 
+
 
 def code_dir(): 
     ''' Directory where all the code is located (the directory that this file is in!)

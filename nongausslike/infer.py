@@ -12,8 +12,8 @@ except OSError:
 import nongauss as NG 
 
 
-def W_importance(tag, chain, density_method='kde', n_comp_max=20, 
-        info_crit='bic', **kwargs): 
+def W_importance(tag, chain, ica_algorithm=None, density_method='kde', n_comp_max=20, 
+        info_crit='bic', njobs=1, **kwargs): 
     ''' Given a dictionary with the MCMC chain, evaluate the likelihood ratio 
     '''
     if 'RSD' in tag: # Florian's RSD analysis 
@@ -52,39 +52,30 @@ def W_importance(tag, chain, density_method='kde', n_comp_max=20,
         pk_ngc_mock = np.concatenate(pk_ngc_list, axis=1) 
         pk_sgc_mock = np.concatenate(pk_sgc_list, axis=1) 
 
-        if tag == 'RSD_ica_pca': # P_ICA(D - m(theta)) / P_PCA(D - m(theta))
-            lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock)
-            lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock)
+        if tag == 'RSD_pXiICA_gauss': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
+            lnP_ica_ngc = NG.lnL_pXi_ICA(delta_ngc, pk_ngc_mock, ica_algorithm=ica_algorithm, 
+                    density_method=density_method, n_comp_max=n_comp_max, info_crit=info_crit, 
+                    njobs=njobs)
+            lnP_ica_sgc = NG.lnL_pXi_ICA(delta_sgc, pk_sgc_mock, ica_algorithm=ica_algorithm, 
+                    density_method=density_method, n_comp_max=n_comp_max, info_crit=info_crit,
+                    njobs=njobs)
             
-            lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
-            lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
-
-            lnP_den = lnP_pca_ngc + lnP_pca_sgc
-            lnP_num = lnP_ica_ngc + lnP_ica_sgc
-        elif tag == 'RSD_pca_gauss': # P_PCA,KDE (D - m(theta)) / P_Gauss(D - m(theta))
-            lnP_pca_ngc = NG.lnL_pca(delta_ngc, pk_ngc_mock)
             lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
-            
-            lnP_pca_sgc = NG.lnL_pca(delta_sgc, pk_sgc_mock) 
-            lnP_gauss_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
-
-            lnP_den = lnP_gauss_ngc + lnP_gauss_sgc
-            lnP_num = lnP_pca_ngc + lnP_pca_sgc
-        elif tag == 'RSD_ica_gauss': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
-            lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
-            lnP_gauss_ngc = NG.lnL_pca_gauss(delta_ngc, pk_ngc_mock) 
-            
-            lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
             lnP_gauss_sgc = NG.lnL_pca_gauss(delta_sgc, pk_sgc_mock) 
             
-            lnP_den = lnP_gauss_ngc + lnP_gauss_sgc
             lnP_num = lnP_ica_ngc + lnP_ica_sgc
-        elif tag == 'RSD_ica_chi2': # P_ICA(D - m(theta)) / P_PCA,Gauss(D - m(theta))
-            lnP_ica_ngc = NG.lnL_ica(delta_ngc, pk_ngc_mock) 
-            lnP_ica_sgc = NG.lnL_ica(delta_sgc, pk_sgc_mock) 
+            lnP_den = lnP_gauss_ngc + lnP_gauss_sgc
+        elif tag == 'RSD_ica_chi2': 
+            # this should be consistent with above!
+            lnP_ica_ngc = NG.lnL_pXi_ICA(delta_ngc, pk_ngc_mock, ica_algorithm=ica_algorithm, 
+                    density_method=density_method, n_comp_max=n_comp_max, info_crit=info_crit, 
+                    njobs=njobs)
+            lnP_ica_sgc = NG.lnL_pXi_ICA(delta_sgc, pk_sgc_mock, ica_algorithm=ica_algorithm, 
+                    density_method=density_method, n_comp_max=n_comp_max, info_crit=info_crit,
+                    njobs=njobs)
 
+            lnP_num = lnP_ica_ngc + lnP_ica_sgc
             lnP_den = -0.5 * chain['chi2']
-            lnP_num = lnP_ica_ngc + lnP_ica_sgc
 
     elif 'gmf' in tag: # GMF
         geemf = Dat.Gmf() # read in SDSS GMF (data D) 
@@ -98,15 +89,8 @@ def W_importance(tag, chain, density_method='kde', n_comp_max=20,
         
         # old likelihood derived from chi-squared of MCMC chain 
         lnP_den = -0.5 * chain['chi2'] # -0.5 chi-squared from MCMC chain
-        if tag == 'gmf_pXiICA_chi2':
-            # updated likelihood is calculated using  
-            # ln( PI_i p( delta_X_ICA_i | X_ICA_i^(gmm/kde)) )
-            lnP_num = NG.lnL_pXi_ICA(dgmf, gmf_mock, density_method=density_method, n_comp_max=n_comp_max, info_crit=info_crit)
-        elif tag == 'gmf_pX_chi2': 
-            # updated likelihood is calculated using 
-            # ln( p( delta_X | X^(gmm/kde) ) ) 
-            lnP_num = NG.lnL_pX(dgmf, gmf_mock, density_method=density_method, n_comp_max=n_comp_max, info_crit=info_crit)
-        elif tag == 'gmf_all_chi2': 
+
+        if tag == 'gmf_all_chi2': 
             # importance weight determined by the ratio of 
             # the chi^2 from the chain and the chi^2 calculated 
             # using the covariance matrix from the entire catalog
@@ -118,6 +102,17 @@ def W_importance(tag, chain, density_method='kde', n_comp_max=20,
             lnP_num = np.empty(dgmf.shape[0])
             for i in range(dgmf.shape[0]): # updated chi-square
                 lnP_num[i] = -0.5 * np.dot(dgmf[i,:], np.dot(Cinv, dgmf[i,:].T)) 
+        if tag == 'gmf_pXiICA_chi2':
+            # updated likelihood is calculated using  
+            # ln( PI_i p( delta_X_ICA_i | X_ICA_i^(gmm/kde)) )
+            lnP_num = NG.lnL_pXi_ICA(dgmf, gmf_mock, ica_algorithm=ica_algorithm, 
+                    density_method=density_method, n_comp_max=n_comp_max, info_crit=info_crit, 
+                    njobs=njobs)
+        elif tag == 'gmf_pX_chi2': 
+            # updated likelihood is calculated using 
+            # ln( p( delta_X | X^(gmm/kde) ) ) 
+            lnP_num = NG.lnL_pX(dgmf, gmf_mock, density_method=density_method, 
+                    n_comp_max=n_comp_max, info_crit=info_crit, njobs=njobs)
         elif tag == 'gmf_lowN_chi2': 
             # importance weight determined by the ratio of 
             # the chi^2 from the chain and the chi^2 calculated 
@@ -130,10 +125,6 @@ def W_importance(tag, chain, density_method='kde', n_comp_max=20,
             lnP_num = np.empty(dgmf.shape[0])
             for i in range(dgmf.shape[0]): # updated chi-square
                 lnP_num[i] = -0.5 * np.dot(dgmf[i,:Nlim], np.dot(Cinv[:Nlim,:Nlim], dgmf[i,:Nlim].T)) 
-        elif tag == 'gmf_pca_chi2':
-            lnP_num = NG.lnL_pca(dgmf, gmf_mock, density_method=density_method)
-        elif tag == 'gmf_gauss_chi2': 
-            lnP_num = NG.lnL_pca_gauss(dgmf, gmf_mock) 
         else: 
             raise NotImplementedError
     else: 

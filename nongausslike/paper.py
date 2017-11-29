@@ -114,7 +114,7 @@ def div_nonGauss(K=10):
                 r'$D( \textbf{X}^\mathrm{mock} \parallel \sim p_\mathrm{GMM}(\textbf{X}^\mathrm{mock}))$', 
                 r'$D( \textbf{X}^\mathrm{mock} \parallel \sim \prod p_\mathrm{KDE}(\textbf{X}_i^\mathrm{ICA}))$']
 
-        fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp), 'pXi_ICA_scottKDE.K'+str(K)]
+        fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_GMM.K'+str(K)+'.ncomp'+str(ncomp), 'pXi_parICA_scottKDE.K'+str(K)]
 
         for i_div, div_func in enumerate(['renyi0.5', 'kl']): 
             divs = []  
@@ -209,31 +209,21 @@ def Corner_updatedLike(tag_mcmc, tag_like, ichain):
     return None
 
 
-def Like_RSD(tag_like, tag_mcmc='beutler_z1', ichain=0):
-    ''' comparison between Florian's MCMC posterior distribution from 
-    Beutler et al. (2017), to importance sampled posteriors derived for 
-    `tag_like`. 
+def Like_RSD(): 
+    ''' Compare importance sampled likelihoods of GMFs to original likelihood 
     '''
-    if tag_like == 'RSD_ica_gauss': 
-        str_like = 'ICA'
-    elif tag_like == 'RSD_pca_gauss': 
-        str_like = 'PCA'
-    else: 
-        raise NotImplementedError
-    # read in Florian's MCMC chains
-    chain = Inf.mcmc_chains(tag_mcmc, ichain=ichain) 
-    # read in importance weight
-    f_wimp = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
-        'Beutler_et_al_full_shape_analysis_z1_chain', str(ichain), 
-        '.', tag_like, '_weights.dat']) 
-    wimp = np.loadtxt(f_wimp, skiprows=1, unpack=True, usecols=[2]) 
-    
-    # remove burnin (half of Florian's chain is burn in) 
-    burnin = np.zeros(wimp.shape, dtype=bool) 
-    burnin[int(wimp.shape[0]/2):] = True 
+    # import MCMC chain 
+    chain = Inf.mcmc_chains('beutler_z1', ichain=0)
+    # remove burnin?  
+    burnin = np.ones(chain['chi2'].shape, dtype=bool) 
+    burnin[:int(chain['chi2'].shape[0]/4)] = False 
 
-    wlim = np.percentile(wimp[burnin], 99.5)
-    lims = np.where(burnin & (wimp < wlim)) 
+    # importance weight derived from p_KDE(X_i ICA)
+    f_pXiICA = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
+        'Beutler_et_al_full_shape_analysis_z1_chain0.RSD_pXiICA_gauss_weights.defICA.kde.dat']) 
+    #    'Beutler_et_al_full_shape_analysis_z1_chain0.RSD_pXiICA_gauss_weights.parICA.kde.dat']) 
+    wimp = np.loadtxt(f_pXiICA, skiprows=1, unpack=True, usecols=[2]) 
+    like_lbl = r'$\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$'
     
     # ignoring some of the nuissance parameters
     labels = ['alpha_perp', 'alpha_para', 'fsig8', 'b1sig8_NGC', 'b1sig8_SGC', 'b2sig8_NGC', 'b2sig8_SGC'] 
@@ -242,39 +232,50 @@ def Like_RSD(tag_like, tag_mcmc='beutler_z1', ichain=0):
             r'$b_2\sigma_8^{NGC}$', r'$b_2\sigma_8^{SGC}$'] 
     prior_min = [0.8, 0.8, 0.2, 1., 1., -3., -3.]#, -10000., -10000., 0.5, 0.5]
     prior_max = [1.2, 1.2, 0.8, 1.8, 1.8, 5., 5.]#, 10000., 10000., 15., 15.]
-    #prior_max = [1.4, 1.4, 1.1, 5., 5., 6., 6.]#, 10000., 10000., 15., 15.]
+    yrange = [[0.0, 18.], [0., 18.], [0., 10.], [0., 10.], [0., 10.], [0., 0.7], [0., 0.7]]
+    yticks = [[0.,2.,4.], [0., 0.5, 1., 1.5, 2.], [0., 0.1, 0.2, 0.3], [0., 2., 4., 6., 8.], [0., 4., 8., 12]]
+    nbin = 20 
     
-    nbin = 40 
-    fig = plt.figure(figsize=(5*len(labels), 4.5)) 
+    f_out = open(''.join([UT.tex_dir(), 'dat/pk_likelihood.dat']), 'w') 
+    fig = plt.figure(figsize=(5*len(labels), 4)) 
     for i in range(len(labels)): 
-        sub = fig.add_subplot(1, len(labels), i+1) # over-plot the two histograms
+        sub = fig.add_subplot(1, len(labels), i+1) 
         # original Beutler et al.(2017) constraints
         hh = np.histogram(chain[labels[i]][burnin], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
         bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', label='Beutler et al.(2017)') 
-        # updated constraints
-        hh = np.histogram(chain[labels[i]][lims], weights=wimp[lims],normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
-        bp = UT.bar_plot(*hh) 
-        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none', label=str_like+' (imp. sampl.)') 
+        lbls = [None, None, None, None, None, 'Beutler et al.(2017)', None]
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none', label=lbls[i]) 
+        #sub.plot(bp[0], bp[1], c='k', lw=1, ls=':', label=lbls[i])  
+        low, med, high = np.percentile(chain[labels[i]][burnin], [15.86555, 50, 84.13445])
+        f_out.write(''.join(['# ', labels[i], ' Beutler et al. (2017)', '\n']))
+        f_out.write('\t'.join([str(round(low,5)), str(round(med,5)), str(round(high,5)), '\n']))
 
-        # get parameter quanties from the chains and put them in the title of each subplot
-        low, med, high = np.percentile(chain[labels[i]], [15.86555, 50, 84.13445])
+        wlim = np.percentile(wimp[burnin], 99.9)
+        lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
+        # importance weighted constraints
+        hh = np.histogram(chain[labels[i]][lims], weights=wimp[lims],normed=True, bins=nbin, 
+                range=[prior_min[i], prior_max[i]])
+        bp = UT.bar_plot(*hh) 
+        lbls = [None, None, None, None, None, None, like_lbl]
+
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none', label=lbls[i]) 
         low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
 
-        txt = ''.join(['B2017: $', str(round(med,3)), '^{+', str(round(high-med,3)), '}_{-', str(round(med-low,3)), '}$; ', 
-            str_like, ': $', str(round(med_w,3)), '^{+', str(round(high_w-med_w,3)), '}_{-', str(round(med_w-low_w,3)), '}$']) 
-        sub.set_title(txt)
-        #sub.text(0.1, 0.95, txt, ha='left', va='top', transform=sub.transAxes, fontsize=15)
-    
-        if i == 0: sub.legend(loc='upper right', prop={'size': 15})  # legend
+        f_out.write(''.join(['# ', labels[i], ' ', like_lbl, '\n']))
+        f_out.write('\t'.join([str(round(low_w,5)), str(round(med_w,5)), str(round(high_w,5)), '\n']))
+
+        f_out.write('\n') 
+        if i > 1: sub.legend(loc='upper left', prop={'size': 20})  # legend
         # x-axis 
         sub.set_xlim([prior_min[i], prior_max[i]]) 
-        sub.set_xlabel(lbltex[i], fontsize=25)
+        sub.set_xlabel(lbltex[i], labelpad=10, fontsize=25)
         # y-axis
-        sub.set_ylim([0., 1.5*hh[0].max()])
+        sub.set_ylim(yrange[i]) 
+        #sub.set_yticks(yticks[i]) 
 
-    fig.savefig(''.join([UT.tex_dir(), 'figs/Like_RSD.beutler_z1.', tag_like, '.chain', str(ichain), '.pdf']), 
-            bbox_inches='tight') 
+    f_out.close() 
+    fig.subplots_adjust(wspace=.2)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/', 'Like_Pk_comparison.pdf']), bbox_inches='tight') 
     return None
 
 
@@ -514,7 +515,7 @@ def GMF_contours(tag_mcmc='manodeep'):
 if __name__=="__main__": 
     #div_Gauss(K=10)
     #div_nonGauss(K=10)
-    Like_GMF()
+    Like_RSD()
     #GMF_contours()
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
