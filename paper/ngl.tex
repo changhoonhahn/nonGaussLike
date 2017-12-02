@@ -84,7 +84,7 @@ anslyses of LSS studies. They're used for testing analysis
 pipelines~\citep[][]{beutler2017, grieb2017, tinkerinpreparation}, 
 testing the effect of systematics~\citep{guo2012, vargas-magana2014, hahn2017, pinol2017, ross2017}, 
 and, most relevantly for this paper, estimating the covariance 
-matrix~\citep[][]{parkinson2012, kazin2014, grieb2017, alam2017, beutler2017, sinha2017}. 
+matrix~\citep[][]{parkinson2012, kazin2014, grieb2017, alam2017, beutler2017, sinha2017a}. 
 In fact, nearly all current state-of-the-art LSS analyses use
 covariance matrices estimated from mocks to evaluate the likelihood 
 for parameter inference. 
@@ -97,14 +97,18 @@ allow us to incorporate detailed systematic errors present in the
 data and variance beyond the volume of the data. Even for analytic 
 estimates, large ensembles of mocks are crucial for validataion~\citep{slepian2017}. 
 Moreover, as we show later in this paper, mock catalogs allow us to 
-quantify the non-Gaussianity of the likelihood and construct a 
-more accurate estimate of the true likelihood. 
+quantify the non-Gaussianity of the likelihood and more accurately 
+estimate the true likelihood. 
 
 In this paper, we we focus on two LSS analyses: the powerspectrum 
 multipole full shape analysis of \cite{beutler2017} and group multiplicity 
-function analysis of \cite{sinha2017}. Throughout the paper we will 
-make extensive use of same the mock catalogs used in these analyses. 
-Below, in this section, we give a brief description of these mocks. 
+function analysis of \cite{sinha2017a}. Throughout the paper we will 
+make extensive use of the mock catalogs used in these analyses. 
+In this section, we give a brief description of the mocks and how 
+the powerspectrum multipole ($P_\ell$) and group multiplicity function 
+($\zeta(N)$), respectively, are calculated from them. Afterwards, we 
+will describe how we compute the whitened data, ${\bf X}^\mathrm{mock}$, 
+and the covariance matrix, $\mathbb{C}$, from the mocks.
 
 \subsection{MultiDark-PATCHY~Mock Catalog} 
 In their powerspectrum multipole full shape analysis, \cite{beutler2017}
@@ -137,11 +141,75 @@ due to notable issues, which have been since been addressed. Therefore,
 in our analysis we use all 2048 mocks for both the NGC and SGC of 
 the LOWZ+CMASS combined sample.
 
-\subsection{\cite{sinha2017} Mocks}
+\todo{describe how the P(k) measurements are made from the patchy mock catalogs} 
+
+\subsection{\cite{sinha2017a} Mocks}
+The simulations used in the small-scale clustering analysis of \cite{sinha2017a} 
+are from the Large Suite of Dark Matter Simulations project 
+\citep[LasDamas][]{mcbride2009}. More specifically \cite{sinha2017a} uses
+the Consuelo and Carmen configurations, which were designed to model SDSS 
+galaxies with $M_r$ thresholds of $-19$ and $-21$, respectively.
+The initial conditions for these simulations are derived from second order 
+Lagrangian Perturbation Theory using the 2LTPIC code~\citep{scoccimarro1998, crocce2006}
+and evolved using the $N$-body $\mathtt{GADGET}-2$ code~\citep{springel2005}.
+Halos are then identified from the dark matter distribution outputs using 
+the $\mathtt{ntropy-fofsv}$ code~\citep{gardner2007}, which uses a 
+friend-of-friends algorithm~\citep[FoF][]{davis1985} with a linking length of $0.2$
+times the mean inter-particle separation. The FoF halo masses are then adjusted 
+using the \cite{warren2006} correction. 
+The Consuelo simulation contains $1400^3$ dark matter particles with 
+mass of $1.87 \times 10^9\,h^{-1} M_\odot$ in a cubic volume of 
+$420\,h^{-1} Mpc$ per side and is evolved from $z_\mathrm{init} = 99$. 
+The Carmen simulation contains $1120^3$ dark matter particles with mass 
+of $4.938 \times 10^{10}\,h^{-1} M_\odot$ in a cubic volume of 
+$1000\,h^{-1} Mpc$ per side and is evolved from $z_\mathrm{init} = 49$. 
+They use the following cosmological parameters, which are motivated 
+by the WMAP3 constraints \citep{spergel2007}:
+$\Omega_m = 0.25, \Omega_\Lambda = 0.75, \Omega_b = 0.04, h = 0.7, \sigma_8 = 0.8,\;\mathrm{and}\;n_s = 1.0.$
+
+The FoF halo catalogs are then populated with galaxies using the 
+`Halo Occupation Distribution` (HOD) framework. In this framework, the 
+number, positions, and velocities of galaxies are described statistically 
+by an HOD model. \cite{sinha2017a} adopts the `vanilla` HOD model of \cite{zheng2007}, 
+where the mean number of central and satellite galaxies are described by 
+the halo mass and five HOD parameters: $M_\mathrm{min}, 
+\sigma_{\log\,M} , M_0, M_1,~\mathrm{and}~\alpha$. Finally, once the 
+simulation boxes are populated with galaxies, observational systematic 
+effects are imposed. The peculiar velocities of galaxies are used to 
+impose redshift-space distortions. And galaxies that lie outside the redshift
+limits or sky footprint of the SDSS sample are removed. For further 
+details regarding the LasDamas simulations or mock catalogs, we refer
+readers to \cite{sinha2017a}.
+
+To calculate their covariance matrix, \cite{sinha2017a} produced 200 
+independent mock catalogs from 50 simulations using a single set of 
+HOD model parameters. To take advantage of the methods we present 
+in this work (Sections~\todo{ref}), we require a large number of 
+mock catalogs. Our methods rely on sampling multidimensional distributions, 
+so incorporating more mocks into the analysis drastically improves their 
+accuracy. Therefore, we utilize an additional $19,800$ mock catalogs 
+made from the procedure. These mocks are not generated using 
+the same set of HOD model parameters, but $200$ mocks each from $99$ 
+sets of HOD parameters sampled from the MCMC chain used to produce 
+the posterior probability distriubtion presented in \cite{sinha2017a}. 
+
+\todo{describe how the $\zeta(N)$ measurements are made from the patchy mock catalogs} 
+
+\subsection{${\bf X}^\mathrm{mock}$ and covariance matrix $\mathbb{C}$}
+In the rest of this paper we investigate the non-Gaussianity of the 
+likelihood and its impact on parameter inference for the analysis in 
+\cite{beutler2017} and \cite{sinha2017a}. In order to consistently discuss 
+the two separate analyses, we define the ${\bf X}^\mathrm{mock}$ matrix 
+and covariance matrix $\mathbb{C}$ and describe how they are calculated 
+from the mock catalogs described above.
 
 
-\subsection{${\bf X}^\mathrm{mock}$ and }
-\todo{talk about the data whitening and what we mean by covariance matrix for GMF}
+\beq
+{\bf X}_i = [P_0(k)_i,P_2(k)_i,P_4(k)_i]
+\eeq
+
+Furthermore, 
+\todo{talk about the data whitening and what we mean by covariance matrix for GMF} 
 ${\bf X}_i = [P_0(k)_i,P_2(k)_i,P_4(k)_i]$ \\
 ${\bf X}_i = \zeta(N)_i$ \\ 
 ${\bf X} = \{{\bf X}_i\}$
@@ -152,7 +220,7 @@ In \cite{sellentin2017} \todo{discuss how sellentin and hartlap's stuff is an at
 A more direct approach can be taken to quantify the non-Gaussianity of 
 the likelihood. We can calculate the divergence between the distribution 
 of our observable, $p(x)$, and $q(x)$ a multivariate Gaussian described 
-by the average of the mocks and the covariance matrix ${\bf C}$.
+by the average of the mocks and the covariance matrix $\mathbb{C}$.
 The following are two of the most commonly used divergences: 
 the Kullback-Leibler (hereafter KL) divergence
 \beq \label{eq:kl} 
