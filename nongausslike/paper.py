@@ -44,6 +44,55 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
+def _div_Gauss_gmf(K=10):
+    ''' compare the renyi-alpha and KL divergence for the following  
+    - D( gauss(C_X) || gauss(C_X) ) 
+    - D( mock X || gauss(C_X))
+    for only GMF 
+    '''
+    # D( gauss(C_X) || gauss(C_X) ) vs D( mock X || gauss(C_X))
+    fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K)] 
+    lbls = [ r'$D\left( \{x_i \in \mathcal{N}(\bar{\zeta}, \mathcal{C})\}\vert_{i=1}^{N_\mathrm{mock}} \parallel \mathcal{N}(\bar{\zeta}, \mathcal{C})\right)$', 
+            r'$D\left(\{ \zeta_i^\mathrm{mock} \}\vert_{i=1}^{N_\mathrm{mock}} \parallel \mathcal{N}(\bar{\zeta}, \mathcal{C})\right)$']
+    
+    fig = plt.figure(figsize=(12,4))
+    obvs = 'gmf'
+    for i_div, div_func in enumerate(['renyi0.5', 'kl']): 
+        divs = []  
+        for f in fs: 
+            if obvs == 'pk': 
+                f_div = ''.join([UT.dat_dir(), 
+                    'diverg.pk.ngc.', f, '.Nref2000.', div_func, '.dat']) 
+            elif obvs == 'gmf': 
+                f_div = ''.join([UT.dat_dir(), 
+                    'diverg.gmf.', f, '.Nref10000.', div_func, '.dat']) 
+            div = np.loadtxt(f_div)
+            divs.append(div) 
+
+        if i_div == 0: _lbls = [lbls[0], None]
+        else: _lbls = [None, lbls[1]]
+        
+        hrange = [-0.1, 0.25]
+        nbins = 40
+        y_max = 0. 
+        sub = fig.add_subplot(1,2,i_div+1)
+        for div, lbl in zip(divs, _lbls): 
+            hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
+            bp = UT.bar_plot(*hh) 
+            sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', label=lbl) 
+            y_max = max(y_max, bp[1].max()) 
+        sub.set_xlim(hrange) 
+        sub.set_ylim([0., y_max*1.4]) 
+        sub.legend(loc='upper right', prop={'size': 15})
+        if div_func == 'kl': sub.set_xlabel(r'KL divergence', fontsize=20)
+        elif div_func == 'renyi0.5': 
+            sub.set_xlabel(r'R\'enyi-$\alpha$ divergence', fontsize=20)
+    fig.subplots_adjust(wspace=.15)
+    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg_Gauss_gmf.pdf'])
+    fig.savefig(f_fig, bbox_inches='tight') 
+    return None
+
+
 def div_Gauss(K=10):
     ''' compare the renyi-alpha and KL divergence for the following  
     - D( gauss(C_X) || gauss(C_X) ) 
@@ -513,9 +562,10 @@ def GMF_contours(tag_mcmc='manodeep'):
 
 
 if __name__=="__main__": 
+    _div_Gauss_gmf(K=10)
     #div_Gauss(K=10)
     #div_nonGauss(K=10)
-    Like_RSD()
+    #Like_RSD()
     #GMF_contours()
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD('RSD_ica_gauss', ichain=0)
