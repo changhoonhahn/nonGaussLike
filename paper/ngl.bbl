@@ -25,6 +25,12 @@ Beutler, F., Seo, H.-J., Saito, S., {et~al.} 2017,
   \href{http://dx.doi.org/10.1093/mnras/stw3298}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 466, 2242}
 
+\bibitem[{Bianchi {et~al.}(2015)Bianchi, Gil-Mar{\'\i}n, Ruggeri, \&
+  Percival}]{bianchi2015}
+Bianchi, D., Gil-Mar{\'\i}n, H., Ruggeri, R., \& Percival, W.~J. 2015,
+  \href{http://dx.doi.org/10.1093/mnrasl/slv090}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 453, L11}
+
 \bibitem[{Crocce {et~al.}(2006)Crocce, Pueblas, \& Scoccimarro}]{crocce2006}
 Crocce, M., Pueblas, S., \& Scoccimarro, R. 2006,
   \href{http://dx.doi.org/10.1111/j.1365-2966.2006.11040.x}{\JournalTitle{Monthly
@@ -184,6 +190,11 @@ Ross, A.~J., Beutler, F., Chuang, C.-H., {et~al.} 2017,
 Scoccimarro, R. 1998,
   \href{http://dx.doi.org/10.1046/j.1365-8711.1998.01845.x}{\JournalTitle{Monthly
   Notices of the Royal Astronomical Society}, 299, 1097}
+
+\bibitem[{Scoccimarro(2015)}]{scoccimarro2015a}
+---. 2015,
+  \href{http://dx.doi.org/10.1103/PhysRevD.92.083532}{\JournalTitle{Physical
+  Review D}, 92, 083532}
 
 \bibitem[{Sellentin {et~al.}(2017)Sellentin, Jaffe, \& Heavens}]{sellentin2017}
 Sellentin, E., Jaffe, A.~H., \& Heavens, A.~F. 2017,
