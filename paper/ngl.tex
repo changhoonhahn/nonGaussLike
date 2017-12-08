@@ -39,6 +39,8 @@
 \newcommand{\Xref}{{\bf X}^\mathrm{ref}}
 \newcommand{\Yref}{{\bf Y}^\mathrm{ref}}
 \newcommand{\Ralpha}{R\'enyi-$\alpha$}
+\newcommand{\Beut}{B2017}
+\newcommand{\Sinh}{S2017}
 
 \newcommand{\patchy}{{\fontshape\scdefault\selectfont patchy}}
 
@@ -421,8 +423,8 @@ For more details on the non-parametric divergence estimators, we refer readers t
 Now we can use the divergence estimators above to quantify the non-Gaussianity 
 of the likelihood. In other words, we're intersted in the divergence between
 the distribution $p(x)$ sampled by the mock observables $\Xmock$ (Section~\ref{sec:xmock})
-and the multivariate Gaussian distribution assumed in standard analyses
--- $\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$. Since
+and the multivariate Gaussian ``pseudo-likelihood''distribution assumed in 
+standard analyses -- $\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$. Since
 $\Xmock$ is a sample from $p(x)$, we draw a reference sample 
 ${\bf Y}^\mathrm{ref}$ from $\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$ 
 to use in the estimators. Similar to the experiments detailed in \cite{poczos2012}, 
@@ -448,11 +450,28 @@ non-Gaussianity of $p(x)$ sampled by ${\bf X}^\mathrm{mock}$.
 \eitem
 
 \section{Estimating the Non-Gaussian Likelihood}
-The previous section firmly illustrates the non-Gaussianity of both 
-the $P_\ell$ and $\zeta$ likelihoods. We are, however, ultimately 
-interested in developing more accurate parameter inference for LSS 
-studies. 
+In the previous section, we estimate the divergence between the 
+$P_\ell$ and $\zeta$ likelihoods sampled by mocks and their respective 
+Gaussian pseudo-likelihoods. The divergence estimates quantify 
+the non-Gaussianity of the likelihoods and \todo{discredit} the 
+Gaussian likelihood assumption in standard LSS studies. Our ultimate goal, 
+however, goes beyond quantifying this non-Gaussianity. We're interested 
+in quantifying the impact of likelihood Gaussianity on the final 
+cosmological parameter constraints and also in developing more accurate 
+methods for parameter inference in LSS analyses.
 
+While the divergence estimates of the previous are useful for 
+quantifying non-Gaussianity, it's not clear how they propagate 
+onto the inferred parameter constraints. In this section 
+we present two methods for estimating the non-Gaussian likelihood 
+distribution of $P_\ell$ and $\zeta$ from the corresponding mocks.
+These methods will be used to later quantify the impact
+of likelihood non-Gaussianity on the parameter constraints of 
+\Beut and \Sinh. Moreover, they provide a general framework for 
+more accurately estimating the likelihood distribution than 
+the Gaussian pseudo-likelihood. 
+
+\subsection{Nonparameteric Likelihood Estimation}
 
 \bitem
     \item Gaussian Mixture Model 
