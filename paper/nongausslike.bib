@@ -6190,4 +6190,67 @@ hexadecapole, and generalize such estimators to the bispectrum. Using realistic 
   pages = {083532}
 }
 
+@article{hand2017a,
+  title = {An Optimal {{FFT}}-Based Anisotropic Power Spectrum Estimator},
+  volume = {07},
+  issn = {1475-7516},
+  doi = {10.1088/1475-7516/2017/07/002},
+  abstract = {Measurements of line-of-sight dependent clustering via the galaxy power spectrum's multipole moments constitute a powerful tool for testing theoretical models in large-scale structure. Recent work shows that this measurement, including a moving line-of-sight, can be accelerated using Fast Fourier Transforms (FFTs) by decomposing the Legendre polynomials into products of Cartesian vectors. Here, we present a faster, optimal means of using FFTs for this measurement. We avoid redundancy present in the Cartesian decomposition by using a spherical harmonic decomposition of the Legendre polynomials. With this method, a given multipole of order l requires only 2l+1 FFTs rather than the (l+1)(l+2)/2 FFTs of the Cartesian approach. For the hexadecapole (l = 4), this translates to 40\% fewer FFTs, with increased savings for higher l. The reduction in wall-clock time enables the calculation of finely-binned wedges in P(k,$\mu$), obtained by computing multipoles up to a large
+lmax and combining them. This transformation has a number of advantages. We demonstrate that by using non-uniform bins in $\mu$, we can isolate plane-of-sky (angular) systematics to a narrow bin at 0$\mu$ simeq while eliminating the contamination from all other bins. We also show that the covariance matrix of clustering wedges binned uniformly in $\mu$ becomes ill-conditioned when combining multipoles up to large
+values of lmax, but that the problem can be avoided with non-uniform binning. As an example, we present results using
+lmax=16, for which our procedure requires a factor of 3.4 fewer FFTs than the Cartesian method, while removing the first $\mu$ bin leads only to a 7\% increase in statistical error on f
+$\sigma$8, as compared to a 54\% increase with
+lmax=4.},
+  urldate = {2017-12-06},
+  journal = {Journal of Cosmology and Astro-Particle Physics},
+  author = {Hand, Nick and Li, Yin and Slepian, Zachary and Seljak, Uro{\v s}},
+  month = jul,
+  year = {2017},
+  pages = {002}
+}
+
+@article{berlind2006,
+  title = {Percolation {{Galaxy Groups}} and {{Clusters}} in the {{SDSS Redshift Survey}}: {{Identification}}, {{Catalogs}}, and the {{Multiplicity Function}}},
+  volume = {167},
+  issn = {0067-0049},
+  shorttitle = {Percolation {{Galaxy Groups}} and {{Clusters}} in the {{SDSS Redshift Survey}}},
+  doi = {10.1086/508170},
+  abstract = {We identify galaxy groups and clusters in volume-limited samples of the 
+Sloan Digital Sky Survey (SDSS) redshift survey, using a redshift-space
+friends-of-friends algorithm. We optimize the friends-of-friends linking
+lengths to recover galaxy systems that occupy the same dark matter
+halos, using a set of mock catalogs created by populating halos of
+N-body simulations with galaxies. Extensive tests with these mock
+catalogs show that no combination of perpendicular and line-of-sight
+linking lengths is able to yield groups and clusters that simultaneously
+recover the true halo multiplicity function, projected size
+distribution, and velocity dispersion. We adopt a linking length
+combination that yields, for galaxy groups with 10 or more members: a
+group multiplicity function that is unbiased with respect to the true
+halo multiplicity function; an unbiased median relation between the
+multiplicities of groups and their associated halos; a spurious group
+fraction of less than \textasciitilde{}1\% a halo completeness of more than \textasciitilde{}97\% the
+correct projected size distribution as a function of multiplicity; and a
+velocity dispersion distribution that is \textasciitilde{}20\% too low at all
+multiplicities. These results hold over a range of mock catalogs that
+use different input recipes of populating halos with galaxies. We apply
+our group-finding algorithm to the SDSS data and obtain three group and
+cluster catalogs for three volume-limited samples that cover 3495.1
+deg2 on the sky, go out to redshifts of 0.1, 0.068, and
+0.045, and contain 57,138, 37,820, and 18,895 galaxies, respectively. We
+correct for incompleteness caused by fiber collisions and survey edges
+and obtain measurements of the group multiplicity function, with errors
+calculated from realistic mock catalogs. These multiplicity function
+measurements provide a key constraint on the relation between galaxy
+populations and dark matter halos.},
+  urldate = {2017-12-06},
+  journal = {The Astrophysical Journal Supplement Series},
+  author = {Berlind, Andreas A. and Frieman, Joshua and Weinberg, David H. and Blanton, Michael R. and Warren, Michael S. and Abazajian, Kevork and Scranton, Ryan and Hogg, David W. and Scoccimarro, Roman and Bahcall, Neta A. and Brinkmann, J. and Gott, III, J. Richard and Kleinman, S. J. and Krzesinski, J. and Lee, Brian C. and Miller, Christopher J. and Nitta, Atsuko and Schneider, Donald P. and Tucker, Douglas L. and Zehavi, Idit and {SDSS Collaboration}},
+  month = nov,
+  year = {2006},
+  keywords = {Cosmology: Large-Scale Structure of Universe,Galaxies: Clusters: General},
+  pages = {1--25},
+  file = {/Users/chang/Zotero/storage/MR7H4C5J/Berlind et al. - 2006 - Percolation Galaxy Groups and Clusters in the SDSS.pdf}
+}
+
 

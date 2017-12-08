@@ -34,6 +34,11 @@
 \newcommand{\beq}{\begin{equation}}
 \newcommand{\eeq}{\end{equation}}
 \newcommand{\todo}[1]{{\bf \textcolor{red}{#1}}}
+\newcommand{\Dmock}{{\bf D}^\mathrm{mock}}
+\newcommand{\Xmock}{{\bf X}^\mathrm{mock}}
+\newcommand{\Xref}{{\bf X}^\mathrm{ref}}
+\newcommand{\Yref}{{\bf Y}^\mathrm{ref}}
+\newcommand{\Ralpha}{R\'enyi-$\alpha$}
 
 \newcommand{\patchy}{{\fontshape\scdefault\selectfont patchy}}
 
@@ -73,11 +78,17 @@ large-scale structure of universe
         galaxy clustering analyses. 
 \end{itemize}
 
-\section{Gaussian Likelihood Assumption}
+\section{Gaussian Likelihood Assumption} \label{sec:gaussass} 
 \begin{itemize}
     \item Depending on Hogg's paper maybe a simple illustration of how the likelihood asumption 
 \end{itemize}
 
+\todo{However, as we show in this paper, the assumption of likelihood 
+Gaussianity is not necessary. In fact, we will show that the mock catalogs 
+used in standard LSS analyses to estimate the covariance matrix for 
+evaluating the Gaussian likelihood, can be used to quantify the non-Gaussianity. 
+More important the mock catalogs can be used to construct an accurate 
+estimator for the non-Gaussian likelihood.} 
 
 \section{Mock Catalogs}
 Mock catalogs are play an indispensable role in standard cosmological 
@@ -107,18 +118,18 @@ multipole full shape analysis of \cite{beutler2017} and group multiplicity
 function analysis of \cite{sinha2017a}. Throughout the paper we will 
 make extensive use of the mock catalogs used in these analyses. 
 In this section, we give a brief description of these mocks and how 
-the observables used in the analysis -- \emph{i.e.} the powerspectrum 
+the observables used in the analysis -- the powerspectrum 
 multipole ($P_\ell$) and group multiplicity function ($\zeta(N)$) --
 are calculated from them. Afterwards, we will describe how we compute 
-the whitened data, ${\bf X}^\mathrm{mock}$, 
-and the covariance matrix, $\mathbb{C}$, from the mocks.
+the covariance matrix, $\mathbb{C}$, and the pre-processed mock observable
+date, ${\bf X}^\mathrm{mock}$.
 
 \subsection{MultiDark-PATCHY~Mock Catalog} \label{sec:patchy}
 In their powerspectrum multipole full shape analysis, \cite{beutler2017}
 use the MultiDark-\patchy~mock catalogs from \cite{kitaura2016}. 
 These mocks are generated using the \patchy~code \citep{kitaura2014,kitaura2015}. 
 They rely on large-scale density fields generated using augmented
-Lagrangian Perturbation Theory~\citep[ALPT][]{kitaura2013} on a mesh.
+Lagrangian Perturbation Theory~\citep[ALPT;][]{kitaura2013} on a mesh.
 This mesh is then populated with galaxies based on a combined non-linear
 deterministic and stochastic biases. The mocks from the \patchy code 
 are then calibrated to reproduce the galaxy clustering in the 
@@ -144,10 +155,10 @@ due to notable issues, which have been since been addressed. Therefore,
 in our analysis we use all 2048 mocks for both the NGC and SGC of 
 the LOWZ+CMASS combined sample.
 
-\subsection{\cite{sinha2017a} Mocks}
+\subsection{\cite{sinha2017a} Mocks} \label{sec:gmf} 
 The simulations used in the small-scale clustering analysis of \cite{sinha2017a} 
 are from the Large Suite of Dark Matter Simulations project 
-\citep[LasDamas][]{mcbride2009}. More specifically \cite{sinha2017a} uses
+\citep[LasDamas;][]{mcbride2009}. More specifically \cite{sinha2017a} uses
 the Consuelo and Carmen configurations, which were designed to model SDSS 
 galaxies with $M_r$ thresholds of $-19$ and $-21$, respectively.
 The initial conditions for these simulations are derived from second order 
@@ -155,7 +166,7 @@ Lagrangian Perturbation Theory using the 2LTPIC code~\citep{scoccimarro1998, cro
 and evolved using the $N$-body $\mathtt{GADGET}-2$ code~\citep{springel2005}.
 Halos are then identified from the dark matter distribution outputs using 
 the $\mathtt{ntropy-fofsv}$ code~\citep{gardner2007}, which uses a 
-friend-of-friends algorithm~\citep[FoF][]{davis1985} with a linking length of $0.2$
+friend-of-friends algorithm~\citep[FoF;][]{davis1985} with a linking length of $0.2$
 times the mean inter-particle separation. The FoF halo masses are then adjusted 
 using the \cite{warren2006} correction. 
 The Consuelo simulation contains $1400^3$ dark matter particles with 
@@ -171,7 +182,7 @@ $\Omega_m = 0.25, \Omega_\Lambda = 0.75, \Omega_b = 0.04, h = 0.7, \sigma_8 = 0.
 The FoF halo catalogs are then populated with galaxies using the 
 `Halo Occupation Distribution` (HOD) framework. In this framework, the 
 number, positions, and velocities of galaxies are described statistically 
-by an HOD model. \cite{sinha2017a} adopts the `vanilla` HOD model of \cite{zheng2007}, 
+by an HOD model. \cite{sinha2017a} adopts the `vanilla' HOD model of \cite{zheng2007}, 
 where the mean number of central and satellite galaxies are described by 
 the halo mass and five HOD parameters: $M_\mathrm{min}, 
 \sigma_{\log\,M} , M_0, M_1,~\mathrm{and}~\alpha$. Finally, once the 
@@ -194,15 +205,17 @@ the same set of HOD model parameters, but $200$ mocks each from $99$
 sets of HOD parameters sampled from the MCMC chain used to produce 
 the posterior probability distriubtion presented in \cite{sinha2017a}. 
 
-\subsection{Mock Observable ${\bf X}^\mathrm{mock}$ and Covariance Matrix $\mathbb{C}$}
+\subsection{Mock Observable ${\bf X}^\mathrm{mock}$ and Covariance Matrix $\mathbb{C}$} \label{sec:xmock}
 In \cite{beutler2017} and \cite{sinha2017a} they analyze the powerspectrum multipoles 
 measured from the BOSS DR12 galaxies and the group multiplicity 
 function measured from the SDSS DR7 galaxies, respectively. To get from the mock 
 catalogs described above to the covariance matrices used in these 
 analyses, the observables must be consistently measured for each mock 
-catalog. Below we briefly descirbe how $P_\ell(k)$ and $\zeta(N)$ are 
-measured in \cite{beutler2017} and \cite{sinha2017a} and how the 
-covariance matrix is computed. 
+catalog. Below we briefly describe how $P_\ell(k)$ and $\zeta(N)$ 
+and their covariance matrices are measured in \cite{beutler2017} 
+and \cite{sinha2017a}. Furthermore, we describe how we pre-process
+the mock observables to be used in the methods we describe in the 
+next sections.
 
 To measure the powerspectrum multipoles of the BOSS DR12 galaxies
 and the MutliDark-\patchy~mocks (Section~\ref{sec:patchy}), \cite{beutler2017} uses a 
@@ -220,18 +233,18 @@ The powerspectrum monopole and quadrupole are computed over
 the range $k = 0.01 - 0.15\, h\mathrm{Mpc}^{-1}$ while the 
 hexadecapole is computed over the range $k = 0.01 - 0.10\, h\mathrm{Mpc}^{-1}$.
 For further details on the estimator we refer readers to Section 3 of 
-\cite{beuter2017}. 
+\cite{beutler2017}. 
 
 Using the $P_\ell(k)$ of the MultiDark-\patchy~mocks, \cite{beutler2017}
 then computes the covariance matrix of all multipoles as 
 \beq
-\mathbb{C}_{xy} = \frac{1}{N_\mathrm{mock} - 1} \sum\limits_{n=1}^{N_\mathrm{mock}} \big[ P_{\ell,n}(k_i) - \bar{P}_\ell(k_i) \big]
-    \times \big[ P_{\ell^{'},n}(k_j) - \bar{P}_{\ell^{'}}(k_j) \big].
+\mathbb{C}_{xy} = \frac{1}{N_\mathrm{mock} - 1} \sum\limits_{n=1}^{N_\mathrm{mock}} \big[ P_{\ell,n}(k_i) - \overline{P}_\ell(k_i) \big]
+    \times \big[ P_{\ell^{'},n}(k_j) - \overline{P}_{\ell^{'}}(k_j) \big].
 \eeq
-$N_\mathrm{mock}$ is the number of mock catalogs and $\bar{P}_\ell$ is
+$N_\mathrm{mock}$ is the number of mock catalogs and $\overline{P}_\ell$ is
 the mean of the mock powerspectra: 
 \beq
-\bar{P}_\ell(k_i) = \frac{1}{N_\mathrm{mock}} \sum\limits_{n=1}^{N_\mathrm{mock}} P_{\ell, n}(k_i). 
+\overline{P}_\ell(k_i) = \frac{1}{N_\mathrm{mock}} \sum\limits_{n=1}^{N_\mathrm{mock}} P_{\ell, n}(k_i). 
 \eeq
 The $(x,y)$ element of $\mathbb{C}$ is given by 
 $(x,y) = (n_b\frac{\ell}{2} + i, n_b\frac{\ell^{'}}{2} + j)$, where 
@@ -243,52 +256,107 @@ In this work, we compute the $P_\ell(k)$ of the MultiDark-\patchy~mocks,
 using a similar FFT-based estimator of \cite{hand2017a} instead
 of the estimator in \cite{beutler2017}. Our choice was based on 
 computational convenience. A python implementation
-of the estimator is publicly available in the $\mathtt{NBODYKIT}$ package\footnote{http://nbodykit.readthedocs.io/en/latest/index.html}. 
+of the \cite{hand2017a} estimator is publicly available in the $\mathtt{NBODYKIT}$ 
+package\footnote{http://nbodykit.readthedocs.io/en/latest/index.html}. 
 We emphasize that the resulting $P_\ell(k)$s and covariance matrix from 
-the two estimators are consistent with one another. 
+the two estimators have been confirmed to be consistent with one another. 
 
-Next, for the \cite{sinha2017a} analysis, to compute the group multiplicity 
-function, they use the \cite{berlind2006} friend-of-friend algorithm to 
-identify groups in the SDSS and mock data. Based on this algorithm, a 
+Next, for the \cite{sinha2017a} group multiplicity function analysis, 
+they start with the \cite{berlind2006} friend-of-friend algorithm to 
+identify groups in the SDSS and mock data. According to the algorithm, a 
 galaxy pair is assigned to the same group if their projected and line-of-sight 
 separations are both less than the corresponding linking length. \cite{sinha2017a} 
-adopts the \cite{berlind2006} linking lengths: $b_\perp = 0.14$ and $b_\parallel = 0.75$
-times the mean inter-galaxy separation $n_g^{-1/3}$, where $n_g$ is the  
-number density of the sample. For refernce, the linking lengths for the 
-SDSS DR7 $M_r < -19$ sample correspond to comoving lenghts of 
+adopts the \cite{berlind2006} linking lengths: $b_\perp = 0.14$ and $b_\parallel = 0.75$.
+These linking lengths are in units of  mean inter-galaxy separation 
+$n_g^{-1/3}$, where $n_g$ is the number density of the sample. In comoving
+lengths, the linking lengths for the SDSS DR7 $M_r < -19$ sample correspond to
 $(r_\perp, r_\parallel) = (0.57, 3.05)h^{-1}\mathrm{Mpc}$. 
 Once the groups are identified in the SDSS and mock data, $\zeta(N)$
 is derived by calculating the comoving number density of groups 
-in bins of richness $N$~\emph{i.e.} the number of galaxies in the group. 
-For the $M_r < −19$ SDSS sample, \cite{sinha2017a} uses eight bins of $N$: 
+in bins of richness $N$ -- the number of galaxies in the group. 
+For the $M_r < −19$ SDSS sample, \cite{sinha2017a} uses eight $N$ bins: 
 $(5 - 6), (7 - 9), (10 - 13), (14 - 19), (20 - 32), (33 - 52), (53 - 84), (85 - 220)$.
-For further details we refer readers to Section 4.2 of \cite{sinha2017a}. 
+For further details on the GMF calculation, we refer readers to Section 4.2
+of \cite{sinha2017a}. 
+
+From the GMFs of each mocks, \cite{sinha2017a} computes the covariance
+matrix for the analysis as 
+\beq \label{eq:gmf_cov} 
+\mathbb{C}_{ij} = \frac{1}{N_\mathrm{mock} -1} \sum\limits_{n=1}^{N_\mathrm{mock}} \big[\zeta_n(N_i) -  \bar{\zeta}(N_i)\big] \times
+    \big[\zeta_n(N_j) -  \bar{\zeta}(N_j)\big].
+\eeq
+In \cite{sinha2017a}, they compute the covariance matrix using 200 mocks
+generated using a single fiducial set of HOD parameters. However, as we 
+mention in Section~\ref{sec:gmf}, in this paper we use 20,000 mocks from 
+100 different set of HOD parameters sampled from the MCMC chain. Consistent
+with this, the GMF covariance matrix we use in this paper is computed as
+Eq.~\ref{eq:gmf_cov} but with the $N_\mathrm{mock} = 20,000$ mocks. 
 
 In the rest of this paper we investigate the non-Gaussianity of the 
-likelihood and its impact on parameter inference for the analysis in 
-\cite{beutler2017} and \cite{sinha2017a}. In order to consistently discuss 
-the two separate analyses, we define the ${\bf X}^\mathrm{mock}$ matrix 
-and covariance matrix $\mathbb{C}$ and describe how they are calculated 
-from the mock catalogs described above.
-
-
+likelihood and its impact on parameter inference for both \cite{beutler2017} 
+and \cite{sinha2017a}. In order to discuss the two separate analyses
+in a consistent manner, we define the matrix $\Dmock$ of 
+the mock observables ($P_\ell$ and $\zeta$) as follows. 
 \beq
-{\bf X}_i = [P_0(k)_i,P_2(k)_i,P_4(k)_i]
+\Dmock = \{{\bf D}^\mathrm{mock}_n\}
 \eeq
+where $\Dmock_n = [P_0(k)_n,P_2(k)_n,P_4(k)_n]$ for 
+\cite{beutler2017} and $\Dmock_n = \zeta(N)_n$ for 
+\cite{sinha2017a}. The $\Dmock$ matrix for \cite{beutler2017} has dimensions
+$2048 \times 37$. Similiarly, the $\Dmock$ matrix for the $M_r < -19$ 
+analysis in \cite{sinha2017a} has dimensions $20,000 \times 8$. 
 
-Furthermore, 
-\todo{talk about the data whitening and what we mean by covariance matrix for GMF} 
-${\bf X}_i = [P_0(k)_i,P_2(k)_i,P_4(k)_i]$ \\
-${\bf X}_i = \zeta(N)_i$ \\ 
-${\bf X} = \{{\bf X}_i\}$
+For the methods we later describe in Section~\todo{ref}, the mock 
+observable data ($\Dmock$) need to be pre-processed. This pre-processing
+involves two steps: mean-subtraction and whitening. For mean subtraction, 
+the mean of the observable, $\bar{\bf D}^\mathrm{mock} = \overline{P_\ell}$ or 
+$\bar{\zeta}$, is subtracted from $\Dmock$. Then $\Dmock - \bar{\bf D}^\mathrm{mock}$ 
+is whitened using a linear transformation to remove the Gaussian correlation
+between the bins of $\Dmock$: 
+\beq
+\Xmock = L\,(\Dmock - \bar{\bf D}^\mathrm{mock}). 
+\eeq
+The linear transformation is derived so that covariance matrix of the whitened 
+data, $\Xmock$, is the identity matrix $\mathbb{I}$. Such a whitening linear 
+transformation can be derived in infinite ways. 
+One way to derive the linear transformation is through the eigen-decomposition
+of the covariance matrix~\citep[\emph{e.g.}][]{hartlap2009, sellentin2017}. We, alternatively, 
+derive the linear transformation ${\bf L}$ using Choletsky decompositon of the 
+inverse covariance matrix~\citep{Press:1992:NRC:148286}: 
+$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. \todo{We confirm tha the different 
+whitening algorithms, does not impact the results of the paper.}
+Now that we have the pre-processed data of the mock observables, 
+we proceed in the next section to quantifying the non-Gaussianity of the 
+$P_\ell$ and $\zeta$ likelihoods using $\Xmock$. 
+
 
 \section{Quantifying the Likelihood non-Gaussianity}
-In \cite{sellentin2017} \todo{discuss how sellentin and hartlap's stuff is an attempt to quantify the divergence} 
+The standard approach to parameter inference in LSS studies neglects
+to account for likelihood non-Gaussianity (Section~\ref{sec:gaussass}). 
+However, we are not the first to investigate likelihood non-Gaussianity 
+in LSS analyses. Nearly two decades ago, \cite{scoccimarro2000} examined 
+the likelihood non-Gaussianity for the powerspectrum and reduced bispectrum 
+using mock catalogs of the IRAS redshift catalogs. More recently, 
+\cite{hartlap2009} and \cite{sellentin2017} examined the non-Gaussianity 
+of the cosmic shear correlation function likelihood using simulations of 
+the Chandra Deep Field South and CFHTLenS, respectively. 
 
-A more direct approach can be taken to quantify the non-Gaussianity of 
-the likelihood. We can calculate the divergence between the distribution 
-of our observable, $p(x)$, and $q(x)$ a multivariate Gaussian described 
-by the average of the mocks and the covariance matrix $\mathbb{C}$.
+While these works present different methods for identifying 
+likelihood non-Gaussianity, they do not present a concrete way of 
+quantifying it. For instance, \cite{hartlap2009} identifies the
+non-Gaussianity of the cosmic shear likelihood by looking at the
+statistical independence/dependence of PCA components of the mock 
+observable datavector. In \cite{sellentin2017}, they use the Mean
+Integrated Squared Error (MISE) as a distance metric between 
+Gaussian random variables and the whitened mock observable 
+datavector to identify non-Gaussian correlations between two elements 
+of the data vector. These indirect measures of likelihood non-Gaussianity 
+are challenging to interpret and extend more generally to LSS studies. 
+
+A more direct approach, however, can be taken to quantify the 
+non-Gaussianity of the likelihood. We can calculate the divergence between 
+the distribution of our observable, $p(x)$, and $q(x)$ a multivariate Gaussian described 
+by the average of the mocks and the covariance matrix.
 The following are two of the most commonly used divergences: 
 the Kullback-Leibler (hereafter KL) divergence
 \beq \label{eq:kl} 
@@ -309,7 +377,7 @@ equivalent to the KL divergence.
 Of course, in our case, we don't know $p(x)$ --- \emph{i.e.} the distribution of
 our observable. If we did, we would simply use that instead of bothering with 
 the covariance matrix or this paper. We can, however, still estimate the 
-divergence using nonparametric estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
+divergence using nonparametric divergence estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
 These estimators, allows us to estimate the divergence directly from 
 samples $X_{1:n} = \{ X_1, ... X_n \}$ and $Y_{1:m} = \{ Y_1, ... Y_m \}$ 
 drawn from $p$ and $q$ respectively: $\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m})$. 
@@ -351,28 +419,27 @@ For more details on the non-parametric divergence estimators, we refer readers t
 \cite{poczos2012} and \cite{krishnamurthy2014}.
 
 Now we can use the divergence estimators above to quantify the non-Gaussianity 
-of the likelihood. More specifically, we're intersted in the divergence between
-the distribution $p(x)$ sampled by the mock observables (${\bf X}^\mathrm{mock}$)
-and the multivariate Gaussian distribution assumed in standard analyses,
-which is solely described by the mean and covariance calculated from the mocks 
-($\mathcal{N}(\overline{{\bf X}^\mathrm{mock}}, {\bf C})$). Since
-${\bf X}^\mathrm{mock}$ is a sample from $p(x)$, we draw a reference sample 
-${\bf Y}^\mathrm{ref}$ from $\mathcal{N}(\overline{{\bf X}^\mathrm{mock}}, {\bf C}$ 
+of the likelihood. In other words, we're intersted in the divergence between
+the distribution $p(x)$ sampled by the mock observables $\Xmock$ (Section~\ref{sec:xmock})
+and the multivariate Gaussian distribution assumed in standard analyses
+-- $\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$. Since
+$\Xmock$ is a sample from $p(x)$, we draw a reference sample 
+${\bf Y}^\mathrm{ref}$ from $\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$ 
 to use in the estimators. Similar to the experiments detailed in \cite{poczos2012}, 
-we construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as ${\bf X}^\mathrm{mock}$:  
+we construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as $\Xmock$: 
 $2000$ and $10,000$ for the $P_\ell$ and $\zeta$ analyses respectively. 
-
-
-In Figure~\ref{fig:div_nongauss} we compare the distribution of 
-R\'enyi-$\alpha$ (left) and $KL$ (right) divergence estimates (orange)
+In Figure~\ref{fig:div_nongauss}, we compare the distribution of 
+\Ralpha (left) and $KL$ (right) divergence estimates (orange)
 $\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$
 between the mock data ${\bf X}^\mathrm{mock}$ and a reference sample 
 ${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (top) and $\zeta(N)$ (bottom) analyses.
-As a reference point for the comparison, we include in Figure~\ref{fig:div_nongauss} 
-(blue) the distribution of R\'enyi-$\alpha$ and $KL$ divergence estimates if 
-${\bf X}^\mathrm{mock}$ were actually sampled from $\mathcal{N}(\overline{{\bf X}^\mathrm{mock}}, {\bf C})$ 
-and ${\bf Y}^\mathrm{ref}$. All distributions were constructed using $100$ 
-divergence estimates. 
+These distributions were constructed using \todo{100} divergence estimates, 
+where $\Yref$ is resampled for each estimate. In order to illustrate the scatter of the estimators and also  
+as a reference point for the comparison, we include (blue) 
+the distribution of $\hat{D}_{R\alpha}(\Xref \parallel \Yref)$ 
+and $\hat{D}_{KL}(\Xref \parallel \Yref)$ where $\Xref$ is a data vector
+with the same dimension as $\Xmock$ sampled from $\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$.
+%$\hat{D}_{R\alpha}(\Xmock \parallel \Yref)$ and $\hat{D}_{KL}(\Xmock \parallel \Yref)$ are \emph{estimates} of the actual divergence. 
 
 The discrepancy between the blue and orange distributions illustrates the
 non-Gaussianity of $p(x)$ sampled by ${\bf X}^\mathrm{mock}$. 
@@ -380,9 +447,13 @@ non-Gaussianity of $p(x)$ sampled by ${\bf X}^\mathrm{mock}$.
     \item Describe the discrepancy. 
 \eitem
 
-\section{A More Accurate Likelihood} 
-%Estimating the Non-Gaussian Likelihood}
-%\subsection{Nonparametric Likelihood Estimation}
+\section{Estimating the Non-Gaussian Likelihood}
+The previous section firmly illustrates the non-Gaussianity of both 
+the $P_\ell$ and $\zeta$ likelihoods. We are, however, ultimately 
+interested in developing more accurate parameter inference for LSS 
+studies. 
+
+
 \bitem
     \item Gaussian Mixture Model 
     \item expectation maximization algorithm \cite{dempster1977}

@@ -17,6 +17,14 @@ Alam, S., Ata, M., Bailey, S., {et~al.} 2017,
   \href{http://dx.doi.org/10.1093/mnras/stx721}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 470, 2617}
 
+\bibitem[{Berlind {et~al.}(2006)Berlind, Frieman, Weinberg, Blanton, Warren,
+  Abazajian, Scranton, Hogg, Scoccimarro, Bahcall, Brinkmann, Gott, Kleinman,
+  Krzesinski, Lee, Miller, Nitta, Schneider, Tucker, Zehavi, \& {SDSS
+  Collaboration}}]{berlind2006}
+Berlind, A.~A., Frieman, J., Weinberg, D.~H., {et~al.} 2006,
+  \href{http://dx.doi.org/10.1086/508170}{\JournalTitle{The Astrophysical
+  Journal Supplement Series}, 167, 1}
+
 \bibitem[{Beutler {et~al.}(2017)Beutler, Seo, Saito, Chuang, Cuesta,
   Eisenstein, Gil-Mar{\'\i}n, Grieb, Hand, Kitaura, Modi, Nichol, Olmstead,
   Percival, Prada, S{\'a}nchez, Rodriguez-Torres, Ross, Ross, Schneider,
@@ -69,6 +77,11 @@ Hahn, C., Scoccimarro, R., Blanton, M.~R., Tinker, J.~L., \&
   Rodr{\'\i}guez-Torres, S.~A. 2017,
   \href{http://dx.doi.org/10.1093/mnras/stx185}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 467, 1940}
+
+\bibitem[{Hand {et~al.}(2017)Hand, Li, Slepian, \& Seljak}]{hand2017a}
+Hand, N., Li, Y., Slepian, Z., \& Seljak, U. 2017,
+  \href{http://dx.doi.org/10.1088/1475-7516/2017/07/002}{\JournalTitle{Journal
+  of Cosmology and Astro-Particle Physics}, 07, 002}
 
 \bibitem[{Hartlap {et~al.}(2009)Hartlap, Schrabback, Simon, \&
   Schneider}]{hartlap2009}
@@ -190,6 +203,10 @@ Ross, A.~J., Beutler, F., Chuang, C.-H., {et~al.} 2017,
 Scoccimarro, R. 1998,
   \href{http://dx.doi.org/10.1046/j.1365-8711.1998.01845.x}{\JournalTitle{Monthly
   Notices of the Royal Astronomical Society}, 299, 1097}
+
+\bibitem[{Scoccimarro(2000)}]{scoccimarro2000}
+---. 2000, \href{http://dx.doi.org/10.1086/317248}{\JournalTitle{The
+  Astrophysical Journal}, 544, 597}
 
 \bibitem[{Scoccimarro(2015)}]{scoccimarro2015a}
 ---. 2015,
