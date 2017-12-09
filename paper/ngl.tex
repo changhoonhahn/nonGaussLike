@@ -121,8 +121,8 @@ multipole full shape analysis of \cite{beutler2017} and group multiplicity
 function analysis of \cite{sinha2017a}. Throughout the paper we will 
 make extensive use of the mock catalogs used in these analyses. 
 In this section, we give a brief description of these mocks and how 
-the observables used in the analysis -- the powerspectrum 
-multipole ($P_\ell$) and group multiplicity function ($\zeta(N)$) --
+the observables used in the analysis --- the powerspectrum 
+multipole ($P_\ell$) and group multiplicity function ($\zeta(N)$) ---
 are calculated from them. Afterwards, we will describe how we compute 
 the covariance matrix, $\mathbb{C}$, and the pre-processed mock observable
 date, ${\bf X}^\mathrm{mock}$.
@@ -276,7 +276,7 @@ lengths, the linking lengths for the SDSS DR7 $M_r < -19$ sample correspond to
 $(r_\perp, r_\parallel) = (0.57, 3.05)h^{-1}\mathrm{Mpc}$. 
 Once the groups are identified in the SDSS and mock data, $\zeta(N)$
 is derived by calculating the comoving number density of groups 
-in bins of richness $N$ -- the number of galaxies in the group. 
+in bins of richness $N$ --- the number of galaxies in the group. 
 For the $M_r < −19$ SDSS sample, \cite{sinha2017a} uses eight $N$ bins: 
 $(5 - 6), (7 - 9), (10 - 13), (14 - 19), (20 - 32), (33 - 52), (53 - 84), (85 - 220)$.
 For further details on the GMF calculation, we refer readers to Section 4.2
@@ -427,7 +427,7 @@ Now we can use the divergence estimators above to quantify the non-Gaussianity
 of the likelihood. In other words, we're intersted in the divergence between
 the distribution $p(x)$ sampled by the mock observables $\Xmock$ (Section~\ref{sec:xmock})
 and the multivariate Gaussian ``pseudo-likelihood''distribution assumed in 
-standard analyses -- $\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$. Since
+standard analyses --- $\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$. Since
 $\Xmock$ is a sample from $p(x)$, we draw a reference sample 
 ${\bf Y}^\mathrm{ref}$ from $\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$ 
 to use in the estimators. Similar to the experiments detailed in \cite{poczos2012}, 
@@ -456,7 +456,7 @@ non-Gaussianity of $p(x)$ sampled by ${\bf X}^\mathrm{mock}$.
 In the previous section, we estimate the divergence between the 
 $P_\ell$ and $\zeta$ likelihoods sampled by mocks and their respective 
 Gaussian pseudo-likelihoods. The divergence estimates quantify 
-the non-Gaussianity of the likelihoods and \todo{discredit} the 
+the non-Gaussianity of the likelihoods and discredit the 
 Gaussian likelihood assumption in standard LSS studies. Our ultimate goal, 
 however, goes beyond demonstrating this non-Gaussianity. We're interested 
 in quantifying the impact of likelihood non-Gaussianity on the final 
@@ -477,49 +477,56 @@ the Gaussian pseudo-likelihood.
 \subsection{Gaussian Mixture Likelihood Estimation}
 When mock catalogs are used in LSS analyses to estimate the 
 covariance matrix, they are used as data points sampling the 
-likelihood distribution. When constructing the pseudo-likelihood, 
+likelihood distribution. For the pseudo-likelihood, 
 this distribution is assumed to have a Gaussian functional form. 
 However, the Gaussian functional form, or any functional form for 
 that matter, is not necessary to estimate the likelihood distribution. 
-Instead the $N_\mathrm{bin}$-dimensional likelihood distribution 
-can be directly estimated from the set of mock catalogs using -- for 
-instance, Gaussian mixture density estimation. 
+Instead, the $N_\mathrm{bin}$-dimensional likelihood distribution 
+can be directly estimated from the set of mock catalogs using --- for 
+instance, Gaussian mixture density estimation~\citep{9780471006268}. 
 
 Gaussian mixutre density estimation is a ``semi-parametric'' method 
 that uses a Gaussian mixture model, a weighted sum of $k$ Gaussian 
 component densities
 \beq
-p({\bf x}) = \sum\limits_{i=1}^{k} \pi_i\, \mathcal{N}({\bf x}; \bm{\theta}_i),
+p({\bf x}; \bm{\theta}) = \sum\limits_{i=1}^{k} \pi_i\, \mathcal{N}({\bf x}; \bm{\theta}_i),
 \eeq
-to estimate the density~\citep{9780471006268}. 
+to estimate the density. 
 The component weights ($\pi_i$; also known as mixing weights) and the 
 component parameters $\bm{\theta}_i$ are free parameters of the mixture 
-model. Most popularly, the free parameter of the model are estimated 
-through an expectation-maximization (EM) algorithm~\citep{dempster1977}.
-The EM algorithm initiates by randomly assigning $\bm{\theta}^0_i$ to the 
+model. Most popularly, the free parameters of the model, given some data
+set ${\bf X}_N = \{{\bf x}_1,..., {\bf x}_N \}$, are estimated 
+through an expectation-maximization algorithm~\citep[EM;][]{dempster1977, neal1998}.
+The EM algorithm begins by randomly assigning $\bm{\theta}^0_i$ to the 
 $k$ Gaussian componenets. The algorithm then iterates between two steps. 
-In the first step, the algorithm computes, for each point, a probability
-of being generated by each component of the model. These probabilities 
-can be thought of as probabilistic assignments of the points to the 
-components. Next, given the assignment of the data points to the components, 
-$\bm{\theta}^t_i$ of each component are updated to $\bm{\theta}^{t+1}_i$
-to maximize the likelihood of the assigned points. This process is 
-repeated until convergence~\emph{i.e.}
-when the log-likelihood of the data given the mixture model converges. 
-The EM algorithm is guaranteed to converges to a local maximum of the 
-likelihood~\citep{wu1983}. 
+In the first step, the algorithm computes, for each data point ${\bf x}_n$, 
+a probability of being generated by each component of the model. These 
+probabilities can be thought of as weighted assignments of the points 
+to the components. Next, given the assignment of the data points ${\bf x}_n$ to the 
+components, $\bm{\theta}^t_i$ of each component are updated to $\bm{\theta}^{t+1}_i$
+to maximize the likelihood of the assigned points. At this point, the mixing 
+weights $\pi_i$ can also be updated by summing up the assignment weights 
+and normalizing it by $N$, the total number of data points. This entire
+process is repeated until convergence---\emph{i.e.} when the log-likelihood of 
+given the mixture model $\log\,\mathcal{L} = \log\,p({\bf X}_N; \bm{\theta}^t)$ %= \sum\limits_{n=1}^{N} \log\,p({\bf x}_n; \bm{\theta}^t)
+converges. The EM algorithm is guaranteed to converges to a local maximum 
+of the likelihood~\citep{wu1983}. 
 
 Instead of arbitrarily assigning the initial $\bm{\theta}^0_i$, more
 commonly in practice, $\bm{\theta}^0_i$ is derived from a $\mathtt{k-means}$ 
-clustering algorithm~\citep{lloyd1982}.
+clustering algorithm~\citep{lloyd1982}. Without going into details, the 
+$\mathtt{k-means}$ algorithm clusters the data ${\bf X}_N$ into $k$ 
+clusters, each described by the mean (or centroid) $\mu_i$ of the
+samples in the cluster. The algorithm then iteratively chooses centroids that 
+minimize the average squared distance between points in the same cluster.
+In our use of Gaussian mixture modelling, we set the initial conditions of 
+the EM algorithm using the $\mathtt{k-means}{\tiny ++}$ algorithm of ~\cite{arthur2007}. 
 
-\todo{kmeans initial conditions} 
 \todo{Bayesian Information Criteria to determine $k$} 
 
 
 \todo{talk about how this is used extensively in ML and even astronomy} 
-\citep[see also references in][]{kuhn2017}
-This direct 
+\citep[see also references in][]{kuhn2017}. This direct 
 approach is particularly promising for the case of \Sinh, where we have
 $N_\mathrm{mock} = 20,000$ samples of an $N_\mathrm{bin} = 8$ 
 dimensional distribution. \todo{As an illustration of Gaussian mixture 

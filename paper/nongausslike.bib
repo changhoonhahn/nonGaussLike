@@ -6173,23 +6173,6 @@ approximating the LOS to each pair of galaxies by the LOS to one of them. We sho
   pages = {L11--L15}
 }
 
-@article{scoccimarro2015a,
-  title = {Fast Estimators for Redshift-Space Clustering},
-  volume = {92},
-  issn = {1550-7998},
-  doi = {10.1103/PhysRevD.92.083532},
-  abstract = {Redshift-space distortions in galaxy surveys happen along the radial direction, breaking statistical translation invariance. We construct estimators for radial distortions that, using only fast fourier
-transforms (FFTs) of the overdensity field multipoles for a given survey geometry, compute the power spectrum monopole, quadrupole and
-hexadecapole, and generalize such estimators to the bispectrum. Using realistic mock catalogs we compare the signal to noise of two estimators for the power spectrum hexadecapole that require different number of FFTs and measure the bispectrum monopole, quadrupole and hexadecapole. The resulting algorithm is very efficient, e.g. the BOSS survey requires about 3 min for $\mathscr{l}$=0 ,2 ,4 power spectra for scales up to k =0.3 h Mpc-1 and about 15 additional min for $\mathscr{l}$=0 ,2 ,4 bispectra for all scales and triangle shapes up to k =0.2 h Mpc-1 on a single core. The speed of these estimators is essential as it makes possible for one to compute covariance matrices from large number of realizations of mock catalogs with realistic survey characteristics, and paves the way for improved constraints of gravity on cosmological scales, inflation and galaxy bias.},
-  urldate = {2017-12-06},
-  journal = {Physical Review D},
-  author = {Scoccimarro, Rom{\'a}n},
-  month = oct,
-  year = {2015},
-  keywords = {Cosmology},
-  pages = {083532}
-}
-
 @article{hand2017a,
   title = {An Optimal {{FFT}}-Based Anisotropic Power Spectrum Estimator},
   volume = {07},
@@ -6251,6 +6234,155 @@ populations and dark matter halos.},
   keywords = {Cosmology: Large-Scale Structure of Universe,Galaxies: Clusters: General},
   pages = {1--25},
   file = {/Users/chang/Zotero/storage/MR7H4C5J/Berlind et al. - 2006 - Percolation Galaxy Groups and Clusters in the SDSS.pdf}
+}
+
+@book{Press:1992:NRC:148286,
+  address = {New York, NY, USA},
+  title = {Numerical {{Recipes}} in {{C}} ({{2Nd Ed}}.): {{The Art}} of {{Scientific Computing}}},
+  isbn = {0-521-43108-5},
+  publisher = {{Cambridge University Press}},
+  author = {Press, William H. and Teukolsky, Saul A. and Vetterling, William T. and Flannery, Brian P.},
+  year = {1992}
+}
+
+@article{scoccimarro2001,
+  title = {The {{Bispectrum}} of {{IRAS Redshift Catalogs}}},
+  volume = {546},
+  issn = {0004-637X},
+  doi = {10.1086/318284},
+  abstract = {We compute the bispectrum for the galaxy distribution in the IRAS QDOT, 2 Jy, and 1.2 Jy redshift catalogs for wavenumbers 0.05$<$=k$<$=0.2 h Mpc-1 and compare the results with predictions from
+gravitational instability in perturbation theory. Taking into account redshift-space distortions, nonlinear evolution, the survey selection function, and discreteness and finite-volume effects, all three catalogs show evidence for the dependence of the bispectrum on the configuration shape predicted by gravitational instability. Assuming Gaussian initial conditions and local biasing parameterized by linear and nonlinear bias parameters b1 and b2, a likelihood analysis yields 1/b1=1.32+0.36-0.58,
+1.15+0.39-0.39 and
+b2/b21=-0.57+0.45- 0.30, -0.50+0.31-0.51 for the 2 and 1.2 Jy samples, respectively. This implies that IRAS galaxies trace dark matter increasingly weakly as the density contrast increases, consistent with their being underrepresented in clusters. In a model with
+$\chi$2 non-Gaussian initial conditions, the bispectrum
+displays an amplitude and scale dependence different from that found in the Gaussian case; if IRAS galaxies do not have bias b1$>$1 at large scales, $\chi$2 non-Gaussian initial conditions are ruled out at the 95\% confidence level. The IRAS data do not distinguish between Lagrangian and Eulerian local bias.},
+  urldate = {2017-12-08},
+  journal = {The Astrophysical Journal},
+  author = {Scoccimarro, Rom{\'a}n and Feldman, Hume A. and Fry, J. N. and Frieman, Joshua A.},
+  month = jan,
+  year = {2001},
+  keywords = {Cosmology: Large-Scale Structure of Universe,Cosmology: Observations,Methods: Statistical},
+  pages = {652--664},
+  file = {/Users/chang/Zotero/storage/643KWQ3C/Scoccimarro et al. - 2001 - The Bispectrum of IRAS Redshift Catalogs.pdf}
+}
+
+@article{bovy2011,
+  title = {Extreme Deconvolution: {{Inferring}} Complete Distribution Functions from Noisy, Heterogeneous and Incomplete Observations},
+  volume = {5},
+  issn = {1932-6157, 1941-7330},
+  shorttitle = {Extreme Deconvolution},
+  doi = {10.1214/10-AOAS439},
+  abstract = {We generalize the well-known mixtures of Gaussians approach to density estimation and the accompanying Expectation\textendash{}Maximization technique for finding the maximum likelihood parameters of the mixture to the case where each data point carries an individual d-dimensional uncertainty covariance and has unique missing data properties. This algorithm reconstructs the error-deconvolved or ``underlying'' distribution function common to all samples, even when the individual data points are samples from different distributions, obtained by convolving the underlying distribution with the heteroskedastic uncertainty distribution of the data point and projecting out the missing data directions. We show how this basic algorithm can be extended with conjugate priors on all of the model parameters and a ``split-and-merge'' procedure designed to avoid local maxima of the likelihood. We demonstrate the full method by applying it to the problem of inferring the three-dimensional velocity distribution of stars near the Sun from noisy two-dimensional, transverse velocity measurements from the Hipparcos satellite.},
+  language = {EN},
+  number = {2B},
+  urldate = {2017-12-08},
+  journal = {The Annals of Applied Statistics},
+  author = {Bovy, Jo and Hogg, David W. and Roweis, Sam T.},
+  month = jun,
+  year = {2011},
+  keywords = {Bayesian inference,density estimation,Expectation–Maximization,missing data,multivariate estimation,noise},
+  pages = {1657--1677},
+  file = {/Users/chang/Zotero/storage/VKR7ANRI/Bovy et al. - 2011 - Extreme deconvolution Inferring complete distribu.pdf;/Users/chang/Zotero/storage/S8JK6NDP/1310562737.html}
+}
+
+@article{bovy2011a,
+  archivePrefix = {arXiv},
+  eprinttype = {arxiv},
+  eprint = {0905.2979},
+  title = {Extreme Deconvolution: {{Inferring}} Complete Distribution Functions from Noisy, Heterogeneous and Incomplete Observations},
+  volume = {5},
+  issn = {1932-6157},
+  shorttitle = {Extreme Deconvolution},
+  doi = {10.1214/10-AOAS439},
+  abstract = {We generalize the well-known mixtures of Gaussians approach to density estimation and the accompanying Expectation--Maximization technique for finding the maximum likelihood parameters of the mixture to the case where each data point carries an individual \$d\$-dimensional uncertainty covariance and has unique missing data properties. This algorithm reconstructs the error-deconvolved or "underlying" distribution function common to all samples, even when the individual data points are samples from different distributions, obtained by convolving the underlying distribution with the heteroskedastic uncertainty distribution of the data point and projecting out the missing data directions. We show how this basic algorithm can be extended with conjugate priors on all of the model parameters and a "split-and-merge" procedure designed to avoid local maxima of the likelihood. We demonstrate the full method by applying it to the problem of inferring the three-dimensional velocity distribution of stars near the Sun from noisy two-dimensional, transverse velocity measurements from the Hipparcos satellite.},
+  number = {2B},
+  urldate = {2017-12-08},
+  journal = {The Annals of Applied Statistics},
+  author = {Bovy, Jo and Hogg, David W. and Roweis, Sam T.},
+  month = jun,
+  year = {2011},
+  keywords = {Astrophysics - Astrophysics of Galaxies,Physics - Data Analysis; Statistics and Probability,Statistics - Applications,Statistics - Computation,Statistics - Methodology},
+  pages = {1657--1677},
+  file = {/Users/chang/Zotero/storage/S5FT64GQ/0905.html},
+  annote = {Comment: Published in at http://dx.doi.org/10.1214/10-AOAS439 the Annals of Applied Statistics (http://www.imstat.org/aoas/) by the Institute of Mathematical Statistics (http://www.imstat.org)}
+}
+
+@book{zotero-990,
+  type = {book}
+}
+
+@book{9780471006268,
+  title = {Finite {{Mixture Models}}},
+  isbn = {0-471-00626-2},
+  publisher = {{Wiley-Interscience}},
+  author = {McLachlan, Geoffrey and Peel, David},
+  year = {2000}
+}
+
+@article{lloyd1982,
+  title = {Least Squares Quantization in {{PCM}}},
+  volume = {28},
+  issn = {0018-9448},
+  doi = {10.1109/TIT.1982.1056489},
+  abstract = {It has long been realized that in pulse-code modulation (PCM), with a given ensemble of signals to handle, the quantum values should be spaced more closely in the voltage regions where the signal amplitude is more likely to fall. It has been shown by Panter and Dite that, in the limit as the number of quanta becomes infinite, the asymptotic fractional density of quanta per unit voltage should vary as the one-third power of the probability density per unit voltage of signal amplitudes. In this paper the corresponding result for any finite number of quanta is derived; that is, necessary conditions are found that the quanta and associated quantization intervals of an optimum finite quantization scheme must satisfy. The optimization criterion used is that the average quantization noise power be a minimum. It is shown that the result obtained here goes over into the Panter and Dite result as the number of quanta become large. The optimum quautization schemes for2\^bquanta,b=1,2, cdots, 7, are given numerically for Gaussian and for Laplacian distribution of signal amplitudes.},
+  number = {2},
+  journal = {IEEE Transactions on Information Theory},
+  author = {Lloyd, S.},
+  month = mar,
+  year = {1982},
+  keywords = {Least-squares approximation,PCM communication,Quantization (signal),Signal quantization},
+  pages = {129--137},
+  file = {/Users/chang/Zotero/storage/LUPVDB6B/1056489.html}
+}
+
+@article{wu1983,
+  title = {On the {{Convergence Properties}} of the {{EM Algorithm}}},
+  volume = {11},
+  issn = {0090-5364, 2168-8966},
+  doi = {10.1214/aos/1176346060},
+  abstract = {Two convergence aspects of the EM algorithm are studied: (i) does the EM algorithm find a local maximum or a stationary value of the (incomplete-data) likelihood function? (ii) does the sequence of parameter estimates generated by EM converge? Several convergence results are obtained under conditions that are applicable to many practical situations. Two useful special cases are: (a) if the unobserved complete-data specification can be described by a curved exponential family with compact parameter space, all the limit points of any EM sequence are stationary points of the likelihood function; (b) if the likelihood function is unimodal and a certain differentiability condition is satisfied, then any EM sequence converges to the unique maximum likelihood estimate. A list of key properties of the algorithm is included.},
+  language = {EN},
+  number = {1},
+  urldate = {2017-12-09},
+  journal = {The Annals of Statistics},
+  author = {Wu, C. F. Jeff},
+  month = mar,
+  year = {1983},
+  keywords = {curved exponential family,EM algorithm,GEM algorithm,incomplete data,maximum likelihood estimate},
+  pages = {95--103},
+  file = {/Users/chang/Zotero/storage/MPBP8BVX/1176346060.html}
+}
+
+@incollection{neal1998,
+  series = {NATO ASI Series},
+  title = {A {{View}} of the {{Em Algorithm}} That {{Justifies Incremental}}, {{Sparse}}, and Other {{Variants}}},
+  isbn = {978-94-010-6104-9 978-94-011-5014-9},
+  abstract = {The EM algorithm performs maximum likelihood estimation for data in which some variables are unobserved. We present a function that resembles negative free energy and show that the M step maximizes this function with respect to the model parameters and the E step maximizes it with respect to the distribution over the unobserved variables. From this perspective, it is easy to justify an incremental variant of the EM algorithm in which the distribution for only one of the unobserved variables is recalculated in each E step. This variant is shown empirically to give faster convergence in a mixture estimation problem. A variant of the algorithm that exploits sparse conditional distributions is also described, and a wide range of other variant algorithms are also seen to be possible.},
+  language = {en},
+  urldate = {2017-12-09},
+  booktitle = {Learning in {{Graphical Models}}},
+  publisher = {{Springer, Dordrecht}},
+  author = {Neal, Radford M. and Hinton, Geoffrey E.},
+  year = {1998},
+  pages = {355--368},
+  file = {/Users/chang/Zotero/storage/HIYA5M8Y/Neal and Hinton - 1998 - A View of the Em Algorithm that Justifies Incremen.pdf;/Users/chang/Zotero/storage/YKWQR7HD/978-94-011-5014-9_12.html},
+  doi = {10.1007/978-94-011-5014-9_12}
+}
+
+@inproceedings{arthur2007,
+  address = {Philadelphia, PA, USA},
+  series = {SODA '07},
+  title = {K-Means++: {{The Advantages}} of {{Careful Seeding}}},
+  isbn = {978-0-89871-624-5},
+  shorttitle = {K-Means++},
+  abstract = {The k-means method is a widely used clustering technique that seeks to minimize the average squared distance between points in the same cluster. Although it offers no accuracy guarantees, its simplicity and speed are very appealing in practice. By augmenting k-means with a very simple, randomized seeding technique, we obtain an algorithm that is $\Theta$(logk)-competitive with the optimal clustering. Preliminary experiments show that our augmentation improves both the speed and the accuracy of k-means, often quite dramatically.},
+  urldate = {2017-12-09},
+  booktitle = {Proceedings of the {{Eighteenth Annual ACM}}-{{SIAM Symposium}} on {{Discrete Algorithms}}},
+  publisher = {{Society for Industrial and Applied Mathematics}},
+  author = {Arthur, David and Vassilvitskii, Sergei},
+  year = {2007},
+  pages = {1027--1035},
+  file = {/Users/chang/Zotero/storage/CMPFREJV/Arthur and Vassilvitskii - 2007 - K-means++ The Advantages of Careful Seeding.pdf}
 }
 
 
