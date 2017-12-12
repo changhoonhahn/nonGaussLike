@@ -45,6 +45,17 @@ Bianchi, D., Gil-Mar{\'\i}n, H., Ruggeri, R., \& Percival, W.~J. 2015,
   \href{http://dx.doi.org/10.1093/mnrasl/slv090}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 453, L11}
 
+\bibitem[{Bovy {et~al.}(2011)Bovy, Hogg, \& Roweis}]{bovy2011}
+Bovy, J., Hogg, D.~W., \& Roweis, S.~T. 2011,
+  \href{http://dx.doi.org/10.1214/10-AOAS439}{\JournalTitle{The Annals of
+  Applied Statistics}, 5, 1657}
+
+\bibitem[{Broderick {et~al.}(2011)Broderick, Fish, Doeleman, \&
+  Loeb}]{broderick2011}
+Broderick, A.~E., Fish, V.~L., Doeleman, S.~S., \& Loeb, A. 2011,
+  \href{http://dx.doi.org/10.1088/0004-637X/735/2/110}{\JournalTitle{The
+  Astrophysical Journal}, 735, 110}
+
 \bibitem[{Crocce {et~al.}(2006)Crocce, Pueblas, \& Scoccimarro}]{crocce2006}
 Crocce, M., Pueblas, S., \& Scoccimarro, R. 2006,
   \href{http://dx.doi.org/10.1111/j.1365-2966.2006.11040.x}{\JournalTitle{Monthly
@@ -145,6 +156,21 @@ Kuhn, M.~A., \& Feigelson, E.~D. 2017, \JournalTitle{arXiv:1711.11101
   [astro-ph, stat]}, \href{http://arxiv.org/abs/1711.11101}{{\sffamily
   arXiv:1711.11101 [astro-ph, stat]}}
 
+\bibitem[{Lee {et~al.}(2012)Lee, Guillemot, Yue, Kramer, \& Champion}]{lee2012}
+Lee, K.~J., Guillemot, L., Yue, Y.~L., Kramer, M., \& Champion, D.~J. 2012,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2012.21413.x}{\JournalTitle{Monthly
+  Notices of the Royal Astronomical Society}, 424, 2832}
+
+\bibitem[{Leroux(1992)}]{leroux1992}
+Leroux, B.~G. 1992,
+  \href{http://dx.doi.org/10.1214/aos/1176348772}{\JournalTitle{The Annals of
+  Statistics}, 20, 1350}
+
+\bibitem[{Liddle(2007)}]{liddle2007}
+Liddle, A.~R. 2007,
+  \href{http://dx.doi.org/10.1111/j.1745-3933.2007.00306.x}{\JournalTitle{Monthly
+  Notices of the Royal Astronomical Society}, 377, L74}
+
 \bibitem[{Lloyd(1982)}]{lloyd1982}
 Lloyd, S. 1982,
   \href{http://dx.doi.org/10.1109/TIT.1982.1056489}{\JournalTitle{IEEE
@@ -221,6 +247,11 @@ Rodr{\'\i}guez-Torres, S.~A., Chuang, C.-H., Prada, F., {et~al.} 2016,
   \href{http://dx.doi.org/10.1093/mnras/stw1014}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 460, 1173}
 
+\bibitem[{Roeder \& Wasserman(1997)}]{roeder1997}
+Roeder, K., \& Wasserman, L. 1997,
+  \href{http://dx.doi.org/10.1080/01621459.1997.10474044}{\JournalTitle{Journal
+  of the American Statistical Association}, 92, 894}
+
 \bibitem[{Ross {et~al.}(2017)Ross, Beutler, Chuang, Pellejero-Ibanez, Seo,
   Vargas-Maga{\~n}a, Cuesta, Percival, Burden, S{\'a}nchez, Grieb, Reid,
   Brownstein, Dawson, Eisenstein, Ho, Kitaura, Nichol, Olmstead, Prada,
@@ -229,6 +260,11 @@ Rodr{\'\i}guez-Torres, S.~A., Chuang, C.-H., Prada, F., {et~al.} 2016,
 Ross, A.~J., Beutler, F., Chuang, C.-H., {et~al.} 2017,
   \href{http://dx.doi.org/10.1093/mnras/stw2372}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 464, 1168}
+
+\bibitem[{Schwarz(1978)}]{schwarz1978}
+Schwarz, G. 1978,
+  \href{http://dx.doi.org/10.1214/aos/1176344136}{\JournalTitle{The Annals of
+  Statistics}, 6, 461}
 
 \bibitem[{Scoccimarro(1998)}]{scoccimarro1998}
 Scoccimarro, R. 1998,
@@ -272,8 +308,24 @@ Springel, V. 2005,
   \href{http://dx.doi.org/10.1111/j.1365-2966.2005.09655.x}{\JournalTitle{Monthly
   Notices of the Royal Astronomical Society}, 364, 1105}
 
+\bibitem[{Steele \& Raftery(2010)}]{steele2010performance}
+Steele, R.~J., \& Raftery, A.~E. 2010
+
+\bibitem[{Taylor {et~al.}(2015)Taylor, Hopkins, Baldry, Bland-Hawthorn, Brown,
+  Colless, Driver, Norberg, Robotham, Alpaslan, Brough, Cluver, Gunawardhana,
+  Kelvin, Liske, Conselice, Croom, Foster, Jarrett, Lara-Lopez, \&
+  Loveday}]{taylor2015}
+Taylor, E.~N., Hopkins, A.~M., Baldry, I.~K., {et~al.} 2015,
+  \href{http://dx.doi.org/10.1093/mnras/stu1900}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 446, 2144}
+
 \bibitem[{Tinker \& {et al.}(in preparation)}]{tinkerinpreparation}
 Tinker, J.~L., \& {et al.} in preparation
+
+\bibitem[{Vakili \& Hahn(2016)}]{vakili2016}
+Vakili, M., \& Hahn, C.~H. 2016, \JournalTitle{arXiv:1610.01991 [astro-ph]},
+  \href{http://arxiv.org/abs/1610.01991}{{\sffamily arXiv:1610.01991
+  [astro-ph]}}
 
 \bibitem[{Vargas-Maga{\~n}a {et~al.}(2014)Vargas-Maga{\~n}a, Ho, Xu,
   S{\'a}nchez, O'Connell, Eisenstein, Cuesta, Percival, Ross, Aubourg,
@@ -292,6 +344,15 @@ Wang, Q., Sanjeev, K., \& Sergio, V. 2009, \JournalTitle{IEEE TRANSACTIONS ON
 Warren, M.~S., Abazajian, K., Holz, D.~E., \& Teodoro, L. 2006,
   \href{http://dx.doi.org/10.1086/504962}{\JournalTitle{The Astrophysical
   Journal}, 646, 881}
+
+\bibitem[{Wilkinson {et~al.}(2015)Wilkinson, Maraston, Thomas, Coccato,
+  Tojeiro, Cappellari, Belfiore, Bershady, Blanton, Bundy, Cales, Cherinka,
+  Drory, Emsellem, Fu, Law, Li, Maiolino, Masters, Tremonti, Wake, Wang,
+  Weijmans, Xiao, Yan, Zhang, Bizyaev, Brinkmann, Kinemuchi, Malanushenko,
+  Malanushenko, Oravetz, Pan, \& Simmons}]{wilkinson2015}
+Wilkinson, D.~M., Maraston, C., Thomas, D., {et~al.} 2015,
+  \href{http://dx.doi.org/10.1093/mnras/stv301}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 449, 328}
 
 \bibitem[{Wu(1983)}]{wu1983}
 Wu, C. F.~J. 1983,
