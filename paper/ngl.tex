@@ -527,6 +527,8 @@ samples in the cluster. The algorithm then iteratively chooses centroids that
 minimize the average squared distance between points in the same cluster.
 In our use of Gaussian mixture modelling, we set the initial conditions of 
 the EM algorithm using the $\mathtt{k-means}{\tiny ++}$ algorithm of ~\cite{arthur2007}. 
+In Figure~\ref{fig:gmf_ped}, we illustrate Gaussian Mixture density 
+estimation in action. 
 \todo{As an illustration of Gaussian mixture 
 density estimation, in Figure we show Gaussian mixture models of the 
 highest $N$ bin of $\Xmock$.}
@@ -609,6 +611,15 @@ Figure~\ref{fig:gmf_contour}
 between the mock data ${\bf X}^\mathrm{mock}$ and a reference sample 
 ${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (left) and $\zeta(N)$ (right) analyses.}
 \label{fig:div_gauss}
+\end{center}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figs/GMM_pedagog.pdf}
+\caption{}
+\label{fig:gmf_ped}
 \end{center}
 \end{figure}
 
