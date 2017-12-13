@@ -216,6 +216,63 @@ def div_nonGauss(K=10):
     return None
 
 
+def GMM_pedagog(): 
+    ''' A pedagogical demonstration of how GMM works.
+    '''
+    ## read in X_mock from GMF data
+    #X_mock = NG.X_gmf_all()[:,-1]
+    ## mean subtract
+    #X_mock_meansub, _ = NG.meansub(X_mock) 
+    ## and normalize by sigma 
+    #sig = np.std(X_mock_meansub) 
+    #X_mock_meansub /= sig 
+    
+    # draw random samples from a bunch of Gaussians 
+    X = np.random.normal(0, 1, 3000) 
+    X = np.concatenate([X, np.random.normal(-5., 2, 2000)]) 
+    X = np.concatenate([X, np.random.normal(4., 0.5, 3000)]) 
+    #X = np.concatenate([X, np.random.normal(-1., 10, 3000)]) 
+    #X = np.random.normal(0, 1, 100) 
+    #X = np.concatenate([X, np.random.normal(-2.5, 2, 200)]) 
+    #X = np.concatenate([X, np.random.normal(4., 0.5, 300)]) 
+    #X = np.concatenate([X, np.random.normal(-1., 10, 300)]) 
+
+    fig = plt.figure()
+
+    hh = np.histogram(X, normed=True, bins=100, range=[-20, 20])
+
+    Ncomps = [1, 3, 10]
+    lstyles = ['-', '--', ':'] 
+
+    xx = np.linspace(-15., 15., 200) 
+    X_reshape = X.reshape(1,-1).T
+    for i, ncomp in enumerate(Ncomps): 
+        sub = fig.add_subplot(3, 1, i+1)
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none') 
+        gmm = GMix(n_components=ncomp)
+        gmm.fit(X_reshape) 
+        
+        for icomp in range(len(gmm.means_)):
+            gg = gmm.weights_[icomp] * mGauss.pdf(xx, 
+                    gmm.means_[icomp][0], gmm.covariances_[icomp][0][0])
+            sub.plot(xx, gg, c='k', ls=lstyles[i]) 
+        bic = gmm.bic(X_reshape)
+        sub.text(0.025, 0.85, r'$N_\mathrm{comp} = '+str(ncomp)+'$', ha='left', va='top', 
+                transform=sub.transAxes, fontsize=15)
+        sub.text(0.975, 0.85, r'$BIC = '+str(round(bic,2))+'$', ha='right', va='top', 
+                transform=sub.transAxes, fontsize=15)
+
+        sub.set_xlim([-15., 15.]) 
+        sub.set_ylim([0., 0.35]) 
+        if i < 2:
+            sub.set_xticklabels([])
+        sub.set_yticks([0., 0.2]) 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/GMM_pedagog.pdf']), 
+            bbox_inches='tight') 
+    return None 
+
+
 def Corner_updatedLike(tag_mcmc, tag_like, ichain): 
     ''' Corner plot with corrected likelihoods. Comparison between the 
     parameter constraints from the pseudo Gaussian likelihood versus the 
@@ -486,7 +543,8 @@ def GMF_contours(tag_mcmc='manodeep'):
 
 
 if __name__=="__main__": 
-    _div_Gauss_gmf(K=10)
+    GMM_pedagog()
+    #_div_Gauss_gmf(K=10)
     #div_Gauss(K=10)
     #div_nonGauss(K=10)
     #Like_RSD()
