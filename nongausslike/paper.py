@@ -219,14 +219,6 @@ def div_nonGauss(K=10):
 def GMM_pedagog(): 
     ''' A pedagogical demonstration of how GMM works.
     '''
-    ## read in X_mock from GMF data
-    #X_mock = NG.X_gmf_all()[:,-1]
-    ## mean subtract
-    #X_mock_meansub, _ = NG.meansub(X_mock) 
-    ## and normalize by sigma 
-    #sig = np.std(X_mock_meansub) 
-    #X_mock_meansub /= sig 
-    
     # draw random samples from a bunch of Gaussians 
     X = np.random.normal(0, 1, 3000) 
     X = np.concatenate([X, np.random.normal(-5., 2, 2000)]) 
@@ -253,12 +245,20 @@ def GMM_pedagog():
         gmm = GMix(n_components=ncomp)
         gmm.fit(X_reshape) 
         
+        ggs = [] 
         for icomp in range(len(gmm.means_)):
             gg = gmm.weights_[icomp] * mGauss.pdf(xx, 
                     gmm.means_[icomp][0], gmm.covariances_[icomp][0][0])
-            sub.plot(xx, gg, c='k', ls=lstyles[i]) 
+            ggs.append(gg) 
+            if icomp == 0: gg_tot = gg
+            else: gg_tot += gg 
+        sub.plot(xx, gg_tot, c='r', lw=1)#, ls=':')  
+
+        for icomp in range(len(gmm.means_)): 
+            sub.plot(xx, ggs[icomp], c='k', ls=lstyles[i])#, lw=1)
+
         bic = gmm.bic(X_reshape)
-        sub.text(0.025, 0.85, r'$N_\mathrm{comp} = '+str(ncomp)+'$', ha='left', va='top', 
+        sub.text(0.05, 0.85, r'$k = '+str(ncomp)+'$', ha='left', va='top', 
                 transform=sub.transAxes, fontsize=15)
         sub.text(0.975, 0.85, r'$BIC = '+str(round(bic,2))+'$', ha='right', va='top', 
                 transform=sub.transAxes, fontsize=15)
