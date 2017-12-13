@@ -488,8 +488,8 @@ instance, Gaussian mixture density estimation~\citep{9780471006268}.
 In astronomy, Gaussian mixture density estimation has been used for 
 inferring the velocity distribution of stars from the Hipparcos 
 satellite~\citep{bovy2011}, classifying galaxies in the Galaxy And Mass Assembly 
-Survey~\cite{taylor2015}, \todo{pulsar stuff} \citep{lee2012}
-\citep[see also references in][]{kuhn2017}. 
+Survey~\cite{taylor2015}, and classifying pulsars~(\cite{lee2012}; see
+also references in \cite{kuhn2017}). 
 
 Gaussian mixutre density estimation is a ``semi-parametric'' method 
 that uses a weighted sum of $k$ Gaussian component densities (a Gaussian 
@@ -527,12 +527,14 @@ samples in the cluster. The algorithm then iteratively chooses centroids that
 minimize the average squared distance between points in the same cluster.
 In our use of Gaussian mixture modelling, we set the initial conditions of 
 the EM algorithm using the $\mathtt{k-means}{\tiny ++}$ algorithm of ~\cite{arthur2007}. 
-In Figure~\ref{fig:gmf_ped}, we illustrate Gaussian Mixture density 
-estimation in action. 
+In Figure~\ref{fig:gmf_ped}, we illustrate Gaussian Mixture 
+density estimation in action. We use Gaussian mixture models with 
+$k = 1$ (top), $3$ (middle), $10$ (bottom) components to estimate the
+distribution of one dimensional data drawn from three separate Gaussia 
+distributions. 
 \todo{As an illustration of Gaussian mixture 
 density estimation, in Figure we show Gaussian mixture models of the 
 highest $N$ bin of $\Xmock$.}
-
 
 So far in our discussion of Gaussian mixture modeling, we have kept
 the number of componenets $k$ fixed. However, $k$ is a free 
@@ -551,7 +553,7 @@ According to BIC, models with higher likelihood are preferred; however,
 to address the concern of overfitting, BIC introduces a penalty term 
 for the number of parameters in the model: 
 \beq \label{eq:bic}
-\mathrm{BIC} = -2\,\mathrm{ln}\mathcal{L} + N_\mathrm{par}\,\mathrm{ln}N_\mathrm{data}.
+\mathrm{BIC} = -2\,\mathrm{ln}\,\mathcal{L} + N_\mathrm{par}\,\mathrm{ln}N_\mathrm{data}.
 \eeq
 We select $k$ based on the number of components in the model with the 
 lowest BIC. 
@@ -617,8 +619,10 @@ ${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (left) and $\zeta(N)$ (right) analyse
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\textwidth]{figs/GMM_pedagog.pdf}
-\caption{}
+\includegraphics[width=0.75\textwidth]{figs/GMM_pedagog.pdf}
+\caption{We use Gaussian mixture models with $k = 1$ (top), $3$, (middle), $10$ (bottom) 
+    components to estimate the distribution of data (blue) drawn from three Gaussian distributions.
+}
 \label{fig:gmf_ped}
 \end{center}
 \end{figure}
