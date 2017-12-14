@@ -75,6 +75,10 @@ Eisenstein, D.~J., \& Zaldarriaga, M. 2001,
   \href{http://dx.doi.org/10.1086/318226}{\JournalTitle{The Astrophysical
   Journal}, 546, 2}
 
+\bibitem[{Feigelson \& Babu(2012)}]{feigelson2012}
+Feigelson, E.~D., \& Babu, G.~J. 2012, Modern {{Statistical Methods}} for
+  {{Astronomy}}
+
 \bibitem[{Fraley \& Raftery(1998)}]{fraley1998}
 Fraley, C., \& Raftery, A.~E. 1998,
   \href{http://dx.doi.org/10.1093/comjnl/41.8.578}{\JournalTitle{The Computer
@@ -120,6 +124,11 @@ Hand, N., Li, Y., Slepian, Z., \& Seljak, U. 2017,
 Hartlap, J., Schrabback, T., Simon, P., \& Schneider, P. 2009,
   \href{http://dx.doi.org/10.1051/0004-6361/200911697}{\JournalTitle{Astronomy
   and Astrophysics}, 504, 689}
+
+\bibitem[{Hastie {et~al.}(2009)Hastie, Tibshirani, \& Friedman}]{9780387848587}
+Hastie, T., Tibshirani, R., \& Friedman, J. 2009, The {{Elements}} of
+  {{Statistical Learning}}: {{Data Mining}}, {{Inference}}, and {{Prediction}},
+  {{Second Edition}} ({{Springer Series}} in {{Statistics}}) ({Springer})
 
 \bibitem[{Kazin {et~al.}(2014)Kazin, Koda, Blake, Padmanabhan, Brough, Colless,
   Contreras, Couch, Croom, Croton, Davis, Drinkwater, Forster, Gilbank,

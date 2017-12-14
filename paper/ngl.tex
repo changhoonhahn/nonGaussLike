@@ -85,6 +85,8 @@ large-scale structure of universe
         galaxy clustering analyses. 
 \end{itemize}
 
+% Data analysis can only lead to unbiased constraints on a physical theory if the employed likelihood is correct (e.g.  Trotta 2008; Mardia et al. 1979; Anderson 2003; Cramer 1946; Jeffreys 1961; Sun & Berger 2006). 
+
 \section{Gaussian Likelihood Assumption} \label{sec:gaussass} 
 \begin{itemize}
     \item Depending on Hogg's paper maybe a simple illustration of how the likelihood asumption 
@@ -362,6 +364,8 @@ datavector to identify non-Gaussian correlations between two elements
 of the data vector. These indirect measures of likelihood non-Gaussianity 
 are challenging to interpret and extend more generally to LSS studies. 
 
+%Sellentin & Heavens (2018) presented stringent tests that characterize non-Gaussian statistical behaviour, and any sound weak lensing likelihood should hence pass these tests.  The methods derived in Sellentin & Heavens (2018) test whether all pairwise combinations of data elements display the correct statistical behaviour under addition, division and multiplication, and whether the correct marginal distribution ensues for each data point. 
+
 A more direct approach, however, can be taken to quantify the 
 non-Gaussianity of the likelihood. We can calculate the divergence between 
 the distribution of our observable, $p(x)$, and $q(x)$ a multivariate Gaussian described 
@@ -590,7 +594,7 @@ $p_\mathrm{\tiny GMM}(\Xmock)$ and the likelihood distribution in \todo{green}
 for the $P_\ell(k)$ (top) and $\zeta(N)$ (bottom) analyses. For comparison, 
 we also include the distributions from Figure~\ref{fig:div_gauss}. 
 
-For the $\zeta(N)$ analysis of $\Sinh$, our Gaussian mixture density 
+For the $\zeta(N)$ analysis of \Sinh, our Gaussian mixture density 
 estimate significantly improves the divergence discrepancy compared to the 
 pseudo-likelihood. In other words, \emph{our Gaussian mixture density estimate  
 is a significant better estimate of the $\zeta$ likelihood distribution
@@ -630,29 +634,62 @@ analysis~\citep[hereafter PCA;][]{Press:1992:NRC:148286}. For
 a Gaussian likelihood, the resulting components from such a 
 decomposition/transformation are statistically independent.
 However, when the likelihood is not Gaussian, as in our case 
-(Section~\ref{sec:div}), the PCA components 
-are uncorrelated but~\emph{not necessarily statistically independent}~\citep{hartlap2009}. 
+(Section~\ref{sec:div}), the PCA components are uncorrelated 
+but~\emph{not necessarily statistically independent}~\citep{hartlap2009}. 
 Therefore, instead of PCA, we use Independent Component Analysis 
 (hereafter ICA). 
 
 %An intuitive, though slightly hand-waving way to understand how ICA works is to note that a set of linear combinations Yi of independent, non-Gaussian random variables X j will usually have distributions that are more Gaussian than the original dis- tributions of the X j (central limit theorem). Reversing this argu- ment, this suggests that the X j could be recovered from a sample of the Yi by looking for linear combinations of the Yi that have the least Gaussian distributions. These linear combinations will also be close to statistically independent. A more rigorous justi- fication of the method can be found in Hyvärinen et al. (2001).
-
 \bitem
     \item describe ICA 
     \item Some pedagogical figure that shows how ICA works. 
-    \item Kernel Density Estimation 
+\eitem
+\todo{describe ICA here} 
+
+Using ICA, we decompose/transform $\Xmock$ with the unmixing matrix ${\bf W}$ 
+into $N_\mathrm{bin}$ independent components: 
+\beq
+{\bf X}^\mathrm{ICA} = {\bf W}\,\Xmock = \{{\bf X}^\mathrm{ICA}_1, ..., {\bf X}^\mathrm{ICA}_{N_\mathrm{bin}}\}.
+\eeq
+The statistical indpendence of these components, allow us to write 
+down the likelihood distribution as 
+\beq \label{eq:ica_like}
+\mathcal{L} \approx \prod\limits_{n=1}^{N_\mathrm{bin}} p_{x^\mathrm{ICA}_n} (x) 
+\eeq
+where $p_{x^\mathrm{ICA}_n} (x)$ is the 1-dimensional distribution 
+function of the $n^\mathrm{th}$ ICA component, which in our context 
+is sampled by ${\bf X}^\mathrm{ICA}_n$. Based on Eq.~\ref{eq:ica_like}, 
+we can estimate the high-dimensional $\mathcal{L}$ 
+from $\Xmock$ by estimating the $p_{x^\mathrm{ICA}_n}$ distributions 
+from ${\bf X}^\mathrm{ICA}_n$. For estimating the $p_{x^\mathrm{ICA}_n}$s, 
+we use the kerenl density method~\citep[hereafter KDE; \emph{e.g.}][]{9780387848587,feigelson2012}
+following \cite{hartlap2009}. With KDE, the density estimate,
+$\hat{p}_{x^\mathrm{ICA}_n}$, is constructed by 
+smoothing the empirical distribution of the ICA componenet $x^\mathrm{ICA}_n$ 
+using a smooth kernel. In our context, the KDE density estimate 
+can be written as 
+\beq
+\hat{p}_{x^\mathrm{ICA}_n}(x) = \frac{1}{N_\mathrm{mock}b} \sum\limits_{j=1}^{N_\mathrm{mock}} K \left( \frac{x - \mathrm{X}^{(j),\mathrm{ICA}}_n}{b} \right)
+\eeq
+where $b$ is the bandwidth and $K$ is the kernel function. Following the 
+choices of \cite{hartlap2009}, we use a Gaussian distribution for $K$ and the 
+``rule of thumb'' bandwidth (also known as Scott's rule) for $b$.   
+
+
+\bitem
     \item put it all together to estimate the likelihood
     \item Figure~\ref{fig:div_nongauss} showing the results.
 \eitem
 
 \section{Impact on Parameter Inference}
-\subsection{MCMC}
+With accurate estimates of the likelihood distribution in hand, 
+we can now quantify the impact of likelihood non-Gaussianity on the 
+parameter constraints of \Beut~and~\Sinh. We begin by providing a 
+brief overview of the MCMC frameworked used in the original~\Beut~and~\Sinh.
+analyses.
+
 \bitem
     \item details of each of the MCMC runs
-\eitem
-
-\subsection{Importance Sampling} 
-\bitem
     \item equations explaining importance sampling framework
 \eitem
 Figure~\ref{fig:gmf_like}
