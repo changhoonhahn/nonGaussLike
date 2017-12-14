@@ -70,9 +70,24 @@ Davis, M., Efstathiou, G., Frenk, C.~S., \& White, S. D.~M. 1985,
 Dempster, A.~P., Laird, N.~M., \& Rubin, D.~B. 1977, \JournalTitle{Journal of
   the Royal Statistical Society. Series B (Methodological)}, 39, 1
 
+\bibitem[{Eisenstein \& Zaldarriaga(2001)}]{eisenstein2001}
+Eisenstein, D.~J., \& Zaldarriaga, M. 2001,
+  \href{http://dx.doi.org/10.1086/318226}{\JournalTitle{The Astrophysical
+  Journal}, 546, 2}
+
+\bibitem[{Fraley \& Raftery(1998)}]{fraley1998}
+Fraley, C., \& Raftery, A.~E. 1998,
+  \href{http://dx.doi.org/10.1093/comjnl/41.8.578}{\JournalTitle{The Computer
+  Journal}, 41, 578}
+
 \bibitem[{Gardner {et~al.}(2007)Gardner, Connolly, \& McBride}]{gardner2007}
 Gardner, J.~P., Connolly, A., \& McBride, C. 2007, in Astronomical {{Data
   Analysis Software}} and {{Systems XVI}}, Vol. 376, 69
+
+\bibitem[{Gazta{\~n}aga \& Scoccimarro(2005)}]{gaztanaga2005}
+Gazta{\~n}aga, E., \& Scoccimarro, R. 2005,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2005.09234.x}{\JournalTitle{Monthly
+  Notices of the Royal Astronomical Society}, 361, 824}
 
 \bibitem[{Grieb {et~al.}(2017)Grieb, S{\'a}nchez, Salazar-Albornoz,
   Scoccimarro, Crocce, Dalla~Vecchia, Montesano, Gil-Mar{\'\i}n, Ross, Beutler,

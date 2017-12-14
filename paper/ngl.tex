@@ -593,38 +593,57 @@ we also include the distributions from Figure~\ref{fig:div_gauss}.
 For the $\zeta(N)$ analysis of $\Sinh$, our Gaussian mixture density 
 estimate significantly improves the divergence discrepancy compared to the 
 pseudo-likelihood. In other words, \emph{our Gaussian mixture density estimate  
-significant better approximate of the $\zeta$ likelihood distribution
+is a significant better estimate of the $\zeta$ likelihood distribution
 than the pseudo-likelihood}. On the other hand, our Gaussian mixture 
-density estimate for the $P_\ell(k)$ analysis of \Beut does not 
+density estimate for the $P_\ell(k)$ analysis of \Beut~does not 
 significantly improve the divergence discrepancy. The difference in 
 the performance of Gaussian mixture density estimation is not a surprise. 
 One would expect a direct density estimation to be more effective 
-for the \Sinh case, where we are estimating a $N_\mathrm{bin} = 8$ dimensional 
-distribution with $N_\mathrm{mock} = 20,000$ samples, compared to the \Beut 
-case, where we are estimating a higher dimensional distribution 
+for the \Sinh~case, where we are estimating a $N_\mathrm{bin} = 8$ dimensional 
+distribution with $N_\mathrm{mock} = 20,000$ samples, compared to the \Beut~ 
+case. For \Beut~we are estimating a higher dimensional distribution 
 ($N_\mathrm{bin} = 37$) with fewer samples ($N_\mathrm{mock} = 2048$). 
 Given the unconvincing accuracy of the Gaussian mixture density estimate
-for the $P_\ell$ likelihood, in the next section, we present an alterative 
-less direct method for estimating the non-Gaussian likelihood.
+of the $P_\ell$ likelihood, in the next section, we present an alterative 
+method for estimating the non-Gaussian likelihood.
 
 \subsection{Independent Component Analysis} 
 As Figure~\ref{fig:div_nongauss} reveals, Gaussian mixture density
 estimation fails to accurately estimate the $37$-dimensional 
-$P_\ell$ likelihood distribution of the \Beut~analysis. 
+$P_\ell$ likelihood distribution of the \Beut~analysis. Rather than 
+estimating the high dimensional likelihood distribution directly, 
+following the approach from \cite{hartlap2009}, consider a linear
+transformation on the observable ($P_\ell$) into $N_\mathrm{bin}$ 
+statistically independent components. \todo{equation} 
+Since each component is statistically 
+independent from the rest, the likelihood becomes the multiple 
+of $N_\mathrm{bin}$ one dimensional distributions. \todo{equation}
+For the \Beut~case, this reduces the problem of estimating a 37 
+dimensional distribution with $2048$ samples to a problem of 
+estimating 37 one dimensional distributions with $2048$ samples 
+each. The challenge, however, is in finding the transformation. 
 
+Efforts in the past have similarly attempted to tackle the 
+high-dimensionality problem of the observable space~\citep[\emph{e.g.}][]{scoccimarro2000,eisenstein2001,gaztanaga2005,norberg2009,sinha2017a}.
+These works typically use singular value decomposition or principal component 
+analysis~\citep[hereafter PCA;][]{Press:1992:NRC:148286}. For 
+a Gaussian likelihood, the resulting components from such a 
+decomposition/transformation are statistically independent.
+However, when the likelihood is not Gaussian, as in our case 
+(Section~\ref{sec:div}), the PCA components 
+are uncorrelated but~\emph{not necessarily statistically independent}~\citep{hartlap2009}. 
+Therefore, instead of PCA, we use Independent Component Analysis 
+(hereafter ICA). 
 
-is not feasible for the \Beut~analysis.
+%An intuitive, though slightly hand-waving way to understand how ICA works is to note that a set of linear combinations Yi of independent, non-Gaussian random variables X j will usually have distributions that are more Gaussian than the original dis- tributions of the X j (central limit theorem). Reversing this argu- ment, this suggests that the X j could be recovered from a sample of the Yi by looking for linear combinations of the Yi that have the least Gaussian distributions. These linear combinations will also be close to statistically independent. A more rigorous justi- fication of the method can be found in Hyvärinen et al. (2001).
 
-Curse of dimensionality! $2048$ mocks in Beutler not enough to directly estimate 
-the 37-dimensional space, so we use independent component analysis 
-\cite{hartlap2009}
 \bitem
-    \item equation 
-    \item Similar figure to \cite{hartlap2009} that tests the independence? 
+    \item describe ICA 
+    \item Some pedagogical figure that shows how ICA works. 
     \item Kernel Density Estimation 
-    \item 
+    \item put it all together to estimate the likelihood
+    \item Figure~\ref{fig:div_nongauss} showing the results.
 \eitem
-Figure~\ref{fig:div_nongauss}
 
 \section{Impact on Parameter Inference}
 \subsection{MCMC}
