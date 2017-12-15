@@ -371,7 +371,7 @@ non-Gaussianity of the likelihood. We can calculate the divergence between
 the distribution of our observable, $p(x)$, and $q(x)$ a multivariate Gaussian described 
 by the average of the mocks and the covariance matrix.
 The following are two of the most commonly used divergences: 
-the Kullback-Leibler (hereafter KL) divergence
+the Kullback-Leibler (KL) divergence
 \beq \label{eq:kl} 
 D_{KL} ( p \parallel q ) = \int p(x)\,\log \frac{p(x)}{q(x)}\,{\rm d}x
 \eeq
@@ -482,7 +482,7 @@ of likelihood non-Gaussianity on the parameter constraints of
 more accurately estimating the likelihood distribution than 
 the Gaussian pseudo-likelihood. 
 
-\subsection{Gaussian Mixture Likelihood Estimation}
+\subsection{Gaussian Mixture Likelihood Estimation} \label{sec:gmm}
 When mock catalogs are used in LSS analyses to estimate the 
 covariance matrix, they are used as data points sampling the 
 likelihood distribution. For the pseudo-likelihood, 
@@ -611,7 +611,7 @@ Given the unconvincing accuracy of the Gaussian mixture density estimate
 of the $P_\ell$ likelihood, in the next section, we present an alterative 
 method for estimating the non-Gaussian likelihood.
 
-\subsection{Independent Component Analysis} 
+\subsection{Independent Component Analysis} \label{sec:ica}
 As Figure~\ref{fig:div_nongauss} reveals, Gaussian mixture density
 estimation fails to accurately estimate the $37$-dimensional 
 $P_\ell$ likelihood distribution of the \Beut~analysis. Rather than 
@@ -630,14 +630,13 @@ each. The challenge, however, is in finding the transformation.
 Efforts in the past have similarly attempted to tackle the 
 high-dimensionality problem of the observable space~\citep[\emph{e.g.}][]{scoccimarro2000,eisenstein2001,gaztanaga2005,norberg2009,sinha2017a}.
 These works typically use singular value decomposition or principal component 
-analysis~\citep[hereafter PCA;][]{Press:1992:NRC:148286}. For 
+analysis~\citep[PCA;][]{Press:1992:NRC:148286}. For 
 a Gaussian likelihood, the resulting components from such a 
 decomposition/transformation are statistically independent.
 However, when the likelihood is not Gaussian, as in our case 
 (Section~\ref{sec:div}), the PCA components are uncorrelated 
 but~\emph{not necessarily statistically independent}~\citep{hartlap2009}. 
-Therefore, instead of PCA, we use Independent Component Analysis 
-(hereafter ICA). 
+Therefore, instead of PCA, we use Independent Component Analysis (ICA). 
 
 %An intuitive, though slightly hand-waving way to understand how ICA works is to note that a set of linear combinations Yi of independent, non-Gaussian random variables X j will usually have distributions that are more Gaussian than the original dis- tributions of the X j (central limit theorem). Reversing this argu- ment, this suggests that the X j could be recovered from a sample of the Yi by looking for linear combinations of the Yi that have the least Gaussian distributions. These linear combinations will also be close to statistically independent. A more rigorous justi- fication of the method can be found in Hyvärinen et al. (2001).
 \bitem
@@ -658,11 +657,8 @@ down the likelihood distribution as
 \eeq
 where $p_{x^\mathrm{ICA}_n} (x)$ is the 1-dimensional distribution 
 function of the $n^\mathrm{th}$ ICA component, which in our context 
-is sampled by ${\bf X}^\mathrm{ICA}_n$. Based on Eq.~\ref{eq:ica_like}, 
-we can estimate the high-dimensional $\mathcal{L}$ 
-from $\Xmock$ by estimating the $p_{x^\mathrm{ICA}_n}$ distributions 
-from ${\bf X}^\mathrm{ICA}_n$. For estimating the $p_{x^\mathrm{ICA}_n}$s, 
-we use the kerenl density method~\citep[hereafter KDE; \emph{e.g.}][]{9780387848587,feigelson2012}
+is sampled by ${\bf X}^\mathrm{ICA}_n$. In order to estimate $p_{x^\mathrm{ICA}_n}$s, 
+we use the kerenl density method~\citep[KDE; \emph{e.g.}][]{9780387848587,feigelson2012}
 following \cite{hartlap2009}. With KDE, the density estimate,
 $\hat{p}_{x^\mathrm{ICA}_n}$, is constructed by 
 smoothing the empirical distribution of the ICA componenet $x^\mathrm{ICA}_n$ 
@@ -671,30 +667,82 @@ can be written as
 \beq
 \hat{p}_{x^\mathrm{ICA}_n}(x) = \frac{1}{N_\mathrm{mock}b} \sum\limits_{j=1}^{N_\mathrm{mock}} K \left( \frac{x - \mathrm{X}^{(j),\mathrm{ICA}}_n}{b} \right)
 \eeq
-where $b$ is the bandwidth and $K$ is the kernel function. Following the 
+$b$ is the bandwidth and $K$ is the kernel function. Following the 
 choices of \cite{hartlap2009}, we use a Gaussian distribution for $K$ and the 
-``rule of thumb'' bandwidth (also known as Scott's rule) for $b$.   
+``rule of thumb'' bandwidth~\cite[also known as Scott's rule;][]{scott1992,davison2008} 
+for $b$. Finally, plugging $\hat{p}_{x^\mathrm{ICA}_n}$ into Eq.~\ref{eq:ica_like}, 
+we get an estimate for the high-dimensional $\mathcal{L}_X$.
 
+Now that we have a likeilhood estimate from ICA, we test whether it's
+actually a better estimate of the likelihood distribuiton
+than the Gaussian pseudo-likelihood. Following the same procedure as we 
+did for the Gaussian mixture likelihood in Section~\ref{sec:gmm}, we 
+calculate the divergence between our ICA likelihood, $\prod \hat{p}_{x^\mathrm{ICA}_n}$, 
+and the likelihood distribution. We draw a sample from $\prod \hat{p}_{x^\mathrm{ICA}_n}$
+with the same dimensions as $\Yref$, apply the mixing matrix 
+(undoing the ICA transformation), and then calculate the 
+$k$-NN~\Ralpha~and KL divergence estimates between the sample and $\Xmock$. 
+We repeat these steps \todo{100} times to get the distribution of estimates 
+that reflects the scatter in the estimator. In \todo{Figure~\ref{fig:div_nongauss}}, 
+we present the resulting distribution of 
+$\hat{D}\left(\Xmock \parallel \sim \prod \hat{p}_{x^\mathrm{ICA}_n} \right)$
+in \todo{green} for the $P_\ell(k)$ (top) and $\zeta(N)$ (bottom) analyses. 
+For comparison, we also include the distributions from Figure~\ref{fig:div_gauss}. 
 
-\bitem
-    \item put it all together to estimate the likelihood
-    \item Figure~\ref{fig:div_nongauss} showing the results.
-\eitem
+In \emph{both} the \Beut~and~\Sinh~analyses, our ICA likelihood significantly 
+improves the divergence discrepancy compared to the pseudo-likelihood. For 
+\Sinh, however, the ICA likelihood proves to be a less accurate estimate
+than the Gaussian mixture likelihood in Section~\ref{sec:gmm}. More importantly, 
+for the~\Beut~analysis, where the Gaussian mixture likelihood did not improve 
+upon the pseudo-likelihood, the ICA method provides a more accurate likelihood 
+estimate. The ICA method provides an alterative to the more direct 
+Gaussian mixture method. Furthermore, the effectiveness of the ICA method in estimating
+higher dimensional likelihoods with fewer samples (mocks) is  
+particularly appealing since LSS analyses continue to increase the size of 
+their observable data vector. However, as the divergence estimation framework 
+we present makes it easy to test the accuracy of different methods, a hard 
+choice is not necessary and multiple methods can easily be tested to construct 
+the best estimate of the likelihood distribution for each specific analysis. 
+In the following sections, we use the ICA method for the~\Beut~analysis and 
+the Gaussian mixture method for the~\Sinh~analysis. 
 
 \section{Impact on Parameter Inference}
-With accurate estimates of the likelihood distribution in hand, 
-we can now quantify the impact of likelihood non-Gaussianity on the 
-parameter constraints of \Beut~and~\Sinh. We begin by providing a 
-brief overview of the MCMC frameworked used in the original~\Beut~and~\Sinh.
-analyses.
+Both~\Beut~and~\Sinh~use the standard Monte Carlo Markov Chain (MCMC) 
+approach with the Gaussian pseduo-likelihood to derive the posterior distributions
+of their model parameters. The \Beut~analysis involves $11$ parameters:
+$f \sigma_8$, $\alpha_\parallel$, $\alpha_\perp$,
+$b_1^\mathrm{NGC} \sigma_8$, $b_1^\mathrm{SGC} \sigma_8$, 
+$b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8$, 
+$\sigma_v^\mathrm{NGC}$, $\sigma_v^\mathrm{SGC}$, 
+$N^\mathrm{NGC}$, and $N^\mathrm{sGC}$. 
+The \Sinh~analysis involves $5$ parameters:
+$\log\,M_\mathrm{min}$, $\sigma_{\log\,M}$, $\log\,M_0$, $\log\,M_1$, and $\alpha$. 
+Using the improved likelihood estimates from the previous section, we now 
+measure the impact of likelihood non-Gaussianity on the posterior constraints 
+of these parameters. The most straightforward approach would be to replace the 
+Gaussian pseudo-likelihood with the likelihood estimates from 
+Sections~\ref{sec:gmm} and~\ref{sec:ica} and then regenerate the MCMC 
+sample. While this is relatively doable for the~\Beut~analysis, 
+for~\Sinh this is \emph{significantly} more involved. Instead of a perturbation 
+theory based model from~\Beut, the model in \Sinh~is a forward model, similar
+to their mocks (Section~\ref{sec:gmf}). Rerunning the MCMC samples would involve
+evaluating their computational intensive forward model $\sim 10^5$ times. 
 
-\bitem
-    \item details of each of the MCMC runs
-    \item equations explaining importance sampling framework
-\eitem
+Instead, without rerunning the MCMC chains, we use importance sampling to 
+derive the posteriors from our estimated likelihood. 
+Let
+\beq
+p(\theta_1 | {\bf x}) = \int p(\bm{\theta} | {\bf x})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p
+%f(x) \mathrm{d}x = \int \frac{h(x) f(x)}{g(x)} g(x) \mathrm{d}x
+\eeq
+then 
+\beq
+\hat{I} = \frac{1}{N} \sum\limits_{i=1}^N \frac{h(x_i) f(x_i)}{g(x_i)}
+\eeq
+
+\todo{explain importance sampling} 
+
 Figure~\ref{fig:gmf_like}
-
-
 Figure~\ref{fig:gmf_contour}
 
 \section{Discussion}
