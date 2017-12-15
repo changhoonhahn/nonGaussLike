@@ -718,29 +718,41 @@ $\sigma_v^\mathrm{NGC}$, $\sigma_v^\mathrm{SGC}$,
 $N^\mathrm{NGC}$, and $N^\mathrm{sGC}$. 
 Meanwhile the \Sinh~analysis contains $5$ parameters:
 $\log\,M_\mathrm{min}$, $\sigma_{\log\,M}$, $\log\,M_0$, $\log\,M_1$, and $\alpha$. 
-Using the improved likelihood estimates from the previous section, we can now 
-measure the impact of likelihood non-Gaussianity on the posterior constraints 
-of these parameters. The most straightforward approach to do this would be to 
-recalculate MCMC samples using our likelihood estimates from Sections~\ref{sec:gmm} 
-and~\ref{sec:ica}. While this is relatively doable for the~\Beut~analysis, 
-for~\Sinh this is \emph{significantly} more involved. Instead of a perturbation 
+Using the improved likelihood estimates from the Sections~\ref{sec:gmm} 
+and~\ref{sec:ica}, we can now measure the impact of likelihood non-Gaussianity 
+on the posterior distributions of these parameters. The most straightforward 
+approach to do this would be to use our likelihood estimates to recompute the 
+MCMC samples from scratch. While this is relatively doable for the~\Beut~analysis, 
+for~\Sinh this is \emph{significantly} more involved. Rather than a perturbation 
 theory based model from~\Beut, the model in \Sinh~is a forward model, similar
 to their mocks (Section~\ref{sec:gmf}). Rerunning the MCMC samples would involve
 evaluating their computational intensive forward model $\sim 10^5$ times. 
 
-Instead we use importance sampling to derive the posteriors from our estimated 
-likelihood from the MCMC chains that used the pseudo-likelihood. Let 
-$p_O({\bf x} | \bm{\theta})$ be the original pseudo-likelihood and 
-$p_N({\bf x} | \bm{\theta})$ be our ``new'' likelihood. Then the new marginal 
-posterior is
+Without having to rerun the MCMC chains, we instead use importance sampling 
+to derive the new posteriors from the original chains~\citep[see][for details on importance sampling]{wasserman2004}. 
+The \emph{target} distribution we want to sample is the new posterior. We can 
+sample this distribution by using the original posterior as a \emph{proposal} 
+distribution and the ratio of our likelihood estimates over the pseudo-likelihood 
+as importance weights. If we let $p({\bf x} | \bm{\theta})$ be the original 
+pseudo-likelihood and $p'({\bf x} | \bm{\theta})$ be our ``new'' likelihood. 
+Then the new marginal likelihood can be calculated through importance sampling:   
 \begin{align}
-p(\theta_1 | {\bf x}) &= \int p_N({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p \\
-&= \int \frac{p_N({\bf x} | \bm{\theta})}{p_O({\bf x} | \bm{\theta})}\, p_O({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p \\ 
-&= \int \frac{p_N(\bm{\theta} | {\bf x})}{p_O(\bm{\theta} | {\bf x})}\, p_O({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p.
+p'({\bf x} | \theta_1) &= \int p'({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p = \int \frac{p'({\bf x} | \bm{\theta})}{p({\bf x} | \bm{\theta})}\, p({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p \\
+    &\approx \sum\limits_{\bm{\theta}^{(i)} \in S} \frac{p'({\bf x} | \bm{\theta}^{(i)})}{p({\bf x} | \bm{\theta}^{(i)})}. \label{eq:impsamp}
 \end{align}
-Then using Monte Carlo integration, 
+$S$ in Eq.~\ref{eq:impsamp} is the sample drawn from $p({\bf x} | \bm{\theta})$, 
+which in our case is just the original MCMC chain. The only calculation
+required is the importance weight 
+${p'({\bf x} | \bm{\theta}^{(i)})}/{p({\bf x} | \bm{\theta}^{(i)})}$ for each 
+sample $\bm{\theta}^{(i)}$ of the original MCMC chain. We calculate the 
+importance weights for the~\Beut~and~\Sinh~analyses using the ICA likelihood 
+and Gaussian mixture likelihood estimates respectively.  
 
-Figure~\ref{fig:gmf_like}
+~\todo{figure} 
+
+In Figure~\ref{fig:gmf_like}
+
+
 Figure~\ref{fig:gmf_contour}
 
 \section{Discussion}
