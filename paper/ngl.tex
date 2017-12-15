@@ -1,6 +1,7 @@
 \documentclass[12pt, letterpaper, preprint]{aastex}
 \usepackage[breaklinks,colorlinks, urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage{color}
+\usepackage{amsmath}
 \usepackage{bm}
 \input{vc}
 
@@ -709,38 +710,35 @@ the Gaussian mixture method for the~\Sinh~analysis.
 \section{Impact on Parameter Inference}
 Both~\Beut~and~\Sinh~use the standard Monte Carlo Markov Chain (MCMC) 
 approach with the Gaussian pseduo-likelihood to derive the posterior distributions
-of their model parameters. The \Beut~analysis involves $11$ parameters:
+of their model parameters. The \Beut~analysis contains $11$ parameters:
 $f \sigma_8$, $\alpha_\parallel$, $\alpha_\perp$,
 $b_1^\mathrm{NGC} \sigma_8$, $b_1^\mathrm{SGC} \sigma_8$, 
 $b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8$, 
 $\sigma_v^\mathrm{NGC}$, $\sigma_v^\mathrm{SGC}$, 
 $N^\mathrm{NGC}$, and $N^\mathrm{sGC}$. 
-The \Sinh~analysis involves $5$ parameters:
+Meanwhile the \Sinh~analysis contains $5$ parameters:
 $\log\,M_\mathrm{min}$, $\sigma_{\log\,M}$, $\log\,M_0$, $\log\,M_1$, and $\alpha$. 
-Using the improved likelihood estimates from the previous section, we now 
+Using the improved likelihood estimates from the previous section, we can now 
 measure the impact of likelihood non-Gaussianity on the posterior constraints 
-of these parameters. The most straightforward approach would be to replace the 
-Gaussian pseudo-likelihood with the likelihood estimates from 
-Sections~\ref{sec:gmm} and~\ref{sec:ica} and then regenerate the MCMC 
-sample. While this is relatively doable for the~\Beut~analysis, 
+of these parameters. The most straightforward approach to do this would be to 
+recalculate MCMC samples using our likelihood estimates from Sections~\ref{sec:gmm} 
+and~\ref{sec:ica}. While this is relatively doable for the~\Beut~analysis, 
 for~\Sinh this is \emph{significantly} more involved. Instead of a perturbation 
 theory based model from~\Beut, the model in \Sinh~is a forward model, similar
 to their mocks (Section~\ref{sec:gmf}). Rerunning the MCMC samples would involve
 evaluating their computational intensive forward model $\sim 10^5$ times. 
 
-Instead, without rerunning the MCMC chains, we use importance sampling to 
-derive the posteriors from our estimated likelihood. 
-Let
-\beq
-p(\theta_1 | {\bf x}) = \int p(\bm{\theta} | {\bf x})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p
-%f(x) \mathrm{d}x = \int \frac{h(x) f(x)}{g(x)} g(x) \mathrm{d}x
-\eeq
-then 
-\beq
-\hat{I} = \frac{1}{N} \sum\limits_{i=1}^N \frac{h(x_i) f(x_i)}{g(x_i)}
-\eeq
-
-\todo{explain importance sampling} 
+Instead we use importance sampling to derive the posteriors from our estimated 
+likelihood from the MCMC chains that used the pseudo-likelihood. Let 
+$p_O({\bf x} | \bm{\theta})$ be the original pseudo-likelihood and 
+$p_N({\bf x} | \bm{\theta})$ be our ``new'' likelihood. Then the new marginal 
+posterior is
+\begin{align}
+p(\theta_1 | {\bf x}) &= \int p_N({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p \\
+&= \int \frac{p_N({\bf x} | \bm{\theta})}{p_O({\bf x} | \bm{\theta})}\, p_O({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p \\ 
+&= \int \frac{p_N(\bm{\theta} | {\bf x})}{p_O(\bm{\theta} | {\bf x})}\, p_O({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p.
+\end{align}
+Then using Monte Carlo integration, 
 
 Figure~\ref{fig:gmf_like}
 Figure~\ref{fig:gmf_contour}

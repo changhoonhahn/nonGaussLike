@@ -66,6 +66,11 @@ Davis, M., Efstathiou, G., Frenk, C.~S., \& White, S. D.~M. 1985,
   \href{http://dx.doi.org/10.1086/163168}{\JournalTitle{The Astrophysical
   Journal}, 292, 371}
 
+\bibitem[{Davison(2008)}]{davison2008}
+Davison, A.~C. 2008, Statistical {{Models}} ({{Cambridge Series}} in
+  {{Statistical}} and {{Probabilistic Mathematics}}) ({Cambridge University
+  Press})
+
 \bibitem[{Dempster {et~al.}(1977)Dempster, Laird, \& Rubin}]{dempster1977}
 Dempster, A.~P., Laird, N.~M., \& Rubin, D.~B. 1977, \JournalTitle{Journal of
   the Royal Statistical Society. Series B (Methodological)}, 39, 1
@@ -298,6 +303,10 @@ Scoccimarro, R. 1998,
 \bibitem[{Scoccimarro(2000)}]{scoccimarro2000}
 ---. 2000, \href{http://dx.doi.org/10.1086/317248}{\JournalTitle{The
   Astrophysical Journal}, 544, 597}
+
+\bibitem[{Scott(1992)}]{scott1992}
+Scott, D.~W. 1992, Multivariate {{Density Estimation}}: {{Theory}},
+  {{Practice}}, and {{Visualization}} ({Wiley})
 
 \bibitem[{Sellentin {et~al.}(2017)Sellentin, Jaffe, \& Heavens}]{sellentin2017}
 Sellentin, E., Jaffe, A.~H., \& Heavens, A.~F. 2017,
