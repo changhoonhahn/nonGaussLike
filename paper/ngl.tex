@@ -634,10 +634,10 @@ These works typically use singular value decomposition or principal component
 analysis~\citep[PCA;][]{Press:1992:NRC:148286}. For 
 a Gaussian likelihood, the resulting components from such a 
 decomposition/transformation are statistically independent.
-However, when the likelihood is not Gaussian, as in our case 
-(Section~\ref{sec:div}), the PCA components are uncorrelated 
-but~\emph{not necessarily statistically independent}~\citep{hartlap2009}. 
-Therefore, instead of PCA, we use Independent Component Analysis (ICA). 
+However, when the likelihood is not Gaussian the PCA components 
+are uncorrelated but~\emph{not necessarily statistically independent}~\citep{hartlap2009}. 
+Therefore, instead of PCA, we use Independent Component Analysis 
+(ICA). 
 
 %An intuitive, though slightly hand-waving way to understand how ICA works is to note that a set of linear combinations Yi of independent, non-Gaussian random variables X j will usually have distributions that are more Gaussian than the original dis- tributions of the X j (central limit theorem). Reversing this argu- ment, this suggests that the X j could be recovered from a sample of the Yi by looking for linear combinations of the Yi that have the least Gaussian distributions. These linear combinations will also be close to statistically independent. A more rigorous justi- fication of the method can be found in Hyvärinen et al. (2001).
 \bitem
@@ -734,8 +734,8 @@ The \emph{target} distribution we want to sample is the new posterior. We can
 sample this distribution by using the original posterior as a \emph{proposal} 
 distribution and the ratio of our likelihood estimates over the pseudo-likelihood 
 as importance weights. If we let $p({\bf x} | \bm{\theta})$ be the original 
-pseudo-likelihood and $p'({\bf x} | \bm{\theta})$ be our ``new'' likelihood. 
-Then the new marginal likelihood can be calculated through importance sampling:   
+pseudo-likelihood and $p'({\bf x} | \bm{\theta})$ be our ``new'' likelihood,
+then the new marginal likelihood can be calculated through importance sampling:   
 \begin{align}
 p'({\bf x} | \theta_1) &= \int p'({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p = \int \frac{p'({\bf x} | \bm{\theta})}{p({\bf x} | \bm{\theta})}\, p({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_p \\
     &\approx \sum\limits_{\bm{\theta}^{(i)} \in S} \frac{p'({\bf x} | \bm{\theta}^{(i)})}{p({\bf x} | \bm{\theta}^{(i)})}. \label{eq:impsamp}
@@ -748,10 +748,12 @@ sample $\bm{\theta}^{(i)}$ of the original MCMC chain. We calculate the
 importance weights for the~\Beut~and~\Sinh~analyses using the ICA likelihood 
 and Gaussian mixture likelihood estimates respectively.  
 
-~\todo{figure} 
+In Figure~\ref{fig:pk_like}
+
 
 In Figure~\ref{fig:gmf_like}
 
+Figure~\ref{fig:pk_contour}
 
 Figure~\ref{fig:gmf_contour}
 
@@ -789,9 +791,33 @@ ${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (left) and $\zeta(N)$ (right) analyse
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\textwidth]{figs/kNNdiverg_nonGauss.pdf}
+\includegraphics[width=0.9\textwidth]{figs/kNNdiverg_gmm.pdf}
 \caption{}
-\label{fig:div_nongauss}
+\label{fig:div_gmm}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figs/kNNdiverg_ica.pdf}
+\caption{}
+\label{fig:div_ica}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{figs/Like_Pk_comparison.pdf}
+\caption{}
+\label{fig:pk_like}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figs/RSD_contours.pdf}
+\caption{}
+\label{fig:gmf_contour}
 \end{center}
 \end{figure}
 
@@ -805,7 +831,7 @@ ${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (left) and $\zeta(N)$ (right) analyse
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\textwidth]{figs/GMFcontours_manodeep.pdf}
+\includegraphics[width=0.8\textwidth]{figs/GMFcontours_manodeep.pdf}
 \caption{}
 \label{fig:gmf_contour}
 \end{center}
