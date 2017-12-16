@@ -87,8 +87,6 @@ large-scale structure of universe
 \end{itemize}
 
 % Data analysis can only lead to unbiased constraints on a physical theory if the employed likelihood is correct (e.g.  Trotta 2008; Mardia et al. 1979; Anderson 2003; Cramer 1946; Jeffreys 1961; Sun & Berger 2006). 
-
-\section{Gaussian Likelihood Assumption} \label{sec:gaussass} 
 \begin{itemize}
     \item Depending on Hogg's paper maybe a simple illustration of how the likelihood asumption 
 \end{itemize}
@@ -101,7 +99,7 @@ More important the mock catalogs can be used to construct an accurate
 estimator for the non-Gaussian likelihood.} 
 
 \section{Mock Catalogs}
-Mock catalogs are play an indispensable role in standard cosmological 
+Mock catalogs play an indispensable role in standard cosmological 
 anslyses of LSS studies. They're used for testing analysis 
 pipelines~\citep[][]{beutler2017, grieb2017, tinkerinpreparation}, 
 testing the effect of systematics~\citep{guo2012, vargas-magana2014, hahn2017, pinol2017, ross2017}, 
@@ -114,80 +112,75 @@ for parameter inference.
 While some argue for analytic estimates of the covariance 
 matrix~\citep[e.g.][]{mohammed2017} or estimates directly from data
 by subsampling~\citep[e.g.][]{norberg2009}, covariance matrices 
-from mocks have a number of advantages. Mock catalogs allow us 
+from mocks have a number of advantages. Mocks allow us 
 to incorporate detailed systematic errors present in the 
 data and variance beyond the volume of the data. Even for analytic 
-estimates, large ensembles of mocks are crucial for validataion~\citep{slepian2017}. 
-Moreover, as we show later in this paper, mock catalogs present an
+estimates, a large ensemble of mocks are crucial for validataion~\citep[\emph{e.g.}][]{slepian2017}. 
+Moreover, as we show later in this paper, mocks present an
 additional advantage: they allow us to 
 quantify the non-Gaussianity of the likelihood and more accurately 
-estimate the true likelihood. 
+estimate the true likelihood distribution. 
 
 In this paper, we we focus on two LSS analyses: the powerspectrum 
-multipole full shape analysis of \cite{beutler2017} and group multiplicity 
-function analysis of \cite{sinha2017a}. Throughout the paper we will 
+multipole ($P_\ell$) analysis of \Beut~and group multiplicity 
+function ($\zeta$) analysis of \Sinh. Throughout the paper we will 
 make extensive use of the mock catalogs used in these analyses. 
 In this section, we give a brief description of these mocks and how 
 the observables used in the analysis --- the powerspectrum 
 multipole ($P_\ell$) and group multiplicity function ($\zeta(N)$) ---
 are calculated from them. Afterwards, we will describe how we compute 
-the covariance matrix, $\mathbb{C}$, and the pre-processed mock observable
-date, ${\bf X}^\mathrm{mock}$.
+the covariance matrix from the mocks and pre-process the mock observable
+data.
 
 \subsection{MultiDark-PATCHY~Mock Catalog} \label{sec:patchy}
-In their powerspectrum multipole full shape analysis, \cite{beutler2017}
-use the MultiDark-\patchy~mock catalogs from \cite{kitaura2016}. 
+In their powerspectrum multipole analysis, \Beut~use 
+the MultiDark-\patchy~mock catalogs from \cite{kitaura2016}. 
 These mocks are generated using the \patchy~code \citep{kitaura2014,kitaura2015}. 
 They rely on large-scale density fields generated using augmented
-Lagrangian Perturbation Theory~\citep[ALPT;][]{kitaura2013} on a mesh.
-This mesh is then populated with galaxies based on a combined non-linear
-deterministic and stochastic biases. The mocks from the \patchy code 
+Lagrangian Perturbation Theory~\citep[ALPT;][]{kitaura2013} on a mesh,
+which they then populate with galaxies based on a combined non-linear
+deterministic and stochastic biases. The mocks from the \patchy~code 
 are then calibrated to reproduce the galaxy clustering in the 
 high-fidelity BigMultiDark $N$-body simulation~\citep{rodriguez-torres2016, klypin2016}. 
-
-The galaxies are then assigned stellar masses using the 
+Afterwards, the galaxies are assigned stellar masses using the 
 {\fontshape\scdefault\selectfont hadron}~code~\citep{zhao2015}.
-And the {\fontshape\scdefault\selectfont sugar}~code~\citep{rodriguez-torres2016} 
+and the {\fontshape\scdefault\selectfont sugar}~code~\citep{rodriguez-torres2016} 
 is applied to combine different boxes, incorporate selection
 effects and masking to produce mock light-cone galaxy catalogs. 
-The statistics of the resultng mocks are then compared to 
+The statistics of the resulting mocks are then compared to 
 observations and the process is iterated to reach desired 
 accuracy. We refer readers to~\cite{kitaura2016} for further 
 details. 
 
 In total, \cite{kitaura2016} generated a 12,228 mock light-cone 
-galaxy catalogs for BOSS Data Release 12: 2048 for each southern 
-and northern galactic caps of LOWZ, CMASS, combined samples. 
-In \cite{beutler2017}, they use 2045 and 2048 for the northern 
-galactic cap (NGC) and souther galactic cap (SGC) of the LOWZ+CMASS
-combined sample. \cite{beutler2017} excluded 3 mock realizations, 
-due to notable issues, which have been since been addressed. Therefore, 
+galaxy catalogs for BOSS Data Release 12. In \Beut, 
+they use 2045 and 2048 for the northern galactic cap (NGC) and 
+souther galactic cap (SGC) of the LOWZ+CMASS combined sample. 
+\Beut~excluded 3 mock realizations due to notable 
+issues, which have been since been addressed. Therefore, 
 in our analysis we use all 2048 mocks for both the NGC and SGC of 
 the LOWZ+CMASS combined sample.
 
 \subsection{\cite{sinha2017a} Mocks} \label{sec:gmf} 
 The simulations used in the small-scale clustering analysis of \cite{sinha2017a} 
 are from the Large Suite of Dark Matter Simulations project 
-\citep[LasDamas;][]{mcbride2009}. More specifically \cite{sinha2017a} uses
-the Consuelo and Carmen configurations, which were designed to model SDSS 
-galaxies with $M_r$ thresholds of $-19$ and $-21$, respectively.
+\citep[LasDamas;][]{mcbride2009}. These were designed to model galaxy samples 
+from SDSS DR7.
 The initial conditions for these simulations are derived from second order 
 Lagrangian Perturbation Theory using the 2LTPIC code~\citep{scoccimarro1998, crocce2006}
-and evolved using the $N$-body $\mathtt{GADGET}-2$ code~\citep{springel2005}.
+and evolved using the $N$-body $\mathtt{GADGET}$-$2$ code~\citep{springel2005}.
 Halos are then identified from the dark matter distribution outputs using 
 the $\mathtt{ntropy-fofsv}$ code~\citep{gardner2007}, which uses a 
 friend-of-friends algorithm~\citep[FoF;][]{davis1985} with a linking length of $0.2$
-times the mean inter-particle separation. The FoF halo masses are then adjusted 
-using the \cite{warren2006} correction. 
+times the mean inter-particle separation. %The FoF halo masses are then adjusted using the \cite{warren2006} correction. 
+\S
 The Consuelo simulation contains $1400^3$ dark matter particles with 
 mass of $1.87 \times 10^9\,h^{-1} M_\odot$ in a cubic volume of 
 $420\,h^{-1} Mpc$ per side and is evolved from $z_\mathrm{init} = 99$. 
 The Carmen simulation contains $1120^3$ dark matter particles with mass 
 of $4.938 \times 10^{10}\,h^{-1} M_\odot$ in a cubic volume of 
 $1000\,h^{-1} Mpc$ per side and is evolved from $z_\mathrm{init} = 49$. 
-They use the following cosmological parameters, which are motivated 
-by the WMAP3 constraints \citep{spergel2007}:
-$\Omega_m = 0.25, \Omega_\Lambda = 0.75, \Omega_b = 0.04, h = 0.7, \sigma_8 = 0.8,\;\mathrm{and}\;n_s = 1.0.$
+%They use the following cosmological parameters, which are motivated by the WMAP3 constraints \citep{spergel2007}: $\Omega_m = 0.25, \Omega_\Lambda = 0.75, \Omega_b = 0.04, h = 0.7, \sigma_8 = 0.8,\;\mathrm{and}\;n_s = 1.0.$
 
 The FoF halo catalogs are then populated with galaxies using the 
 `Halo Occupation Distribution` (HOD) framework. In this framework, the 
@@ -344,7 +337,7 @@ $P_\ell$ and $\zeta$ likelihoods using $\Xmock$.
 
 \section{Quantifying the Likelihood non-Gaussianity} \label{sec:div}
 The standard approach to parameter inference in LSS studies neglects
-to account for likelihood non-Gaussianity (Section~\ref{sec:gaussass}). 
+to account for likelihood non-Gaussianity. 
 However, we are not the first to investigate likelihood non-Gaussianity 
 in LSS analyses. Nearly two decades ago, \cite{scoccimarro2000} examined 
 the likelihood non-Gaussianity for the powerspectrum and reduced bispectrum 
@@ -711,13 +704,21 @@ the Gaussian mixture method for the~\Sinh~analysis.
 Both~\Beut~and~\Sinh~use the standard Monte Carlo Markov Chain (MCMC) 
 approach with the Gaussian pseduo-likelihood to derive the posterior distributions
 of their model parameters. The \Beut~analysis contains $11$ parameters:
-$f \sigma_8$, $\alpha_\parallel$, $\alpha_\perp$,
-$b_1^\mathrm{NGC} \sigma_8$, $b_1^\mathrm{SGC} \sigma_8$, 
-$b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8$, 
-$\sigma_v^\mathrm{NGC}$, $\sigma_v^\mathrm{SGC}$, 
-$N^\mathrm{NGC}$, and $N^\mathrm{sGC}$. 
+\beq \nonumber
+\Big \{f \sigma_8,~\alpha_\parallel,~\alpha_\perp,~b_1^\mathrm{NGC} \sigma_8,~b_1^\mathrm{SGC} \sigma_8, 
+~b_2^\mathrm{NGC} \sigma_8,~b_2^\mathrm{SGC} \sigma_8,~\sigma_v^\mathrm{NGC},~\sigma_v^\mathrm{SGC}, 
+~N^\mathrm{NGC},~\mathrm{and}~N^\mathrm{SGC} \Big \}. 
+\eeq
+%$f \sigma_8$, $\alpha_\parallel$, $\alpha_\perp$,
+%$b_1^\mathrm{NGC} \sigma_8$, $b_1^\mathrm{SGC} \sigma_8$, 
+%$b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8$, 
+%$\sigma_v^\mathrm{NGC}$, $\sigma_v^\mathrm{SGC}$, 
+%$N^\mathrm{NGC}$, and $N^\mathrm{SGC}$. 
 Meanwhile the \Sinh~analysis contains $5$ parameters:
-$\log\,M_\mathrm{min}$, $\sigma_{\log\,M}$, $\log\,M_0$, $\log\,M_1$, and $\alpha$. 
+\beq \nonumber
+\Big\{ \log\,M_\mathrm{min},~\sigma_{\log\,M},~\log\,M_0,~\log\,M_1,~\mathrm{and}~\alpha \Big\}. 
+\eeq
+%$\log\,M_\mathrm{min}$, $\sigma_{\log\,M}$, $\log\,M_0$, $\log\,M_1$, and $\alpha$. 
 Using the improved likelihood estimates from the Sections~\ref{sec:gmm} 
 and~\ref{sec:ica}, we can now measure the impact of likelihood non-Gaussianity 
 on the posterior distributions of these parameters. The most straightforward 
@@ -750,10 +751,9 @@ and Gaussian mixture likelihood estimates respectively.
 
 In Figure~\ref{fig:pk_like}
 
-
 In Figure~\ref{fig:gmf_like}
 
-Figure~\ref{fig:pk_contour}
+Figure~\ref{fig:rsd_contour}
 
 Figure~\ref{fig:gmf_contour}
 
@@ -817,7 +817,7 @@ ${\bf Y}^\mathrm{ref}$ for the $P_\ell(k)$ (left) and $\zeta(N)$ (right) analyse
 \begin{center}
 \includegraphics[width=0.9\textwidth]{figs/RSD_contours.pdf}
 \caption{}
-\label{fig:gmf_contour}
+\label{fig:rsd_contour}
 \end{center}
 \end{figure}
 
