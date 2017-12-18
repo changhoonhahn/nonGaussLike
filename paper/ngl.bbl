@@ -304,6 +304,12 @@ Scoccimarro, R. 1998,
 ---. 2000, \href{http://dx.doi.org/10.1086/317248}{\JournalTitle{The
   Astrophysical Journal}, 544, 597}
 
+\bibitem[{Scoccimarro(2015)}]{scoccimarro2015}
+---. 2015,
+  \href{http://dx.doi.org/10.1103/PhysRevD.92.083532}{\JournalTitle{Physical
+  Review D}, 92}, \href{http://arxiv.org/abs/1506.02729}{{\sffamily
+  arXiv:1506.02729}}
+
 \bibitem[{Scott(1992)}]{scott1992}
 Scott, D.~W. 1992, Multivariate {{Density Estimation}}: {{Theory}},
   {{Practice}}, and {{Visualization}} ({Wiley})
