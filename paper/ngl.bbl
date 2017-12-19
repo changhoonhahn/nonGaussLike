@@ -56,6 +56,11 @@ Broderick, A.~E., Fish, V.~L., Doeleman, S.~S., \& Loeb, A. 2011,
   \href{http://dx.doi.org/10.1088/0004-637X/735/2/110}{\JournalTitle{The
   Astrophysical Journal}, 735, 110}
 
+\bibitem[{Comon(1994)}]{comon1994}
+Comon, P. 1994,
+  \href{http://dx.doi.org/10.1016/0165-1684(94)90029-9}{\JournalTitle{Signal
+  Processing}, 36, 287}
+
 \bibitem[{Crocce {et~al.}(2006)Crocce, Pueblas, \& Scoccimarro}]{crocce2006}
 Crocce, M., Pueblas, S., \& Scoccimarro, R. 2006,
   \href{http://dx.doi.org/10.1111/j.1365-2966.2006.11040.x}{\JournalTitle{Monthly
@@ -135,8 +140,26 @@ Hastie, T., Tibshirani, R., \& Friedman, J. 2009, The {{Elements}} of
   {{Statistical Learning}}: {{Data Mining}}, {{Inference}}, and {{Prediction}},
   {{Second Edition}} ({{Springer Series}} in {{Statistics}}) ({Springer})
 
+\bibitem[{H{\'e}rault \& Ans(1984)}]{herault1984}
+H{\'e}rault, J., \& Ans, B. 1984, \JournalTitle{Comptes Rendus de
+  l'Acad{\'e}mie des Sciences Paris, S{\'e}rie III, Life Sciences}, 299, 525
+
+\bibitem[{Hyv{\"a}rinen(1998)}]{hyvarinen1998}
+Hyv{\"a}rinen, A. 1998, in Advances in {{Neural Information Processing
+  Systems}} 10, ed. M.~I. Jordan, M.~J. Kearns, \& S.~A. Solla ({MIT Press}),
+  273
+
+\bibitem[{Hyvarinen(1999)}]{hyvarinen1999}
+Hyvarinen, A. 1999,
+  \href{http://dx.doi.org/10.1109/72.761722}{\JournalTitle{IEEE Transactions on
+  Neural Networks}, 10, 626}
+
 \bibitem[{Hyvarinen(2001)}]{hyvarinen2001independent}
-Hyvarinen, A. 2001, Independent Component Analysis (New York: {J. Wiley})
+---. 2001, Independent Component Analysis (New York: {J. Wiley})
+
+\bibitem[{Hyv{\"a}rinen \& Oja(2000)}]{hyvarinen2000}
+Hyv{\"a}rinen, A., \& Oja, E. 2000, \JournalTitle{Neural Networks: The Official
+  Journal of the International Neural Network Society}, 13, 411
 
 \bibitem[{Kazin {et~al.}(2014)Kazin, Koda, Blake, Padmanabhan, Brough, Colless,
   Contreras, Couch, Croom, Croton, Davis, Drinkwater, Forster, Gilbank,
