@@ -3,6 +3,7 @@
 \usepackage{color}
 \usepackage{amsmath}
 \usepackage{natbib}
+\usepackage{ctable}
 \usepackage{bm}
 \input{vc}
 
@@ -30,6 +31,9 @@
 \newcommand{\given}{\,|\,}
 \newcommand{\pseudo}{{\mathrm{pseudo}}}
 \newcommand{\Var}{\mathrm{Var}}
+
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
 % text shih
 \newcommand{\foreign}[1]{\textsl{#1}}
 \newcommand{\etal}{\foreign{et~al.}}
@@ -240,7 +244,7 @@ In this work, we compute the $P_\ell(k)$ using a similar FFT-based
 estimator of \cite{hand2017a} instead of the~\Beut~estimator. Our choice 
 is based on computational convenience. A python implementation
 of the \cite{hand2017a} estimator is publicly available in the $\mathtt{NBODYKIT}$ 
-package\footnote{http://nbodykit.readthedocs.io/en/latest/index.html}. 
+package\footnote{http://nbodykit.readthedocs.io/en/latest/index.html}~\citep{hand2017b}. 
 We confirm that the resulting $P_\ell(k)s$ and covariance matrices from 
 the two estimators are consistent with one another. 
 
@@ -830,8 +834,8 @@ evaluating their computational intensive forward model $> 10^5$ times.
 Without having to re-run the MCMC chains, we instead use importance sampling 
 to derive the new posteriors from the original chains~\citep[see][for details on importance sampling]{wasserman2004}. 
 The \emph{target} distribution we want is the new posterior. To sample this 
-distribution, we use the original posterior as a \emph{proposal} 
-distribution and the ratio of our likelihood estimates over the pseudo-likelihood 
+distribution, we use the original posterior as the \emph{proposal} 
+distribution with the ratio of our likelihood estimates over the pseudo-likelihood 
 as \emph{importance weights}. If we let $P({\bf x} | \bm{\theta})$ be the original 
 pseudo-likelihood and $P'({\bf x} | \bm{\theta})$ be our ``new'' likelihood,
 then the new marginal likelihood can be calculated through importance sampling:   
@@ -843,21 +847,196 @@ Through Monte Carlo integration, this becomes
 P'({\bf x} | \theta_1) \approx \sum\limits_{\bm{\theta}^{(i)} \in S} \frac{P'({\bf x} | \bm{\theta}^{(i)})}{P({\bf x} | \bm{\theta}^{(i)})}. \label{eq:impsamp}
 \eeq
 where $S$ is the sample drawn from $P({\bf x} | \bm{\theta})$. In our 
-case this is just the original MCMC chain. The only calculation required 
+case $S$ is just the original MCMC chain. The only calculation required 
 is the importance weights in Eq.~\ref{eq:impsamp}, 
 ${P'({\bf x} | \bm{\theta}^{(i)})}/{P({\bf x} | \bm{\theta}^{(i)})}$ for 
 each sample $\bm{\theta}^{(i)}$ of the original MCMC chain. 
-$P({\bf x} | \bm{\theta}^{(i)})$ is the pseudo-likelihood
-provided by the original MCMC chain. Meanwhile $P'({\bf x} | \bm{\theta}^{(i)})$
+To derive the importance sampled posterior distributions using 
+the non-Gaussian likelihood estimates from this paper, 
+$P({\bf x} | \bm{\theta}^{(i)})$ 
+is the pseudo-likelihood and 
+$P'({\bf x} | \bm{\theta}^{(i)})$
 is the ICA likelihood for \Beut~and the GMM likelihood~\Sinh.
 
-In Figure~\ref{fig:pk_like} 
+We present in Figure~\ref{fig:pk_like} the resulting posterior 
+distributions using the non-Gaussian ICA likelihood for the 
+$\big \{f \sigma_8$, $\alpha_\parallel$, $\alpha_\perp$, 
+$b_1^\mathrm{NGC} \sigma_8$, $b_1^\mathrm{SGC} \sigma_8$, 
+$b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8,\big \}$
+parameters in the \Beut~$P_\ell$ analysis (orange). We include 
+the original~\Beut~posterior distributions for comparison in 
+blue. On the bottom of each panel, we include box plots marking 
+the confidence interals of the updated and original posteriors. 
+The boxes and ``whiskers'' repesent the $68\%$ and $95\%$ 
+confidence intervals, respectively. We also list the median
+and $68\%$ confidence intervals of the posteriors in Table~\ref{tab:posterior}.
+Overall, likelihood non-Gaussianity does \emph{not} have a significant
+impact on the parameter constraints of the $P_\ell$ analysis. $f \sigma_8$ 
+and $b_2 \sigma_8$ are the main parameters with noticeable 
+change in their posteriors. \todo{put the actual numbers} 
 
-Figure~\ref{fig:rsd_contour}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure 5 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{figs/Like_Pk_comparison.pdf}
+\caption{The posterior distribution for 
+    $\big \{f \sigma_8$, $\alpha_\parallel$, $\alpha_\perp$, 
+    $b_1^\mathrm{NGC} \sigma_8$, $b_1^\mathrm{SGC} \sigma_8$, 
+    $b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8,\big \}$ 
+    in the~\Beut~$P_\ell$ analysis using the non-Gaussian ICA 
+    likelihood (orange). We include in blue the original~\Beut~posteriors 
+    for comparison. On the bottom of each panel we include box 
+    plots that mark the $68\%$ and $95\%$ confidence intervals of
+    the posterior. The discrepancy between the posteriors is most 
+    evident for the parameters $f\sigma_8$ and and $b^\mathrm{SGC}_2 \sigma_8$.  
+    Overall, however, likelihood non-Gaussianity does \emph{not} 
+    have a siginificant impact on the parameter constraints of 
+    the $P_\ell$ analysis.} 
+\label{fig:pk_like}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In Figure~\ref{fig:gmf_like}
+Focusing on the main cosmological parameters $f \sigma_8$, 
+$\alpha_\parallel$, and $\alpha_\perp$, we present their 
+joint posterior distributions in Figure~\ref{fig:rsd_contour}.  
+The contours mark the $68\%$ and $95\%$ confidence intervals
+of the posteriors. The shift in the $f \sigma_8$ distribution 
+is reflected in the
+$(f\sigma_8, \alpha_\parallel)$ and $(\alpha_\perp, f\sigma_8)$ 
+contours (left and middle panels respectively). Meanwhile, the
+$(\alpha_\parallel, \alpha_\perp)$ distribution (right) show nearly 
+no change from the non-Gaussian likelihood. These joint posteriors 
+corroborate our conclusion from Figure~\ref{fig:pk_like}.
 
-Figure~\ref{fig:gmf_contour}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure 6 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figs/RSD_contours.pdf}
+\caption{Joint posterior distributions of $f \sigma_8$, 
+    $\alpha_\parallel$, and $\alpha_\perp$ in the~\Beut~$P_\ell$ 
+    analysis, compute using the non-Gaussian ICA likelihood (orange). 
+    We include, in blue, the original~\Beut~posteriors for comparison. 
+    The contours in the left and middle panels reflect the shift
+    in $f \sigma_8$ caused by likelihood non-Gaussianity. Otherwise, 
+    the contours illustrate that likelihood non-Gaussianity has little 
+    impact on the cosmological parameters.
+    }
+\label{fig:rsd_contour}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Next in Figure~\ref{fig:gmf_like}, we present the posterior 
+distributions calcuated using the non-Gaussian GMM likelihood for 
+the HOD parameters in the \Sinh~$\zeta$ analysis (orange).  
+We include the posteriors calculated using the pseudo-likelihood 
+for comparison in blue. The box plots on the bottom of each plot 
+mark the $68\%$ and $95\%$ confidence intervals of the posteriors. 
+We also list the median and $68\%$ confidence intervals 
+in Table~\ref{tab:posterior}. In dotted lines, we plot the 
+original \Sinh~posteriors, which differ from the blue distribution.
+This difference is caused by the difference in the covariance 
+matrix we use in the pseudo-likelihood~(see Section~\ref{sec:xmock}).  
+The difference, however, is negiligible. 
+
+\emph{Likelihood non-Gaussianity 
+significantly impacts the posterior distribution of all the HOD 
+parameters except $\log M_0$}.
+\todo{put in details once the numbers out}
+The impact of likelihood non-Gaussianity is further emphasized in 
+the joint posterior distributions of Figure~\ref{fig:gmf_contour}.
+The $(\log\,M_\mathrm{min},\,\sigma_{\log M})$ and 
+$(\log\,M_\mathrm{min},\,\alpha)$ contours are both shifted 
+and broadened. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure 7 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{figs/Like_GMF_comparison.pdf}
+\caption{The posterior distribution for HOD parameters 
+    $\log\, M_\mathrm{min}$, $\sigma_{\log\,M}$, 
+    $\log\, M_0$, $\log\, M_1$, and $\alpha$ in the~\Sinh~$\zeta$ 
+    analysis using the non-Gaussian GMM likelihood (orange). We 
+    include in blue the posteriors calculated from the pseudo-likelihood
+    for comparison. We also include the original~\Sinh~posterior 
+    (dotted; see text for details). On the bottom of each panel we 
+    include box plots that mark the $68\%$ and $95\%$ confidence 
+    intervals of the posterior.
+}
+\label{fig:gmf_like}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure 8 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{figs/GMFcontours_manodeep.pdf}
+\caption{}
+\label{fig:gmf_contour}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table 1 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\caption{Impact of likelihood non-Gaussianity on the posterior parameter constraints of \Beut~and~\Sinh}
+\begin{center}
+\begin{tabular}{cccccccc} \toprule
+    \multicolumn{8}{c}{\Beut~$P_\ell$ analysis} \\%[-7pt]
+    \multicolumn{1}{c}{} & 
+    \multicolumn{1}{c}{$f \sigma_8$} & 
+    \multicolumn{1}{c}{$\alpha_\parallel$} & 
+    \multicolumn{1}{c}{$\alpha_\perp$} & 
+    \multicolumn{1}{c}{$b_1^\mathrm{NGC} \sigma_8$} & 
+    \multicolumn{1}{c}{$b_1^\mathrm{SGC} \sigma_8$} &
+    \multicolumn{1}{c}{$b_2^\mathrm{NGC} \sigma_8$} & 
+    \multicolumn{1}{c}{$b_2^\mathrm{SGC} \sigma_8$} \\
+    \hline
+    \multicolumn{1}{c}{\Beut} & 
+    \multicolumn{1}{c}{0.478} & 
+    \multicolumn{1}{c}{$\alpha_\parallel$} & 
+    \multicolumn{1}{c}{$\alpha_\perp$} & 
+    \multicolumn{1}{c}{$b_1^\mathrm{NGC} \sigma_8$} & 
+    \multicolumn{1}{c}{$b_1^\mathrm{SGC} \sigma_8$} &
+    \multicolumn{1}{c}{$b_2^\mathrm{NGC} \sigma_8$} & 
+    \multicolumn{1}{c}{$b_2^\mathrm{SGC} \sigma_8$} \\ 
+    \multicolumn{1}{c}{\specialcell{non-Gaussian\\ $\mathcal{L}_\mathrm{ICA}$}} &  
+    \multicolumn{1}{c}{0.478} & 
+    \multicolumn{1}{c}{$\alpha_\parallel$} & 
+    \multicolumn{1}{c}{$\alpha_\perp$} & 
+    \multicolumn{1}{c}{$b_1^\mathrm{NGC} \sigma_8$} & 
+    \multicolumn{1}{c}{$b_1^\mathrm{SGC} \sigma_8$} &
+    \multicolumn{1}{c}{$b_2^\mathrm{NGC} \sigma_8$} & 
+    \multicolumn{1}{c}{$b_2^\mathrm{SGC} \sigma_8$} \\ 
+
+%\multicolumn{5}{c}{} \\[-5pt]
+%% Initial Green Valley Fraction 
+%\multicolumn{1}{c}{$f_{GV}(\mathcal{M}_*)$} & 
+%\multicolumn{1}{c}{$A_{GV} (\log\;\mathcal{M}_* - 10.5) + \delta_{GV}$} & 
+%\multicolumn{1}{c}{Initial $z \approx 1$ Green Valley Fraction (Eq.~\ref{eq:f_gv})} & 
+%\multicolumn{1}{c}{$A_{GV}$} & 
+%\multicolumn{1}{l}{$[0., 1.]$} \\
+%\multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & 
+%\multicolumn{1}{c}{$\delta_{GV}$} & \multicolumn{1}{l}{$[-0.4, 0.6]$} \\[3pt]
+\hline
+\end{tabular} \label{tab:posterior} 
+\end{center}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 \section{Discussion}
 \bitem
@@ -867,38 +1046,6 @@ Figure~\ref{fig:gmf_contour}
 
 \section{Summary}
 
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{figs/Like_Pk_comparison.pdf}
-\caption{}
-\label{fig:pk_like}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.9\textwidth]{figs/RSD_contours.pdf}
-\caption{}
-\label{fig:rsd_contour}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{figs/Like_GMF_comparison.pdf}
-\caption{}
-\label{fig:gmf_like}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.8\textwidth]{figs/GMFcontours_manodeep.pdf}
-\caption{}
-\label{fig:gmf_contour}
-\end{center}
-\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Acknowledgements
