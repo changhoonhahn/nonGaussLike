@@ -395,7 +395,7 @@ def Like_RSD():
     # ignoring some of the nuissance parameters
     labels = ['b1sig8_NGC', 'b1sig8_SGC', 'b2sig8_NGC', 'b2sig8_SGC', 
             'alpha_perp', 'alpha_para', 'fsig8'] 
-    lbltex = [r'$b_1\sigma_8^{NGC}$', r'$b_1\sigma_8^{SGC}$', r'$b_2\sigma_8^{NGC}$', r'$b_2\sigma_8^{SGC}$', 
+    lbltex = [r'$b^{NGC}_1\sigma_8$', r'$b^{SGC}_1\sigma_8$', r'$b^{NGC}_2\sigma_8$', r'$b^{SGC}_2\sigma_8$', 
             r'$\alpha_\perp$', r'$\alpha_\parallel$', r'$f \sigma_8$'] 
     prior_min = [1., 1., -3., -3., 0.8, 0.8, 0.2]#, -10000., -10000., 0.5, 0.5]
     prior_max = [1.8, 1.8, 5., 5., 1.2, 1.2, 0.8]#, 10000., 10000., 15., 15.]
@@ -405,14 +405,27 @@ def Like_RSD():
     nbin = 30 
     
     f_out = open(''.join([UT.tex_dir(), 'dat/pk_likelihood.dat']), 'w') 
-    fig = plt.figure(figsize=(20, 10)) 
+
+    pretty_colors = prettycolors() 
+    fig = plt.figure(figsize=(15, 9)) 
+    gs = gridspec.GridSpec(5, 4, height_ratios=[3, 0.75, 1.1, 3, 0.75]) 
+
     for i in range(len(labels)): 
-        sub = fig.add_subplot(2, 4, i+1) 
+        if i < 4: 
+            sub = plt.subplot(gs[i]) 
+            sub_box = plt.subplot(gs[i+4])
+        else: 
+            sub = plt.subplot(gs[i+8]) 
+            sub_box = plt.subplot(gs[i+12]) 
+
+        bplots1 = [] 
         # original Beutler et al.(2017) constraints
         hh = np.histogram(chain[labels[i]][burnin], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
         bp = UT.bar_plot(*hh) 
         sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none')
-        low, med, high = np.percentile(chain[labels[i]][burnin], [15.86555, 50, 84.13445])
+        lowlow, low, med, high, highhigh = np.percentile(chain[labels[i]][burnin], [2.5, 16, 50, 84, 97.5])
+        bplots1.append({'med': med, 'q1': low, 'q3': high, 'whislo': lowlow, 'whishi': highhigh, 'fliers': []})
+
         f_out.write(''.join(['# ', labels[i], ' Beutler et al. (2017)', '\n']))
         f_out.write('\t'.join([str(round(low,5)), str(round(med,5)), str(round(high,5)), '\n']))
 
@@ -423,28 +436,48 @@ def Like_RSD():
                 range=[prior_min[i], prior_max[i]])
         bp = UT.bar_plot(*hh) 
         sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none') 
-        low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
+        lowlow_w, low_w, med_w, high_w, highhigh_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in 
+                [0.025, 0.16, 0.50, 0.84, 0.975]]
+        # stats dict for each box
+        bplots1.append({'med': med_w, 'q1': low_w, 'q3': high_w, 'whislo': lowlow_w, 'whishi': highhigh_w, 'fliers': []})
 
         f_out.write(''.join(['# ', labels[i], ' ', like_lbl, '\n']))
         f_out.write('\t'.join([str(round(low_w,5)), str(round(med_w,5)), str(round(high_w,5)), '\n']))
-
         f_out.write('\n') 
+
+        medianprops = {'alpha': 0.}
+        whiskprop = dict(linestyle='-', linewidth=1, color='k') 
+        boxprops = dict(linestyle='-', linewidth=1, color='k')
+        bxp1 = sub_box.bxp(bplots1, positions=[1,2], vert=False, patch_artist=True, 
+                      showfliers=False, boxprops=boxprops, medianprops=medianprops, whiskerprops=whiskprop)
+
+        for ibox, box in enumerate(bxp1['boxes']):
+            if ibox == 0:
+                box.set(facecolor=pretty_colors[1], alpha=0.75)
+            elif ibox == 1:
+                box.set(facecolor=pretty_colors[3], alpha=0.75)
         # x-axis 
         sub.set_xlim([prior_min[i], prior_max[i]]) 
-        sub.set_xlabel(lbltex[i], labelpad=10, fontsize=25)
+        sub.set_xticklabels([]) 
+        sub_box.set_xlim([prior_min[i], prior_max[i]]) 
+        if i < 4: sub_box.set_xlabel(lbltex[i], labelpad=10, fontsize=22)
+        else: sub_box.set_xlabel(lbltex[i], labelpad=10, fontsize=25)
         # y-axis
         sub.set_ylim(yrange[i]) 
         sub.set_yticks(yticks[i]) 
+        sub_box.set_yticklabels([]) 
+    f_out.close() 
 
-    sub = fig.add_subplot(2, 4, 8, frameon=False) 
-    sub.fill_between(bp[0], np.zeros(len(bp[0])), np.zeros(len(bp[0])), alpha=0.75, edgecolor='none', label='Beutler et al. (2017)') 
-    sub.fill_between(bp[0], np.zeros(len(bp[0])), np.zeros(len(bp[0])), alpha=0.75, edgecolor='none', label=like_lbl) 
+    sub = fig.add_subplot(1,1,1, frameon=False) 
+    sub.fill_between(bp[0], np.zeros(len(bp[0])), np.zeros(len(bp[0])), 
+            alpha=0.75, edgecolor='none', label=r'Beutler et al. (2017)')
+    sub.fill_between(bp[0], np.zeros(len(bp[0])), np.zeros(len(bp[0])), 
+            alpha=0.75, edgecolor='none', label='Hahn et al. (2018) \n $\mathcal{L}^\mathrm{ICA}$' ) 
     sub.set_xticks([])
     sub.set_yticks([])
-    sub.legend(loc='center left', prop={'size': 20})  # legend
+    sub.legend(bbox_to_anchor=(1.01, 0.4), prop={'size': 17})  # legend
 
-    f_out.close() 
-    fig.subplots_adjust(wspace=.2, hspace=.3)
+    fig.subplots_adjust(wspace=.2, hspace=0)
     fig.savefig(''.join([UT.tex_dir(), 'figs/', 'Like_Pk_comparison.pdf']), bbox_inches='tight') 
     return None
 
@@ -744,6 +777,6 @@ if __name__=="__main__":
     #div_ICA()
     #GMF_contours()
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
-    #Like_RSD()
-    RSD_contours()
+    Like_RSD()
+    #RSD_contours()
     #Like_GMF()
