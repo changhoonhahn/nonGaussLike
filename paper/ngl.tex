@@ -132,7 +132,7 @@ function ($\zeta$) analysis of \Sinh. Throughout the paper we will
 make extensive use of the mock catalogs used in these analyses. 
 In this section, we give a brief description of these mocks and how 
 the observables used in the analysis --- the powerspectrum 
-multipole ($P_\ell$) and group multiplicity function ($\zeta(N)$) ---
+multipole ($P_\ell$) and group multiplicity function ($\zeta$) ---
 are calculated from them. Afterwards, we will describe how we compute 
 the covariance matrix from the mocks and pre-process the mock observable
 data.
@@ -157,14 +157,20 @@ observations and the process is iterated to reach desired
 accuracy. We refer readers to~\cite{kitaura2016} for further 
 details. 
 
-In total, \cite{kitaura2016} generated a 12,228 mock light-cone 
+In total, \cite{kitaura2016} generated 12,228 mock light-cone 
 galaxy catalogs for BOSS Data Release 12. In \Beut, 
 they use 2045 and 2048 for the northern galactic cap (NGC) and 
 souther galactic cap (SGC) of the LOWZ+CMASS combined sample. 
 \Beut~excluded 3 mock realizations due to notable 
-issues, which have been since been addressed. Therefore, 
-in our analysis we use all 2048 mocks for both the NGC and SGC of 
-the LOWZ+CMASS combined sample.
+issues. These issues have since been addressed so in our analysis 
+we use all 2048 mocks for both the NGC and SGC of the LOWZ+CMASS
+combined sample. In \Beut, they conduct multiple analyses, 
+some using only the powerspectrum monopole and quadrupole 
+and others using monopole, quadrupole, and hexadecapole. They 
+also separately analyze three redshift bins: $0.2 < z < 0.5$, 
+$0.4 < z < 0.6$, and $0.5 < z < 0.75$. In this paper we focus on 
+one of these analyses: the analysis of the powerspectrum monopole, 
+quadrupole, and hexadecapole for the $0.2 < z < 0.5$ bin.  
 
 \subsection{\cite{sinha2017a} Mocks} \label{sec:gmf} 
 The simulations used in the small-scale clustering analysis of \cite{sinha2017a} 
@@ -176,7 +182,8 @@ Halos are then identified from the dark matter distribution outputs using
 the $\mathtt{ntropy-fofsv}$ code~\citep{gardner2007}, which uses a 
 friend-of-friends algorithm~\citep[FoF;][]{davis1985} with a linking length of $0.2$
 times the mean inter-particle separation. %The FoF halo masses are then adjusted using the \cite{warren2006} correction. 
-\Sinh~uses two configurations of the LasDamas simulations.
+\Sinh~uses two configurations of the LasDamas simulations for the 
+$M_r < -19$ and $M_r < -21$ samples of SDSS DR7.
 The Consuelo simulation contains $1400^3$ dark matter particles with 
 mass of $1.87 \times 10^9\,h^{-1} M_\odot$ in a cubic volume of 
 $420\,h^{-1} Mpc$ per side evolved from $z_\mathrm{init} = 99$. 
@@ -201,12 +208,14 @@ details regarding the mocks, we refer readers to \Sinh.
 To calculate their covariance matrix, \Sinh~produced 200 
 independent mock catalogs from 50 simulations using a single set of 
 HOD model parameters. To take advantage of the methods we later 
-present (Sections~\ref{sec:gmm} and~\ref{sec:ica}), we require a large 
+present, we require a large 
 number of mocks. Our methods rely on using the mocks to sample high 
 dimensional distributions, so incorporating more mocks improves their 
 accuracy. We utilize an addition $99$ sets of HOD parameters with $200$
 mocks each. These parameters are sampled from the MCMC chain used to 
 produce the posterior in~\Sinh. In total we use $20,000$ mocks. 
+Among the multiple analyses in \Sinh, in this paper we focus on the 
+GMF analysis of the SDSS DR7 $M_r < -19$ sample. 
 
 \subsection{Mock Observable ${\bf X}^\mathrm{mock}$ and Covariance Matrix $\mathbb{C}$} \label{sec:xmock}
 To get from the mock catalogs described above to the covariance matrices 
@@ -385,25 +394,21 @@ Plugging $\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m})$ into Eq.~\ref{eq:renyi},
 we get an estimator for the R\'enyi-$\alpha$ divergence. \cite{wang2009} dervies
 a similar estimator for the KL divergence~(Eq.~\ref{eq:kl}). 
 %We note that while the divergence estimators converge to the true divergence with a large enough samples, with a limited number of samples from the distribution, the estimators are noisy. 
-
-These divergence estimates have been applied to Support Vector Machines and used 
-extensively in the machine learning and astronomical literature with great success 
-\todo{elaborate a lot more} 
-\bitem 
-    \item Compile papers that use this divergence, \cite{ntampaka2015, ntampaka2016}
-\eitem
+These divergence estimates have been applied to Support Distribution Machines 
+and used in the machine learning and astronomical literature with great success
+\citep[\emph{e.g.}][]{poczos2011, poczos2012, poczos2012a, poczos2012b, xu2013, ntampaka2015, ntampaka2016, ravanbakhsh2017a}.
 For more details on the non-parametric divergence estimators, we refer readers to 
 \cite{poczos2012} and \cite{krishnamurthy2014}.
 
 With these estimators, we can now explicitly quantify the 
 non-Gaussianity of the likelihood by computing the divergence 
 between the likelihood distribution and the Gaussian 
-pseudo-likelihood distribution:
-$D(\, p(x) \parallel \mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C}\,))$. 
+pseudo-likelihood distribution, $\mathcal{L}^\mathrm{pseudo}$:
+$D(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$.%  \mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C}\,))$. 
 We draw a reference sample ${\bf Y}^\mathrm{ref}$ from 
-$\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$ then 
+$\mathcal{L}^\mathrm{pseudo}$ then %\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$ 
 since $\Xmock$ is in principle sampled from $p(x)$, we can use the 
-estimators to compute $\hat{D}(\Xmock \parallel \mathcal{N})$.
+estimators to compute $\hat{D}(\Xmock \parallel \mathcal{L}^\mathrm{pseudo})$.
 Similar to the experiments detailed in \cite{poczos2012}, 
 we construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as $\Xmock$: 
 $2000$ and $10,000$ for the $P_\ell$ and $\zeta$ analyses respectively. 
@@ -411,9 +416,9 @@ $2000$ and $10,000$ for the $P_\ell$ and $\zeta$ analyses respectively.
 In Figure~\ref{fig:div_gauss}, we present the resulting \Ralpha~(left) 
 and KL (right) divergences ($\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$; orange) 
 for the \Beut~$P_\ell$ (top) and \Sinh~$\zeta$ (bottom) analyses.
-As a reference for comparison, we also include in blue divergence 
+For reference, we also include in blue divergence 
 estimates of the pseudo-likelihood onto itself, which we calculate as 
-$\hat{D}(\Xref \parallel \Yref)$. $\Xref$ is a data vector with 
+$\hat{D}(\Xref \parallel \Yref)$, where $\Xref$ is a data vector with 
 the same dimension as $\Xmock$ sampled from the pseudo-likelihood 
 $\mathcal{N}$. Since $\hat{D}$ are estimates, rather than the true divergence, 
 we compute each of the estimates \todo{100} times (resampling 
@@ -479,13 +484,14 @@ from mocks. However, the Gaussian functional form, or any functional form for
 that matter, is \emph{not} necessary to estimate the likelihood distribution. 
 Instead, the multidimensional likelihood distribution 
 can be directly estimated from the set of mock catalogs using --- for 
-instance using Gaussian mixture density estimation~\citep{9780471006268}. 
-\todo{talk about how this is used extensively in ML} 
-In astronomy, Gaussian mixture density estimation has been used for 
+instance using Gaussian mixture density 
+estimation~\citep{Press:1992:NRC:148286,9780471006268}. 
+Besides its extensive use in machine learning and statistics, 
+in astronomy, Gaussian mixture density estimation has been used for 
 inferring the velocity distribution of stars from the Hipparcos 
 satellite~\citep{bovy2011}, classifying galaxies in the Galaxy And Mass Assembly 
 Survey~\citep{taylor2015}, and classifying pulsars~(\citealt{lee2012}; see
-also references in \citealt{kuhn2017}). 
+also~\citealt{hogg2010,kuhn2017}). 
 
 Gaussian mixutre density estimation is a ``semi-parametric'' method 
 that uses a weighted sum of $k$ Gaussian component densities, a Gaussian 
@@ -663,7 +669,7 @@ where $N_\mathrm{bin}$ is the number of bins in the observable.
 For the \Beut~case, this reduces the problem of estimating a 37 
 dimensional distribution with $2048$ samples to a problem of 
 estimating 37 one dimensional distributions with $2048$ samples 
-each. The challenge, however, is in finding the transformation ${\bf M}$. 
+each. The challenge, however, is in finding the transformation. 
 
 Efforts in the past have attempted to tackle this sort of 
 high-dimensional problem~\citep[\emph{e.g.}][]{scoccimarro2000,eisenstein2001,gaztanaga2005,norberg2009,sinha2017a}.
@@ -682,8 +688,8 @@ we first assume that ${\bf x}$ is generated by some linear transformation
 ${\bf x} = {\bf M}\,{\bf x}^\mathrm{IC}$. The goal of ICA is to invert 
 this problem, ${\bf y} = {\bf W}\,{\bf x}$, and find ${\bf W}$ and ${\bf y}$ 
 that best estimate ${\bf y} \approx {\bf x}^\mathrm{IC}$. The basic 
-premise of ICA is simple, maximizing non-Gaussianity maximizes the 
-statistical independence. Consider a single component of ${\bf y}$: 
+premise of ICA is simple, \emph{maximizing non-Gaussianity maximizes the 
+statistical independence}. Consider a single component of ${\bf y}$: 
 \beq
 {\bf y}_n = {\bf w}_n^{\tiny t}\,{\bf x} = {\bf w}_n^{\tiny t}\,{\bf M}\,{\bf x}^\mathrm{IC} 
 \eeq
@@ -740,12 +746,9 @@ using a smooth kernel:
 $b$ is the bandwidth and $K$ is the kernel function. Following the 
 choices of \cite{hartlap2009}, we use a Gaussian distribution for $K$ and the 
 ``rule of thumb'' bandwidth~\cite[also known as Scott's rule;][]{scott1992,davison2008} 
-for $b$. Combining all $N_\mathrm{bin}$ $\hat{p}_{x^\mathrm{ICA}_n}$ 
-estimates into Eq.~\ref{eq:ica_like}, we can estimate the likelihood 
-distribution 
-\beq
-p(x) \approx \prod\limits_{n=1}^{N_\mathrm{bin}} \hat{p}_{x^\mathrm{ICA}_n}(x)
-\eeq
+for $b$. Combining $\hat{p}_{x^\mathrm{ICA}_n}s$ estimates for 
+all $n = 1, ..., N_\mathrm{bin}$ into Eq.~\ref{eq:ica_like}, we 
+can estimate the likelihood distribution $p(x) \approx \prod\limits_n \hat{p}_{x^\mathrm{ICA}_n}(x)$
 
 We again test whether the likelihood estimate from ICA is actually 
 a better estimate of the likelihood distribution than the Gaussian 
@@ -790,8 +793,8 @@ For comparison, we include the distributions from Figure~\ref{fig:div_gauss}.
 
 For \emph{both} \Beut~and~\Sinh, our ICA likelihood significantly 
 improves the divergence discrepancy compared to the pseudo-likelihood. For 
-\Sinh, however, the ICA likelihood proves to be a less accurate estimate
-than the Gaussian mixture likelihood in Section~\ref{sec:gmm}. More importantly, 
+\Sinh, however, the ICA likelihood proves to be less accurate than 
+the Gaussian mixture likelihood in Section~\ref{sec:gmm}. More importantly, 
 for \Beut, where the Gaussian mixture likelihood did not improve 
 upon the pseudo-likelihood, the ICA method provides a significantly 
 more accurate likelihood estimate. This demonstrates that the ICA 
@@ -803,9 +806,9 @@ increase the size of their observable data vector. However, as
 the divergence estimation framework we present makes it easy to test the accuracy of different methods, a hard 
 choice is not necessary and multiple methods can easily be tested to construct 
 the best estimate of the likelihood distribution for each specific analysis. 
-In the following sections, based on the performances of the GMM and ICA 
-methods, we use the ICA method for the~\Beut~analysis and 
-the GMM method for the~\Sinh~analysis. 
+Based on the performances of the GMM and ICA methods, in the following
+sections we use the ICA method for the~\Beut~analysis and the GMM 
+method for the~\Sinh~analysis. 
 
 \section{Impact on Parameter Inference}
 To derive the posterior distribution of their model parameters,
@@ -891,6 +894,8 @@ change in their posteriors. \todo{put the actual numbers}
     plots that mark the $68\%$ and $95\%$ confidence intervals of
     the posterior. The discrepancy between the posteriors is most 
     evident for the parameters $f\sigma_8$ and and $b^\mathrm{SGC}_2 \sigma_8$.  
+    In other words using the pseudo-likelihood in the $P_\ell$ 
+    analysis biases the posteriors of these parameters. 
     Overall, however, likelihood non-Gaussianity does \emph{not} 
     have a siginificant impact on the parameter constraints of 
     the $P_\ell$ analysis.} 

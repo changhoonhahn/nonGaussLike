@@ -149,6 +149,10 @@ Hastie, T., Tibshirani, R., \& Friedman, J. 2009, The {{Elements}} of
 H{\'e}rault, J., \& Ans, B. 1984, \JournalTitle{Comptes Rendus de
   l'Acad{\'e}mie des Sciences Paris, S{\'e}rie III, Life Sciences}, 299, 525
 
+\bibitem[{Hogg {et~al.}(2010)Hogg, Bovy, \& Lang}]{hogg2010}
+Hogg, D.~W., Bovy, J., \& Lang, D. 2010, \JournalTitle{ArXiv e-prints}, 1008,
+  arXiv:1008.4686
+
 \bibitem[{Hyv{\"a}rinen(1998)}]{hyvarinen1998}
 Hyv{\"a}rinen, A. 1998, in Advances in {{Neural Information Processing
   Systems}} 10, ed. M.~I. Jordan, M.~J. Kearns, \& S.~A. Solla ({MIT Press}),
@@ -286,6 +290,22 @@ Pinol, L., Cahn, R.~N., Hand, N., Seljak, U., \& White, M. 2017,
   \href{http://dx.doi.org/10.1088/1475-7516/2017/04/008}{\JournalTitle{Journal
   of Cosmology and Astroparticle Physics}, 2017, 008}
 
+\bibitem[{P{\'o}czos {et~al.}(2011)P{\'o}czos, Szab{\'o}, \&
+  Schneider}]{poczos2011}
+P{\'o}czos, B., Szab{\'o}, Z., \& Schneider, J. 2011, in 2011 19th {{European
+  Signal Processing Conference}}, 1718
+
+\bibitem[{Poczos {et~al.}(2012{\natexlab{a}})Poczos, Xiong, \&
+  Schneider}]{poczos2012a}
+Poczos, B., Xiong, L., \& Schneider, J. 2012{\natexlab{a}},
+  \JournalTitle{arXiv:1202.3758 [cs, stat]},
+  \href{http://arxiv.org/abs/1202.3758}{{\sffamily arXiv:1202.3758 [cs, stat]}}
+
+\bibitem[{Poczos {et~al.}(2012{\natexlab{b}})Poczos, Xiong, Sutherland, \&
+  Schneider}]{poczos2012b}
+Poczos, B., Xiong, L., Sutherland, D., \& Schneider, J. 2012{\natexlab{b}},
+  \JournalTitle{Machine Learning Department}
+
 \bibitem[{P{\'o}czos {et~al.}(2012)P{\'o}czos, Xiong, Sutherland, \&
   Schneider}]{poczos2012}
 P{\'o}czos, B., Xiong, L., Sutherland, D.~J., \& Schneider, J. 2012,
@@ -297,6 +317,11 @@ P{\'o}czos, B., Xiong, L., Sutherland, D.~J., \& Schneider, J. 2012,
 Press, W.~H., Teukolsky, S.~A., Vetterling, W.~T., \& Flannery, B.~P. 1992,
   Numerical {{Recipes}} in {{C}} ({{2Nd Ed}}.): {{The Art}} of {{Scientific
   Computing}} (New York, NY, USA: {Cambridge University Press})
+
+\bibitem[{Ravanbakhsh {et~al.}(2017)Ravanbakhsh, Lanusse, Mandelbaum,
+  Schneider, \& Poczos}]{ravanbakhsh2017a}
+Ravanbakhsh, S., Lanusse, F., Mandelbaum, R., Schneider, J., \& Poczos, B.
+  2017, in Thirty-{{First AAAI Conference}} on {{Artificial Intelligence}}
 
 \bibitem[{Rodr{\'\i}guez-Torres {et~al.}(2016)Rodr{\'\i}guez-Torres, Chuang,
   Prada, Guo, Klypin, Behroozi, Hahn, Comparat, Yepes, Montero-Dorta,
@@ -418,6 +443,12 @@ Wilkinson, D.~M., Maraston, C., Thomas, D., {et~al.} 2015,
 Wu, C. F.~J. 1983,
   \href{http://dx.doi.org/10.1214/aos/1176346060}{\JournalTitle{The Annals of
   Statistics}, 11, 95}
+
+\bibitem[{Xu {et~al.}(2013)Xu, Ho, Trac, Schneider, Poczos, \&
+  Ntampaka}]{xu2013}
+Xu, X., Ho, S., Trac, H., {et~al.} 2013,
+  \href{http://dx.doi.org/10.1088/0004-637X/772/2/147}{\JournalTitle{The
+  Astrophysical Journal}, 772, 147}
 
 \bibitem[{Zhao {et~al.}(2015)Zhao, Kitaura, Chuang, Prada, Yepes, \&
   Tao}]{zhao2015}
