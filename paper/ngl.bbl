@@ -124,8 +124,13 @@ Hahn, C., Scoccimarro, R., Blanton, M.~R., Tinker, J.~L., \&
   \href{http://dx.doi.org/10.1093/mnras/stx185}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 467, 1940}
 
-\bibitem[{Hand {et~al.}(2017)Hand, Li, Slepian, \& Seljak}]{hand2017a}
-Hand, N., Li, Y., Slepian, Z., \& Seljak, U. 2017,
+\bibitem[{Hand {et~al.}(2017{\natexlab{a}})Hand, Feng, Beutler, Li, Modi,
+  Seljak, \& Slepian}]{hand2017b}
+Hand, N., Feng, Y., Beutler, F., {et~al.} 2017{\natexlab{a}}
+
+\bibitem[{Hand {et~al.}(2017{\natexlab{b}})Hand, Li, Slepian, \&
+  Seljak}]{hand2017a}
+Hand, N., Li, Y., Slepian, Z., \& Seljak, U. 2017{\natexlab{b}},
   \href{http://dx.doi.org/10.1088/1475-7516/2017/07/002}{\JournalTitle{Journal
   of Cosmology and Astro-Particle Physics}, 07, 002}
 

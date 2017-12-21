@@ -29,6 +29,7 @@ import nongauss as NG
 # -- plotting -- 
 from ChangTools.plotting import prettycolors
 from matplotlib import lines as mlines
+from matplotlib import gridspec
 import matplotlib as mpl 
 import matplotlib.pyplot as plt 
 mpl.rcParams['text.usetex'] = True
@@ -480,7 +481,7 @@ def RSD_contours():
     wlim = np.percentile(wimp[burnin], 98.9)
     lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
 
-    fig = plt.figure(figsize=(15, 5)) 
+    fig = plt.figure(figsize=(13.5, 4)) 
     # f sigma8  vs alpha_parallel 
     sub = fig.add_subplot(131)
     DFM.hist2d(chain['fsig8'][burnin], chain['alpha_para'][burnin], color='#1F77B4', 
@@ -511,7 +512,7 @@ def RSD_contours():
     
     legs = [mlines.Line2D([], [], ls='-', c='#1F77B4', linewidth=5, 
         label='Beutler et al. (2017)')]
-    sub.legend(loc='upper right', handles=legs, frameon=False, fontsize=17)
+    sub.legend(loc='upper left', handles=legs, frameon=False, fontsize=17)
 
     # alpha_parallel vs alpha_perp 
     sub = fig.add_subplot(133)
@@ -528,10 +529,11 @@ def RSD_contours():
     sub.set_yticks([0.8, 0.9, 1.0, 1.1, 1.2])
     
     legs = [mlines.Line2D([], [], ls='-', c='#FF7F0E', linewidth=10, alpha=0.5, 
-        label=r'$\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$')]
-    sub.legend(loc='upper right', handles=legs, frameon=False, fontsize=17)
+        label='Hahn et al. (2018) \n $\mathcal{L}^\mathrm{ICA}$')]
+    #    label=r'$\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$')]
+    sub.legend(loc='upper left', handles=legs, frameon=False, fontsize=16)
 
-    fig.subplots_adjust(wspace=.275)
+    fig.subplots_adjust(wspace=0.3)
     fig.savefig(''.join([UT.tex_dir(), 'figs/', 'RSD_contours.pdf']), bbox_inches='tight') 
     return None 
 
@@ -567,10 +569,18 @@ def Like_GMF():
     yticks = [[0.,1.,2.,3.,4.], [0., 0.5, 1., 1.5, 2.], [0., 0.1, 0.2, 0.3], [0., 2., 4., 6., 8.], [0., 4., 8., 12]]
     nbin = 20 
     
+    pretty_colors = prettycolors() 
     f_out = open(''.join([UT.tex_dir(), 'dat/gmf_likelihood.dat']), 'w') 
-    fig = plt.figure(figsize=(15, 9)) 
+    fig = plt.figure(figsize=(12.5, 10)) 
+    gs = gridspec.GridSpec(5, 3, height_ratios=[3, 0.75, 1, 3, 0.75]) 
+
     for i in range(len(labels)): 
-        sub = fig.add_subplot(2, 3, i+1) 
+        if i < 3: 
+            sub = plt.subplot(gs[i]) 
+            sub_box = plt.subplot(gs[i+3])
+        else: 
+            sub = plt.subplot(gs[i+6]) 
+            sub_box = plt.subplot(gs[i+9]) 
         # original Sinha et al.(2017) constraints
         hh = np.histogram(chain[labels[i]][burnin], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
         bp = UT.bar_plot(*hh) 
@@ -579,6 +589,10 @@ def Like_GMF():
         f_out.write(''.join(['# ', labels[i], ' Sinha et al. (2017)', '\n']))
         f_out.write('\t'.join([str(round(low,5)), str(round(med,5)), str(round(high,5)), '\n']))
 
+        # general box properties
+        medianprops = {'alpha': 0.}
+        bplots1 = []
+
         for iw, wimp, like_lbl in zip(range(len(wimps)), wimps, like_lbls): 
             wlim = np.percentile(wimp[burnin], 99.9)
             lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
@@ -586,32 +600,56 @@ def Like_GMF():
             hh = np.histogram(chain[labels[i]][lims], weights=wimp[lims],normed=True, bins=nbin, 
                     range=[prior_min[i], prior_max[i]])
             bp = UT.bar_plot(*hh) 
-            sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none') 
-            low_w, med_w, high_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in [0.1586555, 0.50, 0.8413445]]
+            sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], 
+                    color=pretty_colors[2*iw+1], alpha=0.75, edgecolor='none') 
+            lowlow_w, low_w, med_w, high_w, highhigh_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in 
+                    [0.025, 0.16, 0.50, 0.84, 0.975]]
+        
+            # stats dict for each box
+            bplots1.append({'med': med_w, 'q1': low_w, 'q3': high_w, 'whislo': lowlow_w, 'whishi': highhigh_w, 'fliers': []})
 
             f_out.write(''.join(['# ', labels[i], ' ', like_lbl, '\n']))
             f_out.write('\t'.join([str(round(low_w,5)), str(round(med_w,5)), str(round(high_w,5)), '\n']))
-        
+
+        whiskprop = dict(linestyle='-', linewidth=1, color='k') 
+        boxprops = dict(linestyle='-', linewidth=1, color='k')
+        bxp1 = sub_box.bxp(bplots1, positions=[1,2], vert=False, patch_artist=True, 
+                      showfliers=False, boxprops=boxprops, medianprops=medianprops, whiskerprops=whiskprop)
+
+        for ibox, box in enumerate(bxp1['boxes']):
+            if ibox == 0:
+                box.set(facecolor=pretty_colors[1], alpha=0.75)
+            elif ibox == 1:
+                box.set(facecolor=pretty_colors[3], alpha=0.75)
+        sub_box.set_yticklabels([]) 
+        #if i in [0,3] : 
+        #    sub_box.set_yticks([1,2])
+        #    sub_box.set_yticklabels(["pseudo", "GMM"], fontdict={'fontsize':12}) 
+        #else: sub_box.set_yticks([])
+
+        #ax.set_xlabel(par_labels[i_col], fontsize=25, labelpad=15)
         f_out.write('\n') 
         # x-axis 
         sub.set_xlim([prior_min[i], prior_max[i]]) 
-        sub.set_xlabel(lbltex[i], labelpad=10, fontsize=25)
+        sub.set_xticks([]) 
+        sub_box.set_xlim([prior_min[i], prior_max[i]]) 
+        sub_box.set_xlabel(lbltex[i], labelpad=8, fontsize=25)#, fontsize=25)
         # y-axis
         sub.set_ylim(yrange[i]) 
         sub.set_yticks(yticks[i]) 
+    f_out.close() 
     
-    sub = fig.add_subplot(2, 3, 6, frameon=False) 
+    sub = fig.add_subplot(1,1,1, frameon=False) 
     sub.plot([0., 0.], [0., 0.], c='k', lw=1, ls=':', label='Sinha et al. (2017)') 
     sub.fill_between(bp[0], np.zeros(len(bp[0])), np.zeros(len(bp[0])), 
-            alpha=0.75, edgecolor='none', label=like_lbls[0])
+            alpha=0.75, edgecolor='none', label=r'$\mathcal{L}^\mathrm{pseudo}$')
     sub.fill_between(bp[0], np.zeros(len(bp[0])), np.zeros(len(bp[0])), 
-            alpha=0.75, edgecolor='none', label=like_lbls[1]) 
+            alpha=0.75, edgecolor='none', label='Hahn et al. (2018) \n $\mathcal{L}^\mathrm{GMM}$' ) 
     sub.set_xticks([])
     sub.set_yticks([])
-    sub.legend(loc='center left', prop={'size': 20})  # legend
 
-    f_out.close() 
-    fig.subplots_adjust(wspace=.2, hspace=0.3)
+    sub.legend(bbox_to_anchor=(1., 0.4), prop={'size': 20})  # legend
+    fig.subplots_adjust(wspace=.2, hspace=0)
     fig.savefig(''.join([UT.tex_dir(), 'figs/', 'Like_GMF_comparison.pdf']), bbox_inches='tight') 
     return None
    
@@ -635,8 +673,6 @@ def GMF_contours(tag_mcmc='manodeep'):
     w_pX = np.loadtxt(f_pX, skiprows=1, unpack=True, usecols=[2]) 
 
     wimps = [w_all, w_pX]
-    imp_lbls = [r"$\mathcal{N} \left(\,\overline{\zeta}, \,{\bf C}^{'} \right)$", #\mathrm{all}\;\theta})$', 
-            r'$p_\mathrm{GMM} \left(\{\zeta^\mathrm{mock}\} \right)$']
     imp_colors = ['#1F77B4', '#FF7F0E']
     imp_conts = [False, True]
     imp_lws = [1.25, 0]
@@ -689,6 +725,8 @@ def GMF_contours(tag_mcmc='manodeep'):
     
     legs = []
     legs.append(mlines.Line2D([], [], ls='--', c='k', linewidth=2, label='Sinha et al.(2017)'))
+    #imp_lbls = [r"$\mathcal{N} \left(\,\overline{\zeta}, \,{\bf C}^{'} \right)$", r'$p_\mathrm{GMM} \left(\{\zeta^\mathrm{mock}\} \right)$']
+    imp_lbls = [r"$\mathcal{L}^\mathrm{pseudo}$", '$\mathcal{L}^\mathrm{GMM}$; Hahn et al. (2018)']
     for imp_lbl, imp_color in zip(imp_lbls, imp_colors): 
         legs.append(mlines.Line2D([], [], ls='-', c=imp_color, linewidth=5, alpha=0.5, label=imp_lbl))
     sub.legend(loc='upper right', handles=legs, frameon=False, fontsize=15)#, handletextpad=0.1)#, scatteryoffsets=[0.5])
@@ -703,9 +741,9 @@ if __name__=="__main__":
     #_div_Gauss_gmf(K=10)
     #div_Gauss(K=10)
     #div_GMM()
-    div_ICA()
+    #div_ICA()
     #GMF_contours()
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #Like_RSD()
-    #RSD_contours()
+    RSD_contours()
     #Like_GMF()
