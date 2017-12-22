@@ -297,9 +297,8 @@ $\Dmock$ has dimensions of $2048 \times 37$ and $20,000\times8$
 for \Beut~and \Sinh~respectively. 
 
 For the methods in Sections~\ref{sec:gmm}~and~\ref{sec:ica}, the mock 
-observable data ($\Dmock$) need to be pre-processed. \todo{why preprocess}
-This pre-processing
-involves two steps: mean-subtraction and whitening. For mean subtraction, 
+observable data ($\Dmock$) need to be pre-processed. This pre-processing
+involves two steps: mean-subtraction (centering) and whitening. For mean subtraction, 
 the mean of the observable is subtracted from $\Dmock$. Then 
 $\Dmock - \overline{\bf D}^\mathrm{mock}$ is whitened using a linear transformation 
 to remove the Gaussian correlation between the bins of $\Dmock$: 
@@ -542,7 +541,7 @@ components.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.75\textwidth]{figs/GMM_pedagog.pdf}
+\includegraphics[width=0.65\textwidth]{figs/GMM_pedagog.pdf}
 \caption{A pedagogical illustration of Gaussian mixture density estimation.
     We use GMMs with $k = 1$ (top), $3$ (middle), $10$ (bottom) 
     components to estimate the distribution of data (blue) drawn from three 
@@ -867,16 +866,51 @@ $\big \{f \sigma_8$, $\alpha_\parallel$, $\alpha_\perp$,
 $b_1^\mathrm{NGC} \sigma_8$, $b_1^\mathrm{SGC} \sigma_8$, 
 $b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8,\big \}$
 parameters in the \Beut~$P_\ell$ analysis (orange). We include 
-the original~\Beut~posterior distributions for comparison in 
-blue. On the bottom of each panel, we include box plots marking 
-the confidence interals of the updated and original posteriors. 
+the original~\Beut~posteriors for comparison in blue. On the 
+bottom of each panel, we also include box plots marking the 
+confidence interals of the updated and original posteriors. 
 The boxes and ``whiskers'' repesent the $68\%$ and $95\%$ 
-confidence intervals, respectively. We also list the median
-and $68\%$ confidence intervals of the posteriors in Table~\ref{tab:posterior}.
-Overall, likelihood non-Gaussianity does \emph{not} have a significant
-impact on the parameter constraints of the $P_\ell$ analysis. $f \sigma_8$ 
-and $b_2 \sigma_8$ are the main parameters with noticeable 
-change in their posteriors. \todo{put the actual numbers} 
+confidence intervals, respectively. The median and $68\%$ 
+confidence intervals of the posteriors are listed in Table~\ref{tab:posterior}.
+$f \sigma_8$ and $b_2 \sigma_8$ are the main parameters with 
+noticeable change in their posteriors. The posterior of $b_2 \sigma_8$
+broadens from \todo{number} to \todo{number} once likelihood 
+non-Gaussianity is incorporated. For $f \sigma_8$, the posterior
+shifts from \todo{number} to \todo{number}. The other parameter 
+constraints, however, remain largely unaffected by likelihood non-Gaussianity. 
+
+Focusing on the main cosmological parameters $f \sigma_8$, 
+$\alpha_\parallel$, and $\alpha_\perp$, we present their 
+joint posterior distributions in Figure~\ref{fig:rsd_contour}.  
+The contours mark the $68\%$ and $95\%$ confidence intervals
+of the posteriors. The shift in the $f \sigma_8$ distribution 
+is reflected in the
+$(f\sigma_8, \alpha_\parallel)$ and $(\alpha_\perp, f\sigma_8)$ 
+contours (left and middle panels respectively). Meanwhile, the
+$(\alpha_\parallel, \alpha_\perp)$ distribution (right) show nearly 
+no change from the non-Gaussian likelihood. These joint posteriors 
+corroborate our conclusion from Figure~\ref{fig:pk_like}.
+
+Despite its impact on $f \sigma_8$ and $b_2^\mathrm{SGC} \sigma_8$, 
+overall, likelihood non-Gaussianity does \emph{not}
+significantly impact the parameter constraints of the $P_\ell$ 
+analysis. $b_2^\mathrm{SGC} \sigma_8$ is a poorly constrained nuisance 
+parameter. Although using the pseudo-likelihood noticeably 
+biases the $f \sigma_8$ constraint, the impact relative to 
+its uncertainty is small. In retrospect, the fact that the $P_\ell$
+analysis is largely unaffected by likelihood non-Gaussianity is not a 
+big surprise. In fact, its consistent with the divergences in 
+Figure~\ref{fig:div_gauss}, which found relatively small discrepancies 
+between the likelihood and pseudo-likelihood. 
+The Gaussian pseudo-likelihood assumption for $P_\ell$ 
+is motivated by the Central Limit Theorem. If enough modes are sampled 
+in the powerspectrum, then the likelihood approaches a Gaussian. In 
+the restrictive $k$ range of the \Beut~analysis ($0.01 < k < 0.15$), 
+one would expect this to be the case. 
+\todo{When we repeat the comparison for the $P_\ell$ analysis without 
+the hexadecapole, we see even less impact on the parameter constraints. 
+This suggests that most of the non-Gaussianity in the likelihood comes 
+from the hexadecapole which has the lowest signal to noise.} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 5 
@@ -894,8 +928,8 @@ change in their posteriors. \todo{put the actual numbers}
     plots that mark the $68\%$ and $95\%$ confidence intervals of
     the posterior. The discrepancy between the posteriors is most 
     evident for the parameters $f\sigma_8$ and and $b^\mathrm{SGC}_2 \sigma_8$.  
-    In other words using the pseudo-likelihood in the $P_\ell$ 
-    analysis biases the posteriors of these parameters. 
+    Hence, using the pseudo-likelihood in the $P_\ell$ analysis 
+    biases the posteriors of these parameters. 
     Overall, however, likelihood non-Gaussianity does \emph{not} 
     have a siginificant impact on the parameter constraints of 
     the $P_\ell$ analysis.} 
@@ -904,17 +938,6 @@ change in their posteriors. \todo{put the actual numbers}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Focusing on the main cosmological parameters $f \sigma_8$, 
-$\alpha_\parallel$, and $\alpha_\perp$, we present their 
-joint posterior distributions in Figure~\ref{fig:rsd_contour}.  
-The contours mark the $68\%$ and $95\%$ confidence intervals
-of the posteriors. The shift in the $f \sigma_8$ distribution 
-is reflected in the
-$(f\sigma_8, \alpha_\parallel)$ and $(\alpha_\perp, f\sigma_8)$ 
-contours (left and middle panels respectively). Meanwhile, the
-$(\alpha_\parallel, \alpha_\perp)$ distribution (right) show nearly 
-no change from the non-Gaussian likelihood. These joint posteriors 
-corroborate our conclusion from Figure~\ref{fig:pk_like}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 6 
@@ -929,7 +952,7 @@ corroborate our conclusion from Figure~\ref{fig:pk_like}.
     The contours in the left and middle panels reflect the shift
     in $f \sigma_8$ caused by likelihood non-Gaussianity. Otherwise, 
     the contours illustrate that likelihood non-Gaussianity has little 
-    impact on the cosmological parameters.
+    impact on the cosmological parameters for the $P_\ell$ analysis.
     }
 \label{fig:rsd_contour}
 \end{center}
@@ -942,23 +965,29 @@ the HOD parameters in the \Sinh~$\zeta$ analysis (orange).
 We include the posteriors calculated using the pseudo-likelihood 
 for comparison in blue. The box plots on the bottom of each plot 
 mark the $68\%$ and $95\%$ confidence intervals of the posteriors. 
-We also list the median and $68\%$ confidence intervals 
-in Table~\ref{tab:posterior}. In dotted lines, we plot the 
+In dotted lines, we plot the 
 original \Sinh~posteriors, which differ from the blue distribution.
 This difference is caused by the difference in the covariance 
 matrix we use in the pseudo-likelihood~(see Section~\ref{sec:xmock}).  
 The difference, however, is negiligible. 
 
-Likelihood non-Gaussianity significantly impacts the posterior 
-distribution of the HOD parameters $\log\, M_\mathrm{min}$, 
-$\log\, M_1$, and $\alpha$. $\zeta$ analysis  
-$\sigma_{\log\,M}$and  $\log\, M_0$
-\todo{put in details once the numbers out}
-The impact of likelihood non-Gaussianity is further emphasized in 
-the joint posterior distributions of Figure~\ref{fig:gmf_contour}.
-The $(\log\,M_\mathrm{min},\,\sigma_{\log M})$ and 
-$(\log\,M_\mathrm{min},\,\alpha)$ contours are both shifted 
-and broadened. 
+Besides the poorly constrained parameters $\sigma_{\log M}$ and $\log\, M_0$, 
+likelihood non-Gaussianity significantly impacts the posterior 
+distributions of the HOD parameters. Each of the parameter constraints 
+for $\log\,M_\mathrm{min}$, $\log M_1$, and $\alpha$, are significantly 
+broader and also shifted compared to the pseudo-likelihood constraints
+(see Table~\ref{tab:posterior} for details). 
+The impact of likelihood non-Gaussianity is further emphasized by 
+the joint posterior distributions in Figure~\ref{fig:gmf_contour}.
+The $\log\,M_\mathrm{min}$ versus $\sigma_{\log M}$ and 
+$\log\,M_\mathrm{min}$ versus $\alpha$ contours are both shifted 
+and broadened compared to the $\mathcal{L}^\mathrm{pseudo}$ 
+posterior. Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~reveal 
+that \emph{due to likelihood non-Gaussianity, using the Gaussian 
+pseudo-likelihood significantly underestimates the uncertainty and 
+biases the parameter constraints of the \Sinh~$\zeta$ analysis.}
+
+\todo{Need to talk about what causes the likelihood non-Gaussianity}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 7 
@@ -974,7 +1003,13 @@ and broadened.
     for comparison. We also include the original~\Sinh~posterior 
     (dotted; see text for details). On the bottom of each panel we 
     include box plots that mark the $68\%$ and $95\%$ confidence 
-    intervals of the posterior.
+    intervals of the posterior. Besides the poorly constrained 
+    parameters $\sigma_{\log M}$ and $\log\, M_0$, the posteriors of 
+    $\log\,M_\mathrm{min}$, $\log M_1$, and $\alpha$, are significantly 
+    broader and shifted compared to the pseudo-likelihood constraints. 
+    Likelihood non-Gaussianity significantly impacts the parameter
+    constraints of the $zeta$ analysis. Therefore using the pseudo-likelihood  
+    underestimates the uncertainty and biases the HOD parameter constraints. 
     }
 \label{fig:gmf_like}
 \end{center}
@@ -991,8 +1026,12 @@ and broadened.
     in the~\Sinh~$\zeta$ analysis, compute using the non-Gaussian 
     GMM likelihood (orange). We include, in blue, the posteriors 
     computed using the pseudo-likelihood; we also include the 
-    original~\Sinh~posterior (dotted; see text for details).
-}
+    original~\Sinh~posterior (dotted; see text for details). 
+    The contours confirm that that \emph{due to likelihood 
+    non-Gaussianity, posteriors from the pseudo-likelihood underestimate 
+    the uncertainties and significantly biases the parameter constraints 
+    of the \Sinh~analysis.} 
+    }
 \label{fig:gmf_contour}
 \end{center}
 \end{figure}
@@ -1030,17 +1069,10 @@ and broadened.
     \multicolumn{1}{c}{$b_1^\mathrm{NGC} \sigma_8$} & 
     \multicolumn{1}{c}{$b_1^\mathrm{SGC} \sigma_8$} &
     \multicolumn{1}{c}{$b_2^\mathrm{NGC} \sigma_8$} & 
-    \multicolumn{1}{c}{$b_2^\mathrm{SGC} \sigma_8$} \\ 
-
-%\multicolumn{5}{c}{} \\[-5pt]
-%% Initial Green Valley Fraction 
-%\multicolumn{1}{c}{$f_{GV}(\mathcal{M}_*)$} & 
-%\multicolumn{1}{c}{$A_{GV} (\log\;\mathcal{M}_* - 10.5) + \delta_{GV}$} & 
-%\multicolumn{1}{c}{Initial $z \approx 1$ Green Valley Fraction (Eq.~\ref{eq:f_gv})} & 
-%\multicolumn{1}{c}{$A_{GV}$} & 
-%\multicolumn{1}{l}{$[0., 1.]$} \\
-%\multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & 
-%\multicolumn{1}{c}{$\delta_{GV}$} & \multicolumn{1}{l}{$[-0.4, 0.6]$} \\[3pt]
+    \multicolumn{1}{c}{$b_2^\mathrm{SGC} \sigma_8$} \\[10pt]
+    \hline 
+    \hline
+    \multicolumn{8}{c}{\Sinh~$\zeta$ analysis} \\%[-7pt]
 \hline
 \end{tabular} \label{tab:posterior} 
 \end{center}
@@ -1048,14 +1080,32 @@ and broadened.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-\section{Discussion}
-\bitem
-    \item Will it matter for future surveys? 
-    \item Likelihood free inference (cite justin's paper) 
-\eitem
-
 \section{Summary}
+Future surveys such as the Dark Energy Spectroscopic Instrument 
+\todo{(citecite)}, will expand the cosmic volumes probed by galaxies 
+and therefore the increase number of modes on all scales. Consequently,
+for $P_\ell$ analyses we expect likelihood non-Gaussianity to have 
+an even smaller effect using these surveys. For higher order statistics 
+such as the bispectrum, however, likelihood non-Gaussianity 
+
+
+One of the main results of \Sinh, is that while the $\Lambda$CDM + HOD 
+model is successful at fitting either $\zeta(N)$ or the project two-point
+correlation function $w_p(r_p)$, it struggles to jointly fit both 
+observables. Such tensions suggests shortcomings in the `vanilla' 
+HOD model. However, once likelihood non-Gaussianity is 
+correctly considered, the posteriors are broadened and shifted to relax 
+these tensions. We examine the effect of likelihood non-Gaussianity 
+in more detail in Hahn et al. (in prep.). 
+
+
+Nevertheless, the divergence and likelihood 
+estimation frameworks we introduce in this paper provides a straightforward 
+way of testing and quantifying the impact of likelihood non-Gaussianity. 
+
+
+methods likelihood-free inference such as Approximate Bayesian 
+Computation have garnered popularity in the literature~\citep[\emph{e.g.}][]{hahn2017a}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

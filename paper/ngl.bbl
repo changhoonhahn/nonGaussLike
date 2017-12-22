@@ -117,12 +117,18 @@ Guo, H., Zehavi, I., \& Zheng, Z. 2012,
   \href{http://dx.doi.org/10.1088/0004-637X/756/2/127}{\JournalTitle{The
   Astrophysical Journal}, 756, 127}
 
-\bibitem[{Hahn {et~al.}(2017)Hahn, Scoccimarro, Blanton, Tinker, \&
-  Rodr{\'\i}guez-Torres}]{hahn2017}
+\bibitem[{Hahn {et~al.}(2017{\natexlab{a}})Hahn, Scoccimarro, Blanton, Tinker,
+  \& Rodr{\'\i}guez-Torres}]{hahn2017}
 Hahn, C., Scoccimarro, R., Blanton, M.~R., Tinker, J.~L., \&
-  Rodr{\'\i}guez-Torres, S.~A. 2017,
+  Rodr{\'\i}guez-Torres, S.~A. 2017{\natexlab{a}},
   \href{http://dx.doi.org/10.1093/mnras/stx185}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 467, 1940}
+
+\bibitem[{Hahn {et~al.}(2017{\natexlab{b}})Hahn, Vakili, Walsh, Hearin, Hogg,
+  \& Campbell}]{hahn2017a}
+Hahn, C., Vakili, M., Walsh, K., {et~al.} 2017{\natexlab{b}},
+  \href{http://dx.doi.org/10.1093/mnras/stx894}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 469, 2791}
 
 \bibitem[{Hand {et~al.}(2017{\natexlab{a}})Hand, Feng, Beutler, Li, Modi,
   Seljak, \& Slepian}]{hand2017b}
