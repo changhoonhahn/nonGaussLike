@@ -2,6 +2,42 @@
 \providecommand\natexlab[1]{#1}
 \providecommand\JournalTitle[1]{#1}
 
+\bibitem[{Ade {et~al.}(2016)Ade, Aghanim, Arnaud, Ashdown, Aumont, Baccigalupi,
+  Banday, Barreiro, Bartlett, Bartolo, Battaner, Battye, Benabed, Beno{\^\i}t,
+  Benoit-L{\'e}vy, Bernard, Bersanelli, Bielewicz, Bock, Bonaldi, Bonavera,
+  Bond, Borrill, Bouchet, Bucher, Burigana, Butler, Calabrese, Cardoso,
+  Catalano, Challinor, Chamballu, Chary, Chiang, Christensen, Church, Clements,
+  Colombi, Colombo, Combet, Comis, Couchot, Coulais, Crill, Curto, Cuttaia,
+  Danese, Davies, Davis, de~Bernardis, de~Rosa, de~Zotti, Delabrouille,
+  D{\'e}sert, Diego, Dolag, Dole, Donzelli, Dor{\'e}, Douspis, Ducout, Dupac,
+  Efstathiou, Elsner, En{\ss}lin, Eriksen, Falgarone, Fergusson, Finelli,
+  Forni, Frailis, Fraisse, Franceschi, Frejsel, Galeotta, Galli, Ganga, Giard,
+  Giraud-H{\'e}raud, Gjerl{\o}w, Gonz{\'a}lez-Nuevo, G{\'o}rski, Gratton,
+  Gregorio, Gruppuso, Gudmundsson, Hansen, Hanson, Harrison,
+  Henrot-Versill{\'e}, Hern{\'a}ndez-Monteagudo, Herranz, Hildebrandt, Hivon,
+  Hobson, Holmes, Hornstrup, Hovest, Huffenberger, Hurier, Jaffe, Jaffe, Jones,
+  Juvela, Keih{\"a}nen, Keskitalo, Kisner, Kneissl, Knoche, Kunz, Kurki-Suonio,
+  Lagache, L{\"a}hteenm{\"a}ki, Lamarre, Lasenby, Lattanzi, Lawrence, Leonardi,
+  Lesgourgues, Levrier, Liguori, Lilje, Linden-V{\o}rnle, L{\'o}pez-Caniego,
+  Lubin, Mac{\'\i}as-P{\'e}rez, Maggio, Maino, Mandolesi, Mangilli, Maris,
+  Martin, Mart{\'\i}nez-Gonz{\'a}lez, Masi, Matarrese, McGehee, Meinhold,
+  Melchiorri, Melin, Mendes, Mennella, Migliaccio, Mitra,
+  Miville-Desch{\^e}nes, Moneti, Montier, Morgante, Mortlock, Moss, Munshi,
+  Murphy, Naselsky, Nati, Natoli, Netterfield, N{\o}rgaard-Nielsen, Noviello,
+  Novikov, Novikov, Oxborrow, Paci, Pagano, Pajot, Paoletti, Partridge, Pasian,
+  Patanchon, Pearson, Perdereau, Perotto, Perrotta, Pettorino, Piacentini,
+  Piat, Pierpaoli, Pietrobon, Plaszczynski, Pointecouteau, Polenta, Popa,
+  Pratt, Pr{\'e}zeau, Prunet, Puget, Rachen, Rebolo, Reinecke, Remazeilles,
+  Renault, Renzi, Ristorcelli, Rocha, Roman, Rosset, Rossetti, Roudier,
+  Rubi{\~n}o-Mart{\'\i}n, Rusholme, Sandri, Santos, Savelainen, Savini, Scott,
+  Seiffert, Shellard, Spencer, Stolyarov, Stompor, Sudiwala, Sunyaev, Sutton,
+  Suur-Uski, Sygnet, Tauber, Terenzi, Toffolatti, Tomasi, Tristram, Tucci,
+  Tuovinen, T{\"u}rler, Umana, Valenziano, Valiviita, Tent, Vielva, Villa,
+  Wade, Wandelt, Wehus, Weller, White, Yvon, Zacchei, \& Zonca}]{ade2016}
+Ade, P. a.~R., Aghanim, N., Arnaud, M., {et~al.} 2016,
+  \href{http://dx.doi.org/10.1051/0004-6361/201525833}{\JournalTitle{Astronomy
+  \& Astrophysics}, 594, A24}
+
 \bibitem[{Alam {et~al.}(2017)Alam, Ata, Bailey, Beutler, Bizyaev, Blazek,
   Bolton, Brownstein, Burden, Chuang, Comparat, Cuesta, Dawson, Eisenstein,
   Escoffier, Gil-Mar{\'\i}n, Grieb, Hand, Ho, Kinemuchi, Kirkby, Kitaura,
@@ -55,6 +91,51 @@ Bovy, J., Hogg, D.~W., \& Roweis, S.~T. 2011,
 Broderick, A.~E., Fish, V.~L., Doeleman, S.~S., \& Loeb, A. 2011,
   \href{http://dx.doi.org/10.1088/0004-637X/735/2/110}{\JournalTitle{The
   Astrophysical Journal}, 735, 110}
+
+\bibitem[{Cash(1979)}]{cash1979}
+Cash, W. 1979, \href{http://dx.doi.org/10.1086/156922}{\JournalTitle{The
+  Astrophysical Journal}, 228, 939}
+
+\bibitem[{Collaboration {et~al.}(2014)Collaboration, Ade, Aghanim,
+  Armitage-Caplan, Arnaud, Ashdown, Atrio-Barandela, Aumont, Baccigalupi,
+  Banday, Barreiro, Barrena, Bartlett, Battaner, Battye, Benabed, Beno{\^\i}t,
+  Benoit-L{\'e}vy, Bernard, Bersanelli, Bielewicz, Bikmaev, Blanchard, Bobin,
+  Bock, B{\"o}hringer, Bonaldi, Bond, Borrill, Bouchet, Bourdin, Bridges,
+  Brown, Bucher, Burenin, Burigana, Butler, Cardoso, Carvalho, Catalano,
+  Challinor, Chamballu, Chary, Chiang, Chiang, Chon, Christensen, Church,
+  Clements, Colombi, Colombo, Couchot, Coulais, Crill, Curto, Cuttaia,
+  Da~Silva, Dahle, Danese, Davies, Davis, {de Bernardis}, {de Rosa}, {de
+  Zotti}, Delabrouille, Delouis, D{\'e}mocl{\`e}s, D{\'e}sert, Dickinson,
+  Diego, Dolag, Dole, Donzelli, Dor{\'e}, Douspis, Dupac, Efstathiou,
+  En{\ss}lin, Eriksen, Finelli, Flores-Cacho, Forni, Frailis, Franceschi,
+  Fromenteau, Galeotta, Ganga, G{\'e}nova-Santos, Giard, Giardino,
+  Giraud-H{\'e}raud, Gonz{\'a}lez-Nuevo, G{\'o}rski, Gratton, Gregorio,
+  Gruppuso, Hansen, Hanson, Harrison, Henrot-Versill{\'e},
+  Hern{\'a}ndez-Monteagudo, Herranz, Hildebrandt, Hivon, Hobson, Holmes,
+  Hornstrup, Hovest, Huffenberger, Hurier, Jaffe, Jaffe, Jones, Juvela,
+  Keih{\"a}nen, Keskitalo, Khamitov, Kisner, Kneissl, Knoche, Knox, Kunz,
+  Kurki-Suonio, Lagache, L{\"a}hteenm{\"a}ki, Lamarre, Lasenby, Laureijs,
+  Lawrence, Leahy, Leonardi, Le{\'o}n-Tavares, Lesgourgues, Liddle, Liguori,
+  Lilje, Linden-V{\o}rnle, L{\'o}pez-Caniego, Lubin, Mac{\'\i}as-P{\'e}rez,
+  Maffei, Maino, Mandolesi, Marcos-Caballero, Maris, Marshall, Martin,
+  Mart{\'\i}nez-Gonz{\'a}lez, Masi, Matarrese, Matthai, Mazzotta, Meinhold,
+  Melchiorri, Melin, Mendes, Mennella, Migliaccio, Mitra,
+  Miville-Desch{\^e}nes, Moneti, Montier, Morgante, Mortlock, Moss, Munshi,
+  Naselsky, Nati, Natoli, Netterfield, N{\o}rgaard-Nielsen, Noviello, Novikov,
+  Novikov, Osborne, Oxborrow, Paci, Pagano, Pajot, Paoletti, Partridge, Pasian,
+  Patanchon, Perdereau, Perotto, Perrotta, Piacentini, Piat, Pierpaoli,
+  Pietrobon, Plaszczynski, Pointecouteau, Polenta, Ponthieu, Popa, Poutanen,
+  Pratt, Pr{\'e}zeau, Prunet, Puget, Rachen, Rebolo, Reinecke, Remazeilles,
+  Renault, Ricciardi, Riller, Ristorcelli, Rocha, Roman, Rosset, Roudier,
+  Rowan-Robinson, Rubi{\~n}o-Mart{\'\i}n, Rusholme, Sandri, Santos, Savini,
+  Scott, Seiffert, Shellard, Spencer, Starck, Stolyarov, Stompor, Sudiwala,
+  Sunyaev, Sureau, Sutton, Suur-Uski, Sygnet, Tauber, Tavagnacco, Terenzi,
+  Toffolatti, Tomasi, Tristram, Tucci, Tuovinen, T{\"u}rler, Umana, Valenziano,
+  Valiviita, Van~Tent, Vielva, Villa, Vittorio, Wade, Wandelt, Weller, White,
+  White, Yvon, Zacchei, \& Zonca}]{planckcollaboration2014}
+Collaboration, P., Ade, P. A.~R., Aghanim, N., {et~al.} 2014,
+  \href{http://dx.doi.org/10.1051/0004-6361/201321521}{\JournalTitle{Astronomy
+  \& Astrophysics}, 571, A20}
 
 \bibitem[{Comon(1994)}]{comon1994}
 Comon, P. 1994,
@@ -375,6 +456,12 @@ Scoccimarro, R. 1998,
 \bibitem[{Scott(1992)}]{scott1992}
 Scott, D.~W. 1992, Multivariate {{Density Estimation}}: {{Theory}},
   {{Practice}}, and {{Visualization}} ({Wiley})
+
+\bibitem[{Sefusatti \& Scoccimarro(2005)}]{sefusatti2005}
+Sefusatti, E., \& Scoccimarro, R. 2005,
+  \href{http://dx.doi.org/10.1103/PhysRevD.71.063001}{\JournalTitle{Physical
+  Review D}, 71}, \href{http://arxiv.org/abs/astro-ph/0412626}{{\sffamily
+  arXiv:astro-ph/0412626}}
 
 \bibitem[{Sellentin {et~al.}(2017)Sellentin, Jaffe, \& Heavens}]{sellentin2017}
 Sellentin, E., Jaffe, A.~H., \& Heavens, A.~F. 2017,

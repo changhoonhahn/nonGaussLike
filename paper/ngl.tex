@@ -312,8 +312,8 @@ One way to derive the linear transformation is through the eigen-decomposition
 of the covariance matrix~\citep[\emph{e.g.}][]{hartlap2009, sellentin2017}. We, alternatively, 
 derive the linear transformation ${\bf L}$ using Choletsky decompositon of the 
 inverse covariance matrix~\citep{Press:1992:NRC:148286}: 
-$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. \todo{We confirm tha the different 
-whitening algorithms, does not impact the results of the paper.}
+$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. \todo{Our choice of Choletsky  
+whitening does not impact the results of the paper.}
 Now that we have the pre-processed data of the mock observables, 
 we proceed in the next section to quantifying the non-Gaussianity of the 
 $P_\ell$ and $\zeta$ likelihoods. 
@@ -339,7 +339,7 @@ observable. In \cite{sellentin2017}, they use the Mean
 Integrated Squared Error (MISE) as a distance metric between 
 Gaussian random variables and the whitened mock observable 
 data vector to characterize non-Gaussian correlations between elements 
-of the data vector. These indirect measures of likelihood non-Gaussianity 
+of the data vector. These indirect measures of non-Gaussianity 
 are challenging to interpret and extend more generally to LSS studies. 
 %Sellentin & Heavens (2018) presented stringent tests that characterize non-Gaussian statistical behaviour, and any sound weak lensing likelihood should hence pass these tests.  The methods derived in Sellentin & Heavens (2018) test whether all pairwise combinations of data elements display the correct statistical behaviour under addition, division and multiplication, and whether the correct marginal distribution ensues for each data point. 
 
@@ -813,34 +813,36 @@ method for the~\Sinh~analysis.
 To derive the posterior distribution of their model parameters,
 both~\Beut~and~\Sinh~use the standard Monte Carlo Markov Chain (MCMC) 
 approach with the Gaussian pseduo-likelihood. The \Beut~analysis 
-contains $11$ parameters,
+includes $11$ parameters,
 \beq \nonumber
 \Big \{f \sigma_8,~\alpha_\parallel,~\alpha_\perp,~b_1^\mathrm{NGC} \sigma_8,~b_1^\mathrm{SGC} \sigma_8, 
 ~b_2^\mathrm{NGC} \sigma_8,~b_2^\mathrm{SGC} \sigma_8,~\sigma_v^\mathrm{NGC},~\sigma_v^\mathrm{SGC}, 
 ~N^\mathrm{NGC},~\mathrm{and}~N^\mathrm{SGC} \Big \}, 
 \eeq
-while the \Sinh~analysis contains $5$ parameters,
+while the \Sinh~analysis includes $5$ parameters,
 \beq \nonumber
 \Big\{ \log\,M_\mathrm{min},~\sigma_{\log\,M},~\log\,M_0,~\log\,M_1,~\mathrm{and}~\alpha \Big\}. 
 \eeq
-Using the improved likelihood estimates from the Sections~\ref{sec:gmm} 
-and~\ref{sec:ica}, we can measure the impact of likelihood non-Gaussianity 
-on the posterior distributions of these parameters. The most straightforward 
+Using the improved likelihood estimates of Sections~\ref{sec:gmm} 
+and~\ref{sec:ica}, we can now better estimate the true posterior distributions
+of these parameters and quantify the impact of likelihood non-Gaussianity 
+on parameter constraints. The most straightforward 
 approach to do this would be to use the likelihood estimates to compute 
 MCMC samples from scratch. While this is relatively doable for the~\Beut~analysis, 
 for~\Sinh~this is \emph{significantly} more involved. Rather than a perturbation 
 theory based model from~\Beut, the \Sinh~model is a forward model, same as 
 their mocks (Section~\ref{sec:gmf}). Rerunning the MCMC samples would involve
-evaluating their computational intensive forward model $> 10^5$ times. 
+evaluating their computationally costly forward model $> 10^5$ times. 
 
 Without having to re-run the MCMC chains, we instead use importance sampling 
 to derive the new posteriors from the original chains~\citep[see][for details on importance sampling]{wasserman2004}. 
 The \emph{target} distribution we want is the new posterior. To sample this 
-distribution, we use the original posterior as the \emph{proposal} 
-distribution with the ratio of our likelihood estimates over the pseudo-likelihood 
-as \emph{importance weights}. If we let $P({\bf x} | \bm{\theta})$ be the original 
-pseudo-likelihood and $P'({\bf x} | \bm{\theta})$ be our ``new'' likelihood,
-then the new marginal likelihood can be calculated through importance sampling:   
+distribution, we sample the original posterior as the \emph{proposal} 
+distribution with importance weights, which in our case is the ratio 
+of our likelihood estimates over the pseudo-likelihood. If we let 
+$P({\bf x} | \bm{\theta})$ be the original pseudo-likelihood and 
+$P'({\bf x} | \bm{\theta})$ be our ``new'' likelihood, then the new 
+marginal likelihood can be calculated through importance sampling:   
 \beq
 P'({\bf x} | \theta_1) = \int P'({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_m = \int \frac{P'({\bf x} | \bm{\theta})}{P({\bf x} | \bm{\theta})}\, P({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_m \\
 \eeq
@@ -853,12 +855,8 @@ case $S$ is just the original MCMC chain. The only calculation required
 is the importance weights in Eq.~\ref{eq:impsamp}, 
 ${P'({\bf x} | \bm{\theta}^{(i)})}/{P({\bf x} | \bm{\theta}^{(i)})}$ for 
 each sample $\bm{\theta}^{(i)}$ of the original MCMC chain. 
-To derive the importance sampled posterior distributions using 
-the non-Gaussian likelihood estimates from this paper, 
-$P({\bf x} | \bm{\theta}^{(i)})$ 
-is the pseudo-likelihood and 
-$P'({\bf x} | \bm{\theta}^{(i)})$
-is the ICA likelihood for \Beut~and the GMM likelihood~\Sinh.
+For \Beut, $P({\bf x} | \bm{\theta}^{(i)})$ is the ICA likelihood;  
+for \Sinh, $P({\bf x} | \bm{\theta}^{(i)})$ is the GMM likelihood.
 
 We present in Figure~\ref{fig:pk_like} the resulting posterior 
 distributions using the non-Gaussian ICA likelihood for the 
@@ -868,14 +866,14 @@ $b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8,\big \}$
 parameters in the \Beut~$P_\ell$ analysis (orange). We include 
 the original~\Beut~posteriors for comparison in blue. On the 
 bottom of each panel, we also include box plots marking the 
-confidence interals of the updated and original posteriors. 
+confidence intervals of the updated and original posteriors. 
 The boxes and ``whiskers'' repesent the $68\%$ and $95\%$ 
 confidence intervals, respectively. The median and $68\%$ 
 confidence intervals of the posteriors are listed in Table~\ref{tab:posterior}.
 $f \sigma_8$ and $b_2 \sigma_8$ are the main parameters with 
 noticeable change in their posteriors. The posterior of $b_2 \sigma_8$
 broadens from \todo{number} to \todo{number} once likelihood 
-non-Gaussianity is incorporated. For $f \sigma_8$, the posterior
+non-Gaussianity is incorporated. Meanwhile, the $f \sigma_8$ posterior
 shifts from \todo{number} to \todo{number}. The other parameter 
 constraints, however, remain largely unaffected by likelihood non-Gaussianity. 
 
@@ -886,8 +884,8 @@ The contours mark the $68\%$ and $95\%$ confidence intervals
 of the posteriors. The shift in the $f \sigma_8$ distribution 
 is reflected in the
 $(f\sigma_8, \alpha_\parallel)$ and $(\alpha_\perp, f\sigma_8)$ 
-contours (left and middle panels respectively). Meanwhile, the
-$(\alpha_\parallel, \alpha_\perp)$ distribution (right) show nearly 
+contours (left and middle panels respectively). The 
+$(\alpha_\parallel, \alpha_\perp)$ distribution (right), however, show nearly 
 no change from the non-Gaussian likelihood. These joint posteriors 
 corroborate our conclusion from Figure~\ref{fig:pk_like}.
 
@@ -897,13 +895,13 @@ significantly impact the parameter constraints of the $P_\ell$
 analysis. $b_2^\mathrm{SGC} \sigma_8$ is a poorly constrained nuisance 
 parameter. Although using the pseudo-likelihood noticeably 
 biases the $f \sigma_8$ constraint, the impact relative to 
-its uncertainty is small. In retrospect, the fact that the $P_\ell$
+its uncertainty is small: \todo{numbers}. In retrospect, the fact that the $P_\ell$
 analysis is largely unaffected by likelihood non-Gaussianity is not a 
-big surprise. In fact, its consistent with the divergences in 
+big surprise. It's consistent with the divergences in 
 Figure~\ref{fig:div_gauss}, which found relatively small discrepancies 
-between the likelihood and pseudo-likelihood. 
-The Gaussian pseudo-likelihood assumption for $P_\ell$ 
-is motivated by the Central Limit Theorem. If enough modes are sampled 
+between the likelihood and pseudo-likelihood. Furthermore, 
+the Gaussian pseudo-likelihood assumption for $P_\ell$ 
+is motivated by the Central Limit Theorem: if enough modes are sampled 
 in the powerspectrum, then the likelihood approaches a Gaussian. In 
 the restrictive $k$ range of the \Beut~analysis ($0.01 < k < 0.15$), 
 one would expect this to be the case. 
@@ -965,8 +963,8 @@ the HOD parameters in the \Sinh~$\zeta$ analysis (orange).
 We include the posteriors calculated using the pseudo-likelihood 
 for comparison in blue. The box plots on the bottom of each plot 
 mark the $68\%$ and $95\%$ confidence intervals of the posteriors. 
-In dotted lines, we plot the 
-original \Sinh~posteriors, which differ from the blue distribution.
+In the dotted lines, we plot the original \Sinh~posteriors, 
+which differ slightly from the blue distribution.
 This difference is caused by the difference in the covariance 
 matrix we use in the pseudo-likelihood~(see Section~\ref{sec:xmock}).  
 The difference, however, is negiligible. 
@@ -983,11 +981,53 @@ The $\log\,M_\mathrm{min}$ versus $\sigma_{\log M}$ and
 $\log\,M_\mathrm{min}$ versus $\alpha$ contours are both shifted 
 and broadened compared to the $\mathcal{L}^\mathrm{pseudo}$ 
 posterior. Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~reveal 
-that \emph{due to likelihood non-Gaussianity, using the Gaussian 
-pseudo-likelihood significantly underestimates the uncertainty and 
-biases the parameter constraints of the \Sinh~$\zeta$ analysis.}
+that \emph{using the Gaussian pseudo-likelihood significantly 
+underestimates the uncertainty and biases the parameter constraints 
+of the \Sinh~$\zeta$ analysis.}
 
-\todo{Need to talk about what causes the likelihood non-Gaussianity}
+The contrast between the pseudo-likelihood posteriors and our
+posteriors appropriately reflect the divergences in 
+Figure~\ref{fig:div_gauss}, which revealed significant
+discrepancy between the $\zeta$ likelihood distribution and the 
+pseudo-likelihood. These divergences and posteriors are consistent 
+with the expectation that the true $\zeta$ likelihood distribution is likely Poisson, 
+rather than Gaussian, similar to the likelihood of observed cluster
+counts~\citep{cash1979,planckcollaboration2014,ade2016}. However, 
+the complicated connection between groups identified with a FoF 
+algorithm and the underlying matter overdensity makes  
+writing down the exact $\zeta$ likelihood function 
+would be tremendously difficult. Regardless, the GMM likelihood 
+estimation method we present provides a straightforward estimate 
+of the non-Gaussian likelihood. 
+
+The posteriors of the \Sinh~$\zeta$ analysis, highlights the 
+significance of likelihood non-Gaussianity on parameter inference 
+in LSS studies. One of the main results of the \Sinh~HOD analysis, 
+is that the $\Lambda$CDM + HOD model can successful 
+fit either $\zeta(N)$ or the project two-point correlation function 
+$w_p(r_p)$, but struggles to jointly fit both (see Figure\todo{stuff}). Such tensions suggests 
+that the `vanilla' HOD model may not be sufficiently flexible in
+describing the galaxy-halo connection. Likelihood non-Gaussianity 
+impacts this result. Once likelihood non-Gaussianity is included in 
+the analysis, the posteriors are broadened and shifted towards 
+relaxing the tensions. We examine the effect of likelihood non-Gaussianity 
+in more detail in Hahn et al. (in prep.). 
+
+Even for the $P_\ell$ 
+analysis, the impact of likelihood non-Gaussianity on the parameter constraints cannot be dismissed  
+as we demand increasingly more precise constraints.  
+\todo{maybe some handwavy back of the envelope argument with DESI?} 
+The future, however, is encouraging in this regard. 
+Future surveys will expand the cosmic volumes probed by galaxies 
+and therefore increase the number of modes on all scales. Thanks to 
+the Central Limit Theorm, we consequently expect 
+likelihood non-Gaussianity to have an even smaller effect. However, for 
+higher order statistics such as the bispectrum, which has lower 
+signal-to-noise on large scales~\citep{sefusatti2005}, likelihood 
+non-Gaussianity 
+Fortunately the methods we present in this paper make it 
+straightforward to quantify likeilhood non-Gaussianity and 
+examine the effect on parameter inference. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 7 
@@ -1080,23 +1120,11 @@ biases the parameter constraints of the \Sinh~$\zeta$ analysis.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\section{Summary}
-Future surveys such as the Dark Energy Spectroscopic Instrument 
-\todo{(citecite)}, will expand the cosmic volumes probed by galaxies 
-and therefore the increase number of modes on all scales. Consequently,
-for $P_\ell$ analyses we expect likelihood non-Gaussianity to have 
-an even smaller effect using these surveys. For higher order statistics 
-such as the bispectrum, however, likelihood non-Gaussianity 
+\section{Summary and Discussion}
+Standard LSS analyses make two key assumptions in their parameter 
+inference. 
+First, they assume that the likelihood has a Gaussian functional form. 
 
-
-One of the main results of \Sinh, is that while the $\Lambda$CDM + HOD 
-model is successful at fitting either $\zeta(N)$ or the project two-point
-correlation function $w_p(r_p)$, it struggles to jointly fit both 
-observables. Such tensions suggests shortcomings in the `vanilla' 
-HOD model. However, once likelihood non-Gaussianity is 
-correctly considered, the posteriors are broadened and shifted to relax 
-these tensions. We examine the effect of likelihood non-Gaussianity 
-in more detail in Hahn et al. (in prep.). 
 
 
 Nevertheless, the divergence and likelihood 
