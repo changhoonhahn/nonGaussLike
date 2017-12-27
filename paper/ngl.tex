@@ -982,27 +982,26 @@ $\log\,M_\mathrm{min}$ versus $\alpha$ contours are both shifted
 and broadened compared to the $\mathcal{L}^\mathrm{pseudo}$ 
 posterior. Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~reveal 
 that \emph{using the Gaussian pseudo-likelihood significantly 
-underestimates the uncertainty and biases the parameter constraints 
+underestimates the uncertainty and biases the HOD parameter constraints 
 of the \Sinh~$\zeta$ analysis.}
 
-The contrast between the pseudo-likelihood posteriors and our
-posteriors appropriately reflect the divergences in 
-Figure~\ref{fig:div_gauss}, which revealed significant
+The contrast between the pseudo-likelihood posteriors and our posteriors
+in Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~appropriately reflect 
+the divergences in Figure~\ref{fig:div_gauss}, which revealed significant
 discrepancy between the $\zeta$ likelihood distribution and the 
 pseudo-likelihood. These divergences and posteriors are consistent 
 with the expectation that the true $\zeta$ likelihood distribution is likely Poisson, 
 rather than Gaussian, similar to the likelihood of observed cluster
 counts~\citep{cash1979,planckcollaboration2014,ade2016}. However, 
 the complicated connection between groups identified with a FoF 
-algorithm and the underlying matter overdensity makes  
-writing down the exact $\zeta$ likelihood function 
-would be tremendously difficult. Regardless, the GMM likelihood 
-estimation method we present provides a straightforward estimate 
+algorithm and the underlying matter overdensity makes writing down 
+the exact $\zeta$ likelihood function tremendously difficult. Regardless, 
+the GMM likelihood estimation method we present provides a straightforward estimate 
 of the non-Gaussian likelihood. 
 
-The posteriors of the \Sinh~$\zeta$ analysis, highlights the 
-significance of likelihood non-Gaussianity on parameter inference 
-in LSS studies. One of the main results of the \Sinh~HOD analysis, 
+The posteriors of the \Sinh~$\zeta$ analysis, highlights the significance of 
+accounting for likelihood non-Gaussianity in parameter inference of 
+LSS studies. One of the main results of the \Sinh~HOD analysis, 
 is that the $\Lambda$CDM + HOD model can successful 
 fit either $\zeta(N)$ or the project two-point correlation function 
 $w_p(r_p)$, but struggles to jointly fit both (see Figure\todo{stuff}). Such tensions suggests 
@@ -1011,12 +1010,12 @@ describing the galaxy-halo connection. Likelihood non-Gaussianity
 impacts this result. Once likelihood non-Gaussianity is included in 
 the analysis, the posteriors are broadened and shifted towards 
 relaxing the tensions. We examine the effect of likelihood non-Gaussianity 
-in more detail in Hahn et al. (in prep.). 
+for HOD parameter constraints in more detail in Hahn et al. (in prep.). 
 
-Even for the $P_\ell$ 
-analysis, the impact of likelihood non-Gaussianity on the parameter constraints cannot be dismissed  
-as we demand increasingly more precise constraints.  
-\todo{maybe some handwavy back of the envelope argument with DESI?} 
+Even for the $P_\ell$ analysis, the impact of likelihood non-Gaussianity 
+on the parameter constraints cannot easily be dismissed as we demand 
+increasingly more precise constraints.  
+\todo{maybe some handwavy back of the envelope argument with DESI?} \footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}
 The future, however, is encouraging in this regard. 
 Future surveys will expand the cosmic volumes probed by galaxies 
 and therefore increase the number of modes on all scales. Thanks to 
@@ -1024,10 +1023,13 @@ the Central Limit Theorm, we consequently expect
 likelihood non-Gaussianity to have an even smaller effect. However, for 
 higher order statistics such as the bispectrum, which has lower 
 signal-to-noise on large scales~\citep{sefusatti2005}, likelihood 
-non-Gaussianity 
-Fortunately the methods we present in this paper make it 
-straightforward to quantify likeilhood non-Gaussianity and 
-examine the effect on parameter inference. 
+non-Gaussianity \todo{finish}. 
+Fortunately the methods we present in this paper can easily be extended 
+to other observables and analyses. 
+
+
+\todo{paragraph that restates what we did} 
+%make it straightforward to quantify likeilhood non-Gaussianity and examine the effect on parameter inference. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 7 
@@ -1120,12 +1122,41 @@ examine the effect on parameter inference.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\section{Summary and Discussion}
-Standard LSS analyses make two key assumptions in their parameter 
-inference. 
-First, they assume that the likelihood has a Gaussian functional form. 
+\section{Summary}% and Discussion}
+Standard present day LSS analyses makes a major assumption in their parameter 
+inference --- the likelihood has a Gaussian functional-form. We 
+investigate the impact of this assumption on two recent LSS analyses: 
+the \Beut~powerspectrum multipole analysis and the \Sinh~group multiplicity 
+function analysis. We combine the mock catalogs, originally constructed for 
+covariance matrix estimation in these analyses, with non-parametric 
+divergence estimators in order to quantify the non-Gaussianity of the 
+likelihood. Afterwards, we use the same mocks and non-parametric density 
+estimation to construct likelihood estimates that better approximate 
+the non-Gaussian likelihood. These estimates allow us to quantify the 
+impact of likelihood non-Gaussianity on the posterior probability 
+distributions of the \Beut~and~\Sinh~parameters. Furthermore, since our 
+likelihood estimates better approximate the true likelihood, they allow us to derive more 
+accurate parameter constraints. We find the following results from 
+our analysis:  
 
-
+\begin{itemize}
+    \item We measure the divergences between the $P_\ell$ and $\zeta$ 
+        likelihoods and their Gaussian pseudo-likelihoods in order to 
+        quantify the non-Gaussianity of the likelihoods. The comparisons
+        of the divergences reveal significant non-Gaussianity for both 
+        the $P_\ell$ and $\zeta$ likelihoods. \todo{Something about how 
+        the $\zeta$ likelihood is more non-Gaussian than the $P_\ell$ 
+        likelihood}
+    \item From the \Beut~and~\Sinh~mocks, we use Gaussian mixture density 
+        estimation and independent component analysis to construct 
+        estimates of the $P_\ell$ and $\zeta$ likelihoods. The divergence 
+        between our estimates and the $P_\ell$ and $\zeta$ likelihoods 
+        demonstrate that our estimates more accurately approximate the 
+        true likelihoods than the standard pseudo-likelihood. 
+    \item 
+        Parameter constraint comparison results for \Beut
+        Parameter constraint comparison results for \Sinh
+\end{itemize}
 
 Nevertheless, the divergence and likelihood 
 estimation frameworks we introduce in this paper provides a straightforward 
