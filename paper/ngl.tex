@@ -98,14 +98,16 @@ galaxies: statistics
 ---
 methods: data analysis
 ---
-cosmological parameters
----
 cosmology: observations
+---
+cosmological parameters
 ---
 large-scale structure of universe
 }
 
 \section{Introduction}
+
+
 \begin{itemize}
     \item Talk about the use of Bayesian parameter inference and getting the posterior in LSS cosmology 
     \item Explain the two major assumptions that go into evaluating the likelihood
@@ -131,19 +133,33 @@ pseudo-likelihood must insure that their analysis is conducted in sufficiently h
 signal-to-noise regimes and test the impact of likelihood non-Gaussianity. 
 This is unfortunately not a part of the standard practice in LSS studies. 
 
+talk about CMB likelihood analyses? Bring up sellentin et al.'s t-distribution stuff?  
+
+% Data analysis can only lead to unbiased constraints on a physical theory if the employed likelihood is correct (e.g.  Trotta 2008; Mardia et al. 1979; Anderson 2003; Cramer 1946; Jeffreys 1961; Sun & Berger 2006). 
 %At scales where non-linear effects become important, k ≈ 0.2 − 0.3 h/Mpc, the density field cannot be assumed to be Gaussian anymore. A complementary approach at these scales is to consider that the power spectrum distribution about its mean is Gaussian; if there are enough independent modes contributing to a given shell in Fourier space, by the central limit theorem the distribution of the power spectrum should approach Gaussianity. However, due to the finite volume of the survey and shot noise, different modes are correlated, so it is not clear a priori at what scales Gaussianity applies. 
 
-In this paper we 
-% Data analysis can only lead to unbiased constraints on a physical theory if the employed likelihood is correct (e.g.  Trotta 2008; Mardia et al. 1979; Anderson 2003; Cramer 1946; Jeffreys 1961; Sun & Berger 2006). 
+In this paper we investigate the impact of the likelihood Gaussianity
+assumption on two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut)
+and \cite{sinha2017a} (hereafter~\Sinh). \Beut~analyzes the powerspectrum 
+multipoles ($P_\ell$; monopole, quadrupole, and hexadecapole) to measure
+redshift-space distortions along with the Alcock–Paczynski effect and baryon 
+acoustic oscillation scale. Meanwhile \Sinh~analyzes the group multiciplicty 
+function ($\zeta$) in order constrain parameters of the halo model.
+Using the~\Beut~and~\Sinh~analyses, we show in this paper that the assumption 
+of likelihood Gaussianity in LSS is not necessary. We will also show that 
+the mock catalogs used in standard LSS analyses for covariance matrix estimation 
+can be used to quantify the non-Gaussianity. More importantly the mocks can be 
+used to estimate the ``true'' non-Gaussian likelihood. 
 
-\todo{However, as we show in this paper, the assumption of likelihood 
-Gaussianity is not necessary. In fact, we will show that the mock catalogs 
-used in standard LSS analyses to estimate the covariance matrix for 
-evaluating the Gaussian likelihood, can be used to quantify the non-Gaussianity. 
-More important the mock catalogs can be used to construct an accurate 
-estimator for the non-Gaussian likelihood.} 
-
-In Section~\ref{sec:mocks}
+We begin in Section~\ref{sec:mocks} by describing the mock catalogs, 
+which we use throughout the paper, constructed originally for covariance 
+matrix estimation in~\Beut~and~\Sinh. Next in Section~\ref{sec:div}, we present
+non-parametric divergence estimators and quantify the non-Gaussianity of
+the $P_\ell$ and $\zeta$ likelihoods using them. Then in Section~\ref{sec:likeest}, 
+we introduce two methods for estimating the ``true'' likelihood using the 
+mock catalogs. We then use the likelihood estimates to quantify the impact 
+of likelihood non-Gaussianity on the posterior parameter constraints 
+of~\Beut~and~\Sinh. We discuss and conclude the paper in Section~\ref{sec:summary}.  
 
 \section{Mock Catalogs} \label{sec:mocks}
 Mock catalogs play an indispensable role in standard cosmological 
@@ -501,7 +517,7 @@ non-Gaussian}.
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Estimating the Non-Gaussian Likelihood}
+\section{Estimating the Non-Gaussian Likelihood} \label{sec:likeest}
 In the previous section, we estimate the divergence between the 
 $P_\ell$ and $\zeta$ likelihoods sampled by mocks and their respective 
 Gaussian pseudo-likelihoods. These divergences identify and quantify 
@@ -1167,7 +1183,7 @@ to other observables and analyses.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\section{Summary and Discussion}
+\section{Summary and Discussion} \label{sec:summary}
 Standard present day LSS analyses makes a major assumption in their 
 parameter inference --- the likelihood has a Gaussian functional-form. 
 Although this assumption is motivated by the Central Limit Theorem, 
