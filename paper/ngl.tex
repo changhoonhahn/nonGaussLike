@@ -65,20 +65,30 @@
 \email{changhoon.hahn@lbl.gov}
 
 \begin{abstract}
-    \todo{Standard present day LSS analyses makes a major assumption in their parameter 
-inference --- the likelihood has a Gaussian functional-form. We 
-investigate the impact of this assumption on two recent LSS analyses: 
-the \Beut~powerspectrum multipole analysis and the \Sinh~group multiplicity 
-function analysis. We combine the mock catalogs, originally constructed for 
-covariance matrix estimation in these analyses, with non-parametric 
-divergence estimators in order to quantify the non-Gaussianity of the 
-likelihood. Afterwards, we use the same mocks and non-parametric density 
-estimation to construct likelihood estimates that better approximate 
-the non-Gaussian likelihood. These estimates allow us to quantify the 
-impact of likelihood non-Gaussianity on the posterior probability 
-distributions of the \Beut~and~\Sinh~parameters. Furthermore, since our 
-likelihood estimates better approximate the true likelihood, they allow us to derive more 
-    accurate parameter constraints.}
+    Standard present day large-scale structure (LSS) analyses make a major 
+    assumption in their Bayesian parameter inference --- the likelihood has 
+    a Gaussian functional-form. We investigate the impact of this assumption 
+    on two recent LSS analyses: the \cite{beutler2017}~powerspectrum multipole ($P_\ell$) analysis and 
+    the \cite{sinha2017a}~group multiplicity function ($\zeta$) analysis. Using non-parametric 
+    divergence estimators on mock catalogs, originally constructed for covariance matrix 
+    estimation in these analyses, we identify significant non-Gaussianity for both 
+    $P_\ell$ and $\zeta$ 
+    %quantify the non-Gaussianity of the $P_\ell$ and $\zeta$ likelihoods. We 
+    likelihoods. Afterwards, we use Gaussian mixture density estimation and 
+    Independent Component Analysis to construct likelihood estimates that better 
+    approximate the true likelihood than the Gaussian \emph{pseudo}-likelihood. 
+    From the likelihood estimates, we then derive the true posterior probability 
+    disribution of the \Beut~and~\Sinh~parameters. Our parameter constraints reveal 
+    the impact of likelihood non-Gaussianity on the posterior parameter constraints 
+    of \Beut~and~\Sinh. Despite some impact on the $f\sigma_8$ constraint, 
+    likelihood non-Gaussianity does not significantly impact the overall 
+    \Beut~parameter constraints. For the $\zeta$ analysis, 
+    however, using the pseudo-likelihood significantly underestimates the 
+    uncertainties and biases the constraints of \Sinh~halo occupation parameters: 
+    $\log\,M_\mathrm{min}$, $\log\,M_1$ and $\alpha$. The divergence and 
+    likelihood estimation methods we present provides a straightforward framework
+    for quantifying the impact of likelihood non-Gaussianity and deriving more 
+    accurate parameter constraints. 
 \end{abstract}
 
 \keywords{
@@ -440,7 +450,9 @@ Each panel of Figure~\ref{fig:div_gauss} show significant
 discrepancy between the two distributions. This suggests that both 
 the $P_\ell(k)$ and $\zeta(N)$ likelihoods are \emph{significantly 
 non-Gaussian}. 
-%In more detail, we see that the $\zeta(N)$ likelihood is significantly more non-Gaussian than the $P_\ell(k)$ likelihood. 
+
+\todo{In more detail, we see that the $\zeta(N)$ likelihood is significantly more non-Gaussian than the $P_\ell(k)$ likelihood.}
+\todo{Divergences with different ranges in order to isolate where the main contributions to the non-Gaussianity}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 1 
@@ -1031,10 +1043,11 @@ increasingly more precise constraints.
 \todo{maybe some handwavy back of the envelope argument with DESI?} \footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}
 The future, however, is encouraging in this regard. 
 Future surveys will expand the cosmic volumes probed by galaxies 
-and therefore increase the number of modes on all scales. Thanks to 
-the Central Limit Theorm, we consequently expect 
-likelihood non-Gaussianity to have an even smaller effect. However, for 
-higher order statistics such as the bispectrum, which has lower 
+and therefore increase the number of modes on all scales. Even as they
+seek to extend the $k$ range of analyses, thanks to the Central Limit 
+Theorm, we consequently expect likelihood non-Gaussianity to have a 
+smaller effect. However, for higher order statistics such as the 
+bispectrum, which has lower 
 signal-to-noise on large scales~\citep{sefusatti2005}, likelihood 
 non-Gaussianity \todo{finish}. 
 Fortunately the methods we present in this paper can easily be extended 
@@ -1135,50 +1148,89 @@ to other observables and analyses.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\section{Summary}% and Discussion}
-Standard present day LSS analyses makes a major assumption in their parameter 
-inference --- the likelihood has a Gaussian functional-form. We 
-investigate the impact of this assumption on two recent LSS analyses: 
-the \Beut~powerspectrum multipole analysis and the \Sinh~group multiplicity 
-function analysis. We combine the mock catalogs, originally constructed for 
-covariance matrix estimation in these analyses, with non-parametric 
-divergence estimators in order to quantify the non-Gaussianity of the 
-likelihood. Afterwards, we use the same mocks and non-parametric density 
-estimation to construct likelihood estimates that better approximate 
-the non-Gaussian likelihood. These estimates allow us to quantify the 
-impact of likelihood non-Gaussianity on the posterior probability 
-distributions of the \Beut~and~\Sinh~parameters. Furthermore, since our 
-likelihood estimates better approximate the true likelihood, they allow us to derive more 
-accurate parameter constraints. We find the following results from 
-our analysis:  
+\section{Summary and Discussion}
+Standard present day LSS analyses makes a major assumption in their 
+parameter inference --- the likelihood has a Gaussian functional-form. 
+In this paper, we investigate the impact of this assumption on two recent 
+LSS analyses: the \Beut~powerspectrum multipole ($\ell = 0, 2$, and $4$) 
+analysis and the \Sinh~group multiplicity function analysis. We combine 
+mock catalogs, originally constructed 
+for covariance matrix estimation in these analyses, with non-parametric 
+divergence estimators to measure the divergences between the $P_\ell$ and 
+$\zeta$ likelihoods and the Gaussian pseudo-likelihoods from \Beut~and~\Sinh. 
+For both the $P_\ell$ and $\zeta$ likelihoods, the divergences reveal 
+significant likelihood non-Gaussianity. \todo{More details on how 
+the $\zeta$ likelihood is more non-Gaussian than the $P_\ell$ 
+likelihood}
 
-\begin{itemize}
-    \item We measure the divergences between the $P_\ell$ and $\zeta$ 
-        likelihoods and their Gaussian pseudo-likelihoods in order to 
-        quantify the non-Gaussianity of the likelihoods. The comparisons
-        of the divergences reveal significant non-Gaussianity for both 
-        the $P_\ell$ and $\zeta$ likelihoods. \todo{Something about how 
-        the $\zeta$ likelihood is more non-Gaussian than the $P_\ell$ 
-        likelihood}
-    \item From the \Beut~and~\Sinh~mocks, we use Gaussian mixture density 
-        estimation and independent component analysis to construct 
-        estimates of the $P_\ell$ and $\zeta$ likelihoods. The divergence 
-        between our estimates and the $P_\ell$ and $\zeta$ likelihoods 
-        demonstrate that our estimates more accurately approximate the 
-        true likelihoods than the standard pseudo-likelihood. 
-    \item 
-        Parameter constraint comparison results for \Beut
-        Parameter constraint comparison results for \Sinh
-\end{itemize}
+From the same mock catalogs of~\Beut~and~\Sinh, we use non-parametric density 
+estimation to construct estimates of the likelihood distribution 
+that better approximates the true non-Gaussian $P_\ell$ and $\zeta$ 
+likelihoods. For the $\zeta$ likelihood, the direct method 
+of estimating the likelihood distribution with the mocks and Gaussian
+mixture density estimation results in an accurate estimate. For the 
+\Beut~$P_\ell$ analysis, which has fewer mocks and a higher dimensional 
+likelihood, we use Independent Component Analysis to transform the 
+likelihood distribution into statistically independent components. 
+By estimating the one-dimensional distribution of these independent 
+componenets, we derive an estimate of the high-dimensional likelihood 
+distribution. The divergence between these two likelihood estimates and 
+the $P_\ell$ and $\zeta$ likelihoods demonstrate that we derive 
+\emph{more accurate} estimates of the true likelihoods than the 
+pseudo-likelihoods. 
 
-Nevertheless, the divergence and likelihood 
-estimation frameworks we introduce in this paper provides a straightforward 
-way of testing and quantifying the impact of likelihood non-Gaussianity. 
+Finally, using the $P_\ell$ and $\zeta$ likelihood estimates and importance 
+sampling, we derive posterior parameter constraint for the \Beut~and~\Sinh 
+analyses. Since our likelihood estimates are closer to the true likelihood, 
+they allow us to derive more accurate posterior probability distributions 
+than with Gaussian pseudo-likelihoods. By comparing our posteriors to the
+parameter constraints from \Beut~and~\Sinh, we find that likelihood 
+non-Gaussianity does not significantly impact the $P_\ell$ analysis of \Beut. 
+Among the non-nuissance parameters, only $f\sigma_8$ is impacted by \todo{number}. 
+Meanwhile for the \Sinh~$\zeta$ analysis, likelihood non-Gaussianity 
+significant impacts the posterior distributions of the HOD parameter. 
+Using the pseudo-likelihood significantly underestimates the width of the 
+$\log\,M_\mathrm{min}$, $\log\, M_1$, and $\alpha$ posteriors. It also 
+significantly biases their constraints. In fact, accounting for likelihood 
+non-Gaussianity, significantly eases the tension between the $\zeta$ and 
+$w_p(r_p)$ constraints found in \Sinh. Our comparisons of the posteriors 
+ultimately highlight the significance of likelihood non-Gaussianity in 
+parameter inference of LSS studies. 
 
+Based on our results, $P_\ell$ analyses using future surveys (\emph{e.g.} 
+DESI) will not be significantly impacted by likelihood non-Gaussianity.
+While these analyses seek to extend the $k$ ranges probed, future surveys
+will also expand the cosmic volumes probed by galaxies and increase the 
+number of modes on all scales. We therefore expect Central Limit Theorem 
+to reduce the impact of likelihood non-Gaussianity. Likewise, we expect
+future surveys to also reduce the impact of likelihood non-Gaussianity on 
+$\zeta$ analysis with the same multiplicity range, since larger cosmic 
+volumes will probe more high multiplicity groups. For a wider multiplicity 
+range, however, likelihood non-Gaussianity may still be a 
+significant effect. For higher order statistics such as the galaxy bispectrum 
+or three-point function, even for future surveys, likelihood non-Gaussianity 
+may still be a significant effect to consider for parameter inference.  
+Regardless of our expectation, for ever more precise parameter inference the Gaussian 
+likelihood assumption must be extensively tested. The divergence and likelihood 
+estimations we introduce in this paper provides a straightforward framework
+for testing and quantifying the impact of likelihood non-Gaussianity on 
+the final parameter constraints. 
 
-methods likelihood-free inference such as Approximate Bayesian 
-Computation have garnered popularity in the literature~\citep[\emph{e.g.}][]{hahn2017a}
-
+Our likelihood estimation methods allow us to go beyond the pseudo-likelihood 
+and derive more accurate estimates of the likelihood. With a similar 
+motivation at addressing likelihoods that are non-Gaussian or difficult to 
+write down, methods for likelihood-free inference such as Approximate Bayesian 
+Computation~\citep[ABC;][]{hahn2017a,kacprzak2017,alsing2017} have recently 
+been introduced to LSS studies. 
+Although as a likelihood-free inference method, ABC has the advantage 
+of relaxing any assumption on the likelihood, even with smart sampling methods 
+like Population Monte Carlo, it requires an expensive generative forward 
+model to be computed far more times than the number of mocks required for 
+covariance matrix estimation. Our methods (especially the ICA method)
+do not require any more mocks than those already constructed for accurate covariance 
+matrix estimation. Therefore, our methods for likelihood estimation 
+provide both accurate and practical methods for Bayesian parameter inference in 
+LSS. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Acknowledgements
@@ -1188,8 +1240,13 @@ It's a pleasure to thank
     Simone~Ferraro,
     David~W.~Hogg,
     Emmaneul~Schaan, 
-    Roman~Scoccimarro
-    Zachary~Slepian
+    Uro{\u s}~Seljak,
+    and Roman~Scoccimarro 
+for valuable discussions.
+\todo{more acknowledgements}
+This project made use of the NASA Astrophysics Data System
+and open-source software Python, numpy, SciPy, matplotlib, 
+and Scikit-learn.
 
 \bibliographystyle{yahapj}
 \bibliography{nongausslike}

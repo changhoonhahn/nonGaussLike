@@ -53,6 +53,11 @@ Alam, S., Ata, M., Bailey, S., {et~al.} 2017,
   \href{http://dx.doi.org/10.1093/mnras/stx721}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 470, 2617}
 
+\bibitem[{Alsing \& Wandelt(2017)}]{alsing2017}
+Alsing, J., \& Wandelt, B. 2017, \JournalTitle{arXiv:1712.00012 [astro-ph]},
+  \href{http://arxiv.org/abs/1712.00012}{{\sffamily arXiv:1712.00012
+  [astro-ph]}}
+
 \bibitem[{Arthur \& Vassilvitskii(2007)}]{arthur2007}
 Arthur, D., \& Vassilvitskii, S. 2007, in Proceedings of the {{Eighteenth
   Annual ACM}}-{{SIAM Symposium}} on {{Discrete Algorithms}}, SODA '07
@@ -256,6 +261,13 @@ Hyvarinen, A. 1999,
 \bibitem[{Hyv{\"a}rinen \& Oja(2000)}]{hyvarinen2000}
 Hyv{\"a}rinen, A., \& Oja, E. 2000, \JournalTitle{Neural Networks: The Official
   Journal of the International Neural Network Society}, 13, 411
+
+\bibitem[{Kacprzak {et~al.}(2017)Kacprzak, Herbel, Amara, \&
+  R{\'e}fr{\'e}gier}]{kacprzak2017}
+Kacprzak, T., Herbel, J., Amara, A., \& R{\'e}fr{\'e}gier, A. 2017,
+  \JournalTitle{arXiv:1707.07498 [astro-ph]},
+  \href{http://arxiv.org/abs/1707.07498}{{\sffamily arXiv:1707.07498
+  [astro-ph]}}
 
 \bibitem[{Kazin {et~al.}(2014)Kazin, Koda, Blake, Padmanabhan, Brough, Colless,
   Contreras, Couch, Croom, Croton, Davis, Drinkwater, Forster, Gilbank,
