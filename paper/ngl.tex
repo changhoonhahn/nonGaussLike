@@ -139,7 +139,7 @@ talk about CMB likelihood analyses? Bring up sellentin et al.'s t-distribution s
 %At scales where non-linear effects become important, k ≈ 0.2 − 0.3 h/Mpc, the density field cannot be assumed to be Gaussian anymore. A complementary approach at these scales is to consider that the power spectrum distribution about its mean is Gaussian; if there are enough independent modes contributing to a given shell in Fourier space, by the central limit theorem the distribution of the power spectrum should approach Gaussianity. However, due to the finite volume of the survey and shot noise, different modes are correlated, so it is not clear a priori at what scales Gaussianity applies. 
 
 In this paper we investigate the impact of the likelihood Gaussianity
-assumption on two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut)
+assumption on the two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut)
 and \cite{sinha2017a} (hereafter~\Sinh). \Beut~analyzes the powerspectrum 
 multipoles ($P_\ell$; monopole, quadrupole, and hexadecapole) to measure
 redshift-space distortions along with the Alcock–Paczynski effect and baryon 
@@ -471,23 +471,46 @@ we construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as $\Xmock$:
 $2000$ and $10,000$ for the $P_\ell$ and $\zeta$ analyses respectively. 
 
 In Figure~\ref{fig:div_gauss}, we present the resulting \Ralpha~(left) 
-and KL (right) divergences ($\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$; orange) 
-for the \Beut~$P_\ell$ (top) and \Sinh~$\zeta$ (bottom) analyses.
-For reference, we also include in blue divergence 
-estimates of the pseudo-likelihood onto itself, which we calculate as 
-$\hat{D}(\Xref \parallel \Yref)$, where $\Xref$ is a data vector with 
-the same dimension as $\Xmock$ sampled from the pseudo-likelihood 
-$\mathcal{N}$. Since $\hat{D}$ are estimates, rather than the true divergence, 
-we compute each of the estimates \todo{100} times (resampling 
-$\Yref$ each time) and present their distribution in order to 
-illustrate their uncertainty.
-Each panel of Figure~\ref{fig:div_gauss} show significant 
-discrepancy between the two distributions. This suggests that both 
-the $P_\ell(k)$ and $\zeta(N)$ likelihoods are \emph{significantly 
-non-Gaussian}. 
+and KL (right) divergences (orange) between the likelihood and the 
+Gaussian pseudo-likelihood for the \Beut~$P_\ell$ (top) and \Sinh~$\zeta$ (bottom) 
+analyses: $\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$. For reference, we also 
+include (in blue) divergence estimates of the pseudo-likelihood onto itself, 
+which we calculate as $\hat{D}(\Xref \parallel \Yref)$, where $\Xref$ is a 
+data vector with the same dimension as $\Xmock$ sampled from the pseudo-likelihood 
+$\mathcal{N}$. $\hat{D}$s are \emph{estimates} of the true divergence, 
+therefore we resample $\Yref$ and compute each of them \todo{100} times. 
+The distributions in Figure~\ref{fig:div_gauss} are the $\hat{D}$ 
+distributions, which illustrate the uncertainty of $\hat{D}$. The 
+discrepancy between the $\hat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$
+distributions and the reference $\hat{D}(\Xref \parallel \Yref)$ distribution 
+implies that the pseudo-likelihood is not an accurate estimate of the 
+likelihood. Each panel of Figure~\ref{fig:div_gauss} show significant 
+discrepancy between the two distributions. In other words, \emph{both 
+the $P_\ell(k)$ and $\zeta(N)$ likelihoods are significantly non-Gaussian}. 
 
-\todo{In more detail, we see that the $\zeta(N)$ likelihood is significantly more non-Gaussian than the $P_\ell(k)$ likelihood.}
-\todo{Divergences with different ranges in order to isolate where the main contributions to the non-Gaussianity}
+For $P_\ell$, although we find significant discrepancies between the 
+$\hat{D}$ distributions, the discrepancy is relatively small. This is 
+expected since, as we mentioned earlier, the Gaussian pseudo-likelihood 
+assumption for $P_\ell$ is motivated by the Central Limit Theorem. As 
+long as enough modes contribute to the powerspectrum, the likelihood 
+approaches a Gaussian. In the restrictive $k$ range of the \Beut~analysis 
+($0.01 < k < 0.15$ for $\ell = 0$ and $2$; $0.01 < k < 0.15$ for $\ell = 4$), 
+one would expect this to be the case. When we repeat the divergence 
+comparison with $k_\mathrm{min} = 0.05$, we find \todo{something}. On 
+the other hand when we repeat the comparison for $k_\mathrm{max} = 0.1$,
+we find \todo{something}. \todo{what conclusion do we draw from this}.
+
+For $\zeta$, we find a relatively large discrepancy between the $\hat{D}$ 
+distributions. This is consistent with the expectation that the true 
+$\zeta$ likelihood distribution is likely Poisson, not Gaussian, 
+similar to the likelihood of observed cluster counts~\citep{cash1979,planckcollaboration2014,ade2016}. 
+The complicated connection between groups identified with a FoF 
+algorithm and the underlying matter overdensity makes writing down 
+the exact $\zeta$ likelihood function tremendously difficult. Nevertheless, 
+we expect the likelihood to be non-Gaussian. In order to better understand
+the source of non-Gaussianity, we repeat the divergence comparison excluding
+the highest $N$ bin. We find \todo{something}. When we instead exclude the 
+lowest $N$ bin, we find \todo{something}. \todo{conclusion about this}.   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 1 
