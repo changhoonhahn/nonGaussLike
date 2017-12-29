@@ -78,7 +78,7 @@
     Independent Component Analysis to construct likelihood estimates that better 
     approximate the true likelihood than the Gaussian \emph{pseudo}-likelihood. 
     We then use the likelihood estimates to derive the true posterior probability 
-    disribution of the \Beut~and~\Sinh~parameters. Our parameter constraints reveal 
+    distribution of the \Beut~and~\Sinh~parameters. Our parameter constraints reveal 
     the impact of likelihood non-Gaussianity on the posterior parameter constraints 
     of \Beut~and~\Sinh. Despite some impact on the $f\sigma_8$ constraint, 
     likelihood non-Gaussianity does not significantly impact the overall 
@@ -143,7 +143,7 @@ assumption on the two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut
 and \cite{sinha2017a} (hereafter~\Sinh). \Beut~analyzes the powerspectrum 
 multipoles ($P_\ell$; monopole, quadrupole, and hexadecapole) to measure
 redshift-space distortions along with the Alcock–Paczynski effect and baryon 
-acoustic oscillation scale. Meanwhile \Sinh~analyzes the group multiciplicty 
+acoustic oscillation scale. Meanwhile \Sinh~analyzes the group multiplicity 
 function ($\zeta$) in order constrain parameters of the halo model.
 Using the~\Beut~and~\Sinh~analyses, we show in this paper that the assumption 
 of likelihood Gaussianity in LSS is not necessary. We will also show that 
@@ -178,13 +178,13 @@ by subsampling~\citep[e.g.][]{norberg2009}, covariance matrices
 from mocks have a number of advantages. Mocks allow us 
 to incorporate detailed systematic errors present in the 
 data and variance beyond the volume of the data. Even for analytic 
-estimates, a large ensemble of mocks are crucial for validataion~\citep[\emph{e.g.}][]{slepian2017}. 
+estimates, a large ensemble of mocks are crucial for validation~\citep[\emph{e.g.}][]{slepian2017}. 
 Moreover, as we show later in this paper, mocks present an
 additional advantage: they allow us to 
 quantify the non-Gaussianity of the likelihood and more accurately 
 estimate the true likelihood distribution. 
 
-In this paper, we we focus on two LSS analyses: the powerspectrum 
+In this paper, we focus on two LSS analyses: the powerspectrum 
 multipole ($P_\ell$) analysis of \Beut~and group multiplicity 
 function ($\zeta$) analysis of \Sinh. Throughout the paper we will 
 make extensive use of the mock catalogs used in these analyses. 
@@ -218,7 +218,7 @@ details.
 In total, \cite{kitaura2016} generated 12,228 mock light-cone 
 galaxy catalogs for BOSS Data Release 12. In \Beut, 
 they use 2045 and 2048 for the northern galactic cap (NGC) and 
-souther galactic cap (SGC) of the LOWZ+CMASS combined sample. 
+southern galactic cap (SGC) of the LOWZ+CMASS combined sample. 
 \Beut~excluded 3 mock realizations due to notable 
 issues. These issues have since been addressed so in our analysis 
 we use all 2048 mocks for both the NGC and SGC of the LOWZ+CMASS
@@ -285,7 +285,7 @@ in the next sections.
 
 To measure the powerspectrum multipoles of the BOSS DR12 galaxies
 and the MutliDark-\patchy~mocks (Section~\ref{sec:patchy}), \Beut~uses a 
-fast fourier transform (FFT) based anisotropic powerspectrum estimator 
+fast Fourier transform (FFT) based anisotropic powerspectrum estimator 
 based on \cite{bianchi2015} and \cite{scoccimarro2015}. This estimator 
 estimates the  monopole, quadrupole, and hexadecapole 
 ($\ell = 0, 2,\,\mathrm{and}\,4$) of the powerspectrum using FFTs of the 
@@ -368,13 +368,12 @@ data, $\Xmock$, is the identity matrix $\mathbb{I}$. Such a whitening linear
 transformation can be derived in infinite ways. 
 One way to derive the linear transformation is through the eigen-decomposition
 of the covariance matrix~\citep[\emph{e.g.}][]{hartlap2009, sellentin2017}. We, alternatively, 
-derive the linear transformation ${\bf L}$ using Choletsky decompositon of the 
+derive the linear transformation ${\bf L}$ using Choletsky decomposition of the 
 inverse covariance matrix~\citep{Press:1992:NRC:148286}: 
-$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. \todo{Our choice of Choletsky  
-whitening does not impact the results of the paper.}
-Now that we have the pre-processed data of the mock observables, 
-we proceed in the next section to quantifying the non-Gaussianity of the 
-$P_\ell$ and $\zeta$ likelihoods. 
+$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. The different methods for whitening 
+do not impact the results of the paper. Now that we have the pre-processed 
+data of the mock observables, we proceed in the next section to quantifying 
+the non-Gaussianity of the $P_\ell$ and $\zeta$ likelihoods. 
 
 
 \section{Quantifying the Likelihood non-Gaussianity} \label{sec:div}
@@ -448,7 +447,7 @@ This estimator, as \cite{poczos2012} proves, is asymptotically unbias,
 \lim_{n, m \rightarrow \infty} \mathbb{E} \big[ \hat{D}_{\alpha} (X_{1:n} \parallel Y_{1:m}) \big] = D_{\alpha} (p \parallel q).
 \eeq
 Plugging $\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m})$ into Eq.~\ref{eq:renyi},
-we get an estimator for the R\'enyi-$\alpha$ divergence. \cite{wang2009} dervies
+we get an estimator for the R\'enyi-$\alpha$ divergence. \cite{wang2009} derives
 a similar estimator for the KL divergence~(Eq.~\ref{eq:kl}). 
 %We note that while the divergence estimators converge to the true divergence with a large enough samples, with a limited number of samples from the distribution, the estimators are noisy. 
 These divergence estimates have been applied to Support Distribution Machines 
@@ -469,6 +468,8 @@ estimators to compute $\hat{D}(\Xmock \parallel \mathcal{L}^\mathrm{pseudo})$.
 Similar to the experiments detailed in \cite{poczos2012}, 
 we construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as $\Xmock$: 
 $2000$ and $10,000$ for the $P_\ell$ and $\zeta$ analyses respectively. 
+Furthermore, based on the sample size of $\Xmock$ we calculate the 
+divergences using the $k=10$ nearest neighbors. 
 
 In Figure~\ref{fig:div_gauss}, we present the resulting \Ralpha~(left) 
 and KL (right) divergences (orange) between the likelihood and the 
@@ -483,22 +484,25 @@ The distributions in Figure~\ref{fig:div_gauss} are the $\hat{D}$
 distributions, which illustrate the uncertainty of $\hat{D}$. The 
 discrepancy between the $\hat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$
 distributions and the reference $\hat{D}(\Xref \parallel \Yref)$ distribution 
-implies that the pseudo-likelihood is not an accurate estimate of the 
+($\Delta \hat{D}$) implies that the pseudo-likelihood is not an accurate estimate of the 
 likelihood. Each panel of Figure~\ref{fig:div_gauss} show significant 
 discrepancy between the two distributions. In other words, \emph{both 
 the $P_\ell(k)$ and $\zeta(N)$ likelihoods are significantly non-Gaussian}. 
 
-For $P_\ell$, although we find significant discrepancies between the 
-$\hat{D}$ distributions, the discrepancy is relatively small. This is 
-expected since, as we mentioned earlier, the Gaussian pseudo-likelihood 
-assumption for $P_\ell$ is motivated by the Central Limit Theorem. As 
-long as enough modes contribute to the powerspectrum, the likelihood 
-approaches a Gaussian. In the restrictive $k$ range of the \Beut~analysis 
-($0.01 < k < 0.15$ for $\ell = 0$ and $2$; $0.01 < k < 0.15$ for $\ell = 4$), 
-one would expect this to be the case. When we repeat the divergence 
-comparison with $k_\mathrm{min} = 0.05$, we find \todo{something}. On 
-the other hand when we repeat the comparison for $k_\mathrm{max} = 0.1$,
-we find \todo{something}. \todo{what conclusion do we draw from this}.
+Although significant, the discrepancies between the $\hat{D}$ distributions 
+for $P_\ell$ are relatively small. This is expected since, as we mentioned 
+earlier, the Gaussian pseudo-likelihood assumption for $P_\ell$ is motivated 
+by the Central Limit Theorem. As long as enough modes contribute to the 
+powerspectrum, the likelihood approaches a Gaussian. In the restrictive 
+$k$ range of the \Beut~analysis ($0.01 < k < 0.15$ for $\ell = 0$ and $2$; $0.01 < k < 0.15$ for $\ell = 4$), 
+one would expect this to mostly be the case. In order to better understand 
+the source of non-Gaussianity, we repeat the divergence comparisons for 
+different $k$ ranges. When we set $k_\mathrm{min} = 0.05$, $\Delta \hat{D}$ 
+decreases. Meanwhile, when we set $k_\mathrm{max} = 0.1$ for the monopole 
+and quadrupole, $\Delta \hat{D}$ increases. Next, if we restrict 
+the divergences to only the monopole and quadrupole, $\Delta \hat{D}$ decreases. 
+This suggests that $P_\ell$ on large scales (low $k$) and the hexadecapole 
+contribute most to the non-Gaussianity of the $P_\ell$ likelihood. 
 
 For $\zeta$, we find a relatively large discrepancy between the $\hat{D}$ 
 distributions. This is consistent with the expectation that the true 
@@ -523,7 +527,7 @@ lowest $N$ bin, we find \todo{something}. \todo{conclusion about this}.
     the likelihood distribution and the Gaussian pseudo-likelihood 
     for the \Beut~$P_\ell$ (top) and \Sinh~$\zeta$ (bottom) analyses. 
     We include in blue, as reference, the divergence estimates 
-    of the pseudo-liklihood onto itself.  
+    of the pseudo-likelihood onto itself.  
     $\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$ are computed using the 
     non-parametric $k$-NN estimator (Section~\ref{sec:div}) on 
     the mock data $\Xmock$ and a referece sample $\Yref$ drawn
@@ -545,7 +549,7 @@ In the previous section, we estimate the divergence between the
 $P_\ell$ and $\zeta$ likelihoods sampled by mocks and their respective 
 Gaussian pseudo-likelihoods. These divergences identify and quantify 
 the significant non-Gaussianity in the likelihoods of LSS studies.   
-Our ultimate goal, however, is to quantify the impact of likelihod 
+Our ultimate goal, however, is to quantify the impact of likelihood 
 non-Gaussianity on the final cosmological parameter constrains and
 to develop more accurate methods for parameter inference in LSS. 
 From the divergence estimates alone, it's not obvious how they propagate 
@@ -559,7 +563,7 @@ quantify the impact of likelihood non-Gaussianity on the
 
 \subsection{Gaussian Mixture Likelihood Estimation} \label{sec:gmm}
 When mock catalogs are used for parameter inference in LSS analyses, 
-they essentialy serve as data points sampling the likelihood distribution. 
+they essentially serve as data points sampling the likelihood distribution. 
 For the pseudo-likelihood, this distribution is assumed to have a 
 Gaussian functional form. Hence, why we estimate the covariance matrix 
 from mocks. However, the Gaussian functional form, or any functional form for 
@@ -575,7 +579,7 @@ satellite~\citep{bovy2011}, classifying galaxies in the Galaxy And Mass Assembly
 Survey~\citep{taylor2015}, and classifying pulsars~(\citealt{lee2012}; see
 also~\citealt{hogg2010,kuhn2017}). 
 
-Gaussian mixutre density estimation is a ``semi-parametric'' method 
+Gaussian mixture density estimation is a ``semi-parametric'' method 
 that uses a weighted sum of $k$ Gaussian component densities, a Gaussian 
 mixture model (hereafter GMM)
 \beq
@@ -615,7 +619,7 @@ In Figure~\ref{fig:gmm_ped}, we illustrate Gaussian mixture
 density estimation in action. We use GMMs with $k = 1$ (top), $
 3$ (middle), and $10$ (bottom) components to estimate the
 distribution of one dimensional data (blue) drawn from three 
-separate Gaussia distributions. The GMM outputs of the EM algorithm 
+separate Gaussian distributions. The GMM outputs of the EM algorithm 
 are plotted in red with dotted black lines representing each of their 
 components.  
 
@@ -640,7 +644,7 @@ components.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 So far in our description of GMMs, we have kept
-the number of componenets $k$ fixed. However, $k$ is a free 
+the number of components $k$ fixed. However, $k$ is a free 
 parameter and selecting it is a crucial step in Gaussian mixture
 density estimation. With too many components the model may overfit 
 the data; with too few components, 
@@ -670,7 +674,7 @@ With Gaussian mixture density estimation we can directly estimate
 the likelihood distribution using the mock catalogs. We first fit 
 GMMs with $k\mathrm{s} < 30$ components to the whitened 
 mock data $\Xmock$ using the EM algorithm for each model. For each of the 
-coverged GMMs, we calculate the BIC. Afterwards we select 
+converged GMMs, we calculate the BIC. Afterwards we select 
 the model with the lowest BIC as the best density estimate of the likelihood 
 distribution: $\hat{p}_\mathrm{\tiny GMM}(x)$. The selected density estimate can 
 then be used to calculate the
@@ -687,7 +691,7 @@ Instead of $\Yref$ drawn from the pseudo-likelihood, we draw
 samples from $\hat{p}_\mathrm{\tiny GMM}(x)$ with the same 
 dimensions. Then we calculate $k$-NN~\Ralpha~and KL 
 divergence estimates between this sample and $\Xmock$. As we did in Figure~\ref{fig:div_gauss}, 
-we repreat this process \todo{100} times, resampling $\hat{p}_\mathrm{\tiny GMM}$
+we repeat this process \todo{100} times, resampling $\hat{p}_\mathrm{\tiny GMM}$
 each time, in order get a distribution of divergence estimates that 
 reflects the scatter in the estimator. In Figure~\ref{fig:div_gmm}, 
 we present the resulting distribution of divergences between 
@@ -820,7 +824,7 @@ That means ${\bf X}^\mathrm{ICA}_n$ can be used to estimate
 $p_{x^\mathrm{ICA}_n}$ using a method like kernel 
 density estimation~\citep[KDE; \emph{e.g.}][]{9780387848587,feigelson2012}. 
 With KDE, the density estimate, $\hat{p}_{x^\mathrm{ICA}_n}$, is constructed by 
-smoothing the empirical distribution of the ICA componenet $x^\mathrm{ICA}_n$ 
+smoothing the empirical distribution of the ICA component $x^\mathrm{ICA}_n$ 
 using a smooth kernel: 
 \beq
 \hat{p}_{x^\mathrm{ICA}_n}(x) = \frac{1}{N_\mathrm{mock}b} \sum\limits_{j=1}^{N_\mathrm{mock}} K \left( \frac{x - \mathrm{X}^{(j),\mathrm{ICA}}_n}{b} \right). 
@@ -861,7 +865,7 @@ For comparison, we include the distributions from Figure~\ref{fig:div_gauss}.
     likelihood estimate for the \Beut~$P_\ell$ (top) and \Sinh~$\zeta$ 
     (bottom) analyses. We include the divergence estimates from 
     Figure~\ref{fig:div_gauss} for comparison. The ICA likelihood 
-    significantly improves the divergence discrpancy for both the
+    significantly improves the divergence discrepancy for both the
     $P_\ell$ and $\zeta$ analyses. For $\zeta$, the improvement of 
     the ICA likelihood over the pseudo-likelihood is more modest than 
     our GMM estimate from Section~\ref{sec:gmm}. However, for 
@@ -895,7 +899,7 @@ method for the~\Sinh~analysis.
 \section{Impact on Parameter Inference}
 To derive the posterior distribution of their model parameters,
 both~\Beut~and~\Sinh~use the standard Monte Carlo Markov Chain (MCMC) 
-approach with the Gaussian pseduo-likelihood. The \Beut~analysis 
+approach with the Gaussian pseudo-likelihood. The \Beut~analysis 
 includes $11$ parameters,
 \beq \nonumber
 \Big \{f \sigma_8,~\alpha_\parallel,~\alpha_\perp,~b_1^\mathrm{NGC} \sigma_8,~b_1^\mathrm{SGC} \sigma_8, 
@@ -1041,7 +1045,7 @@ from the hexadecapole which has the lowest signal to noise.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Next in Figure~\ref{fig:gmf_like}, we present the posterior 
-distributions calcuated using the non-Gaussian GMM likelihood for 
+distributions calculated using the non-Gaussian GMM likelihood for 
 the HOD parameters in the \Sinh~$\zeta$ analysis (orange).  
 We include the posteriors calculated using the pseudo-likelihood 
 for comparison in blue. The box plots on the bottom of each plot 
@@ -1050,7 +1054,7 @@ In the dotted lines, we plot the original \Sinh~posteriors,
 which differ slightly from the blue distribution.
 This difference is caused by the difference in the covariance 
 matrix we use in the pseudo-likelihood~(see Section~\ref{sec:xmock}).  
-The difference, however, is negiligible. 
+The difference, however, is negligible. 
 
 Besides the poorly constrained parameters $\sigma_{\log M}$ and $\log\, M_0$, 
 likelihood non-Gaussianity significantly impacts the posterior 
@@ -1233,7 +1237,7 @@ mixture density estimation results in an accurate estimate. For the
 likelihood, we use Independent Component Analysis to transform the 
 likelihood distribution into statistically independent components. 
 By estimating the one-dimensional distribution of these independent 
-componenets, we derive an estimate of the high-dimensional likelihood 
+components, we derive an estimate of the high-dimensional likelihood 
 distribution. The divergence between these two likelihood estimates and 
 the $P_\ell$ and $\zeta$ likelihoods demonstrate that we derive 
 \emph{more accurate} estimates of the true likelihoods than the 
@@ -1272,7 +1276,7 @@ or three-point function, even for future surveys, likelihood non-Gaussianity
 may still be a significant effect to consider for parameter inference.  
 Regardless of our expectation, for ever more precise parameter inference the Gaussian 
 likelihood assumption must be extensively tested. The divergence and likelihood 
-estimations we introduce in this paper provides a straightforward framework
+estimations we introduce in this paper provide a straightforward framework
 for testing and quantifying the impact of likelihood non-Gaussianity on 
 the final parameter constraints. 
 
