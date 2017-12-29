@@ -311,8 +311,12 @@ def whiten(X, method='choletsky', hartlap=False):
     Returns X_w (the whitened matrix) and W (the whitening matrix) -- X_w = W.T * X
     '''
     C_x = np.cov(X.T)  # covariance matrix of X 
+    
+    try: 
+        invC_x = np.linalg.inv(C_x) # precision matrix of X 
+    except np.linalg.linalg.LinAlgError: # singular matrix 
+        invC_x = np.linalg.pinv(C_x) # precision matrix of X 
 
-    invC_x = np.linalg.inv(C_x) # precision matrix of X 
     if hartlap: 
         # include Hartlap et al. (2007) factor (i.e. the hartlap factor) 
         invC_x *= (float(X.shape[0]) - float(invC_x.shape[1]) - 2.)/(float(X.shape[0]) - 1.)
