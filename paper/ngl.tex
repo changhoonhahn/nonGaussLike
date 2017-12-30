@@ -122,21 +122,25 @@ for instance, is the correlation function of the density field. Assuming
 that the density field is a Gaussian random field, which it approximately 
 is, the powerspectrum of a specific mode would follow a chi-squared 
 distribution. With sufficiently many independent modes contributing, 
-from Central Limit Theorem, the likelihood of the powerspectrum would \emph{approach} a Gaussian 
-distribution. With finite survey volume, shot noise, and systematic effects 
-the Gaussian likelihood assumption cannot be true for the powerspectrum on 
-all scales. In fact, for the low signal-to-noise regime (on large scales) we explicitly expect 
-the assumption to fail. \cite{scoccimarro2000} provides a clear 
+from Central Limit Theorem, the likelihood of the powerspectrum would 
+\emph{approach} a Gaussian distribution. In practice with finite survey 
+volume, shot noise, and systematic effects 
+
+
+the Gaussian likelihood assumption cannot be true for the powerspectrum. 
+In fact, in low signal-to-noise regimes we explicitly expect the 
+assumption to fail. \cite{scoccimarro2000} provides a clear 
 demonstration of the \todo{finish this sentence}. 
+
+%At scales where non-linear effects become important, k ≈ 0.2 − 0.3 h/Mpc, the density field cannot be assumed to be Gaussian anymore. A complementary approach at these scales is to consider that the power spectrum distribution about its mean is Gaussian; if there are enough independent modes contributing to a given shell in Fourier space, by the central limit theorem the distribution of the power spectrum should approach Gaussianity. However, due to the finite volume of the survey and shot noise, different modes are correlated, so it is not clear a priori at what scales Gaussianity applies. 
+
+\todo{talk about CMB likelihood analyses? Bring up sellentin et al.'s t-distribution stuff?}
 Hence for precise parameter constraints, LSS analyses using the Gaussian 
 pseudo-likelihood must insure that their analysis is conducted in sufficiently high 
 signal-to-noise regimes and test the impact of likelihood non-Gaussianity. 
 This is unfortunately not a part of the standard practice in LSS studies. 
 
-talk about CMB likelihood analyses? Bring up sellentin et al.'s t-distribution stuff?  
-
 % Data analysis can only lead to unbiased constraints on a physical theory if the employed likelihood is correct (e.g.  Trotta 2008; Mardia et al. 1979; Anderson 2003; Cramer 1946; Jeffreys 1961; Sun & Berger 2006). 
-%At scales where non-linear effects become important, k ≈ 0.2 − 0.3 h/Mpc, the density field cannot be assumed to be Gaussian anymore. A complementary approach at these scales is to consider that the power spectrum distribution about its mean is Gaussian; if there are enough independent modes contributing to a given shell in Fourier space, by the central limit theorem the distribution of the power spectrum should approach Gaussianity. However, due to the finite volume of the survey and shot noise, different modes are correlated, so it is not clear a priori at what scales Gaussianity applies. 
 
 In this paper we investigate the impact of the likelihood Gaussianity
 assumption on the two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut)
@@ -504,17 +508,20 @@ the divergences to only the monopole and quadrupole, $\Delta \hat{D}$ decreases.
 This suggests that $P_\ell$ on large scales (low $k$) and the hexadecapole 
 contribute most to the non-Gaussianity of the $P_\ell$ likelihood. 
 
-For $\zeta$, we find a relatively large discrepancy between the $\hat{D}$ 
-distributions. This is consistent with the expectation that the true 
+For $\zeta$, we find relatively large discrepancies between the $\hat{D}$ 
+distributions. This is consistent with the fact that the true 
 $\zeta$ likelihood distribution is likely Poisson, not Gaussian, 
 similar to the likelihood of observed cluster counts~\citep{cash1979,planckcollaboration2014,ade2016}. 
 The complicated connection between groups identified with a FoF 
 algorithm and the underlying matter overdensity makes writing down 
 the exact $\zeta$ likelihood function tremendously difficult. Nevertheless, 
-we expect the likelihood to be non-Gaussian. In order to better understand
-the source of non-Gaussianity, we repeat the divergence comparison excluding
-the highest $N$ bin. We find \todo{something}. When we instead exclude the 
-lowest $N$ bin, we find \todo{something}. \todo{conclusion about this}.   
+we expect the likelihood to be non-Gaussian. We again repeat the 
+divergence comparison using different $N$ ranges to better understand 
+the source of non-Gaussianity. When we exclude the highest $N$ bin, 
+$\Delta \hat{D}$ decreases significantly. On the other hand, 
+$\Delta \hat{D}$ is not significantly impacted when we exclude
+the lowest $N$ bin. High richness groups contibute most to the 
+non-Gaussianity of the $\zeta$ likelihood.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 1 
@@ -660,7 +667,7 @@ According to BIC, models with higher likelihood are preferred; however,
 to address the concern of overfitting, BIC introduces a \emph{penalty} term 
 for the number of parameters in the model: 
 \beq \label{eq:bic}
-\mathrm{BIC} = -2\,\mathrm{ln}\,\mathcal{L} + N_\mathrm{par}\,\mathrm{ln}N_\mathrm{data}.
+\mathrm{BIC} = -2\,\mathrm{ln}\,\mathcal{L} + N_\mathrm{par}\,\mathrm{ln}\,N_\mathrm{data}.
 \eeq
 We select $k$ based on the number of components in the model with the 
 lowest BIC. Of the three panels in Figure~\ref{fig:gmm_ped}, the GMM 
@@ -957,12 +964,13 @@ confidence intervals of the updated and original posteriors.
 The boxes and ``whiskers'' repesent the $68\%$ and $95\%$ 
 confidence intervals, respectively. The median and $68\%$ 
 confidence intervals of the posteriors are listed in Table~\ref{tab:posterior}.
-$f \sigma_8$ and $b_2 \sigma_8$ are the main parameters with 
-noticeable change in their posteriors. The posterior of $b_2 \sigma_8$
-broadens from \todo{number} to \todo{number} once likelihood 
+$f \sigma_8$ and $b_2^\mathrm{SGC} \sigma_8$ are the main parameters with 
+noticeable change in their posteriors. The posterior of $b_2^\mathrm{SGC} \sigma_8$
+broadens from $0.476^{+1.262}_{-1.175}$ to $0.422^{+1.517}_{-1.377}$ once likelihood 
 non-Gaussianity is incorporated. Meanwhile, the $f \sigma_8$ posterior
-shifts from \todo{number} to \todo{number}. The other parameter 
-constraints, however, remain largely unaffected by likelihood non-Gaussianity. 
+shifts from $0.478^{+0.053}_{-0.049}$ to $0.456^{+0.059}_{-0.049}$, which 
+corresponds to a  shift of $0.44 \sigma$. The other parameter constraints, 
+however, remain largely unaffected by likelihood non-Gaussianity. 
 
 Focusing on the main cosmological parameters $f \sigma_8$, 
 $\alpha_\parallel$, and $\alpha_\perp$, we present their 
@@ -980,11 +988,11 @@ Despite its impact on $f \sigma_8$ and $b_2^\mathrm{SGC} \sigma_8$,
 overall, likelihood non-Gaussianity does \emph{not}
 significantly impact the parameter constraints of the $P_\ell$ 
 analysis. $b_2^\mathrm{SGC} \sigma_8$ is a poorly constrained nuisance 
-parameter. Although using the pseudo-likelihood noticeably 
-biases the $f \sigma_8$ constraint, the impact relative to 
-its uncertainty is small: \todo{numbers}. In retrospect, the fact that the $P_\ell$
-analysis is largely unaffected by likelihood non-Gaussianity is not a 
-big surprise. It's consistent with the divergences in 
+parameter. Although using the pseudo-likelihood noticeably biases 
+the $f \sigma_8$ constraint, the impact relative to its uncertainty 
+is small --- less than $0.5 \sigma$. In retrospect, the fact that 
+the $P_\ell$ analysis is largely unaffected by likelihood 
+non-Gaussianity is not a big surprise. It's consistent with the divergences in 
 Figure~\ref{fig:div_gauss}, which found relatively small discrepancies 
 between the likelihood and pseudo-likelihood. Furthermore, 
 the Gaussian pseudo-likelihood assumption for $P_\ell$ 
@@ -1091,7 +1099,7 @@ accounting for likelihood non-Gaussianity in parameter inference of
 LSS studies. One of the main results of the \Sinh~HOD analysis, 
 is that the $\Lambda$CDM + HOD model can successful 
 fit either $\zeta(N)$ or the project two-point correlation function 
-$w_p(r_p)$, but struggles to jointly fit both (see Figure\todo{stuff}). Such tensions suggests 
+$w_p(r_p)$, but struggles to jointly fit both (see Figure~10). Such tensions suggests 
 that the `vanilla' HOD model may not be sufficiently flexible in
 describing the galaxy-halo connection. Likelihood non-Gaussianity 
 impacts this result. Once likelihood non-Gaussianity is included in 
@@ -1100,23 +1108,25 @@ relaxing the tensions. We examine the effect of likelihood non-Gaussianity
 for HOD parameter constraints in more detail in Hahn et al. (in prep.). 
 
 Even for the $P_\ell$ analysis, the impact of likelihood non-Gaussianity 
-on the parameter constraints cannot easily be dismissed as we demand 
-increasingly more precise constraints.  
-\todo{maybe some handwavy back of the envelope argument with DESI?} \footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}
-The future, however, is encouraging in this regard. 
+on the parameter constraints cannot be easily dismissed as we demand 
+increasingly more precise constraints from future experiments. Using the 
+pseudo-likelihood biases the $f\sigma_8$ constraints by $0.5\%$. Meanwhile, 
+the Dark Energy Spectroscopic Instrument~\citep[DESI;][]{levi2013}, for 
+instance, seeks to constrain $f\sigma_8$ to within a percent 
+\footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}. The future, however, is encouraging in this regard. 
 Future surveys will expand the cosmic volumes probed by galaxies 
 and therefore increase the number of modes on all scales. Even as they
 seek to extend the $k$ range of analyses, thanks to the Central Limit 
 Theorm, we consequently expect likelihood non-Gaussianity to have a 
-smaller effect. However, for higher order statistics such as the 
-bispectrum, which has lower 
-signal-to-noise on large scales~\citep{sefusatti2005}, likelihood 
-non-Gaussianity \todo{finish}. 
-Fortunately the methods we present in this paper can easily be extended 
-to other observables and analyses. 
+smaller effect. For higher order statistics, however, likelihood
+non-Gaussianity may still have a significant effect. After all, even 
+for the same survey, \cite{scoccimarro2000} found that the bispectrum
+likelihood is more non-Gaussian than the powerspectrum likelihood.  
+%non-Gaussianity bispectrum, which has lower signal-to-noise on large scales~\citep{sefusatti2005},
+Fortunately the methods we present in this paper
+can easily be extended to other observables and analyses. 
 
-
-\todo{paragraph that restates what we did} 
+%\todo{paragraph that restates what we did} 
 %make it straightforward to quantify likeilhood non-Gaussianity and examine the effect on parameter inference. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
