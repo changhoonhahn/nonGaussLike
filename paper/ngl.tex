@@ -123,15 +123,14 @@ that the density field is a Gaussian random field, which it approximately
 is, the powerspectrum of a specific mode would follow a chi-squared 
 distribution. With sufficiently many independent modes contributing, 
 from Central Limit Theorem, the likelihood of the powerspectrum would 
-\emph{approach} a Gaussian distribution. In practice with finite survey 
-volume, shot noise, and systematic effects 
-
-
-the Gaussian likelihood assumption cannot be true for the powerspectrum. 
-In fact, in low signal-to-noise regimes we explicitly expect the 
-assumption to fail. \cite{scoccimarro2000} provides a clear 
-demonstration of the \todo{finish this sentence}. 
-
+\emph{approach} a Gaussian distribution. In practice, due to finite 
+survey volume, shot noise, and systematic effects different modes
+are correlated and the Gaussian likelihood assumption cannot be true 
+for the powerspectrum. In low signal-to-noise regimes we explicitly 
+expect the Gaussian assumption to fail. \cite{scoccimarro2000} 
+\todo{provides an excellent example of how the Gaussianity 
+illustrates how the }
+this for the powerspectrum. 
 %At scales where non-linear effects become important, k ≈ 0.2 − 0.3 h/Mpc, the density field cannot be assumed to be Gaussian anymore. A complementary approach at these scales is to consider that the power spectrum distribution about its mean is Gaussian; if there are enough independent modes contributing to a given shell in Fourier space, by the central limit theorem the distribution of the power spectrum should approach Gaussianity. However, due to the finite volume of the survey and shot noise, different modes are correlated, so it is not clear a priori at what scales Gaussianity applies. 
 
 \todo{talk about CMB likelihood analyses? Bring up sellentin et al.'s t-distribution stuff?}
@@ -480,48 +479,49 @@ and KL (right) divergences (orange) between the likelihood and the
 Gaussian pseudo-likelihood for the \Beut~$P_\ell$ (top) and \Sinh~$\zeta$ (bottom) 
 analyses: $\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$. For reference, we also 
 include (in blue) divergence estimates of the pseudo-likelihood onto itself, 
-which we calculate as $\hat{D}(\Xref \parallel \Yref)$, where $\Xref$ is a 
+which we calculate as $\hat{D}(\Xref \parallel \Yref)$. $\Xref$ is a 
 data vector with the same dimension as $\Xmock$ sampled from the pseudo-likelihood 
 $\mathcal{N}$. $\hat{D}$s are \emph{estimates} of the true divergence, 
-therefore we resample $\Yref$ and compute each of them \todo{100} times. 
-The distributions in Figure~\ref{fig:div_gauss} are the $\hat{D}$ 
-distributions, which illustrate the uncertainty of $\hat{D}$. The 
-discrepancy between the $\hat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$
-distributions and the reference $\hat{D}(\Xref \parallel \Yref)$ distribution 
-($\Delta \hat{D}$) implies that the pseudo-likelihood is not an accurate estimate of the 
-likelihood. Each panel of Figure~\ref{fig:div_gauss} show significant 
-discrepancy between the two distributions. In other words, \emph{both 
+therefore we resample $\Yref$ and compute each $\hat{D}$ \todo{100} times. 
+Figure~\ref{fig:div_gauss} actually presents the $\hat{D}$ distributions, 
+which also illustrate the uncertainty of $\hat{D}$. The discrepancy between 
+the $\hat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$
+distributions and the reference $\hat{D}(\Xref \parallel \Yref)$ distributions 
+($\Delta \hat{D}$) quantify the discrepancy between the pseudo-likelihood
+and the likelihood. Each panel of Figure~\ref{fig:div_gauss} shows significant 
+discrepancy between the two distributions --- \emph{both 
 the $P_\ell(k)$ and $\zeta(N)$ likelihoods are significantly non-Gaussian}. 
 
-Although significant, the discrepancies between the $\hat{D}$ distributions 
-for $P_\ell$ are relatively small. This is expected since, as we mentioned 
-earlier, the Gaussian pseudo-likelihood assumption for $P_\ell$ is motivated 
-by the Central Limit Theorem. As long as enough modes contribute to the 
-powerspectrum, the likelihood approaches a Gaussian. In the restrictive 
-$k$ range of the \Beut~analysis ($0.01 < k < 0.15$ for $\ell = 0$ and $2$; $0.01 < k < 0.15$ for $\ell = 4$), 
-one would expect this to mostly be the case. In order to better understand 
-the source of non-Gaussianity, we repeat the divergence comparisons for 
-different $k$ ranges. When we set $k_\mathrm{min} = 0.05$, $\Delta \hat{D}$ 
-decreases. Meanwhile, when we set $k_\mathrm{max} = 0.1$ for the monopole 
-and quadrupole, $\Delta \hat{D}$ increases. Next, if we restrict 
-the divergences to only the monopole and quadrupole, $\Delta \hat{D}$ decreases. 
-This suggests that $P_\ell$ on large scales (low $k$) and the hexadecapole 
-contribute most to the non-Gaussianity of the $P_\ell$ likelihood. 
+%While signficant, the discrepancies between the $\hat{D}$ distributions for $P_\ell$ are relatively small. As we mention earlier, 
+The Gaussian pseudo-likelihood assumption for $P_\ell$ is motivated 
+by the Central Limit Theorem. If enough modes contribute to the 
+powerspectrum, then the likelihood approaches a Gaussian. Given the 
+survey volume of BOSS DR12 and the restrictive $k$ range of the \Beut~analysis 
+($0.01 < k < 0.15$ for $\ell = 0$ and $2$; $0.01 < k < 0.15$ for $\ell = 4$), 
+one would expect this to be mostly true. Although relatively small, we
+still find significant $\Delta \hat{D}$ and therefore likelihood non-Gaussinaity. 
+In order to better understand the source of this non-Gaussianity, 
+we repeat the divergence comparisons 
+for different $k$ ranges. If we set $k_\mathrm{min} = 0.05$, $\Delta \hat{D}$ 
+decreases. Meanwhile, when we set $k_\mathrm{max} = 0.1$ for all 
+multipoles, $\Delta \hat{D}$ increases. This suggests that the $P_\ell$ 
+likelihood is most non-Gaussian on large scales (low $k$). Furthermore,
+when we compare the divergences for just the monopole and quadrupole, 
+$\Delta \hat{D}$ decreases. Among the multipole, the hexadecapole 
+contributes most to the non-Gaussianity of the $P_\ell$ likelihood. 
 
-For $\zeta$, we find relatively large discrepancies between the $\hat{D}$ 
-distributions. This is consistent with the fact that the true 
-$\zeta$ likelihood distribution is likely Poisson, not Gaussian, 
-similar to the likelihood of observed cluster counts~\citep{cash1979,planckcollaboration2014,ade2016}. 
-The complicated connection between groups identified with a FoF 
-algorithm and the underlying matter overdensity makes writing down 
-the exact $\zeta$ likelihood function tremendously difficult. Nevertheless, 
-we expect the likelihood to be non-Gaussian. We again repeat the 
-divergence comparison using different $N$ ranges to better understand 
-the source of non-Gaussianity. When we exclude the highest $N$ bin, 
-$\Delta \hat{D}$ decreases significantly. On the other hand, 
-$\Delta \hat{D}$ is not significantly impacted when we exclude
-the lowest $N$ bin. High richness groups contibute most to the 
-non-Gaussianity of the $\zeta$ likelihood.
+For $\zeta$, the discrepancies between the $\hat{D}$ distributions 
+are consistent with the fact that the true $\zeta$ likelihood 
+distribution is likely Poisson, not Gaussian, similar to the likelihood 
+of observed cluster counts~\citep{cash1979,planckcollaboration2014,ade2016}. 
+Although the groups identified with a FoF algorithm do not correspond
+to clusters, we nevertheless expect the likelihood to be non-Gaussian. 
+We again repeat the divergence comparison for different $N$ ranges 
+to better understand the source of non-Gaussianity. Excluding the 
+lowest $N$ bin does not significantly impact $\Delta \hat{D}$. However, 
+when we exclude the highest $N$ bin, $\Delta \hat{D}$ decreases significantly. 
+We therefore find that the high richness end of $\zeta$ contibute most to 
+the non-Gaussianity of the $\zeta$ likelihood.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 1 
@@ -981,29 +981,27 @@ is reflected in the
 $(f\sigma_8, \alpha_\parallel)$ and $(\alpha_\perp, f\sigma_8)$ 
 contours (left and middle panels respectively). The 
 $(\alpha_\parallel, \alpha_\perp)$ distribution (right), however, show nearly 
-no change from the non-Gaussian likelihood. These joint posteriors 
-corroborate our conclusion from Figure~\ref{fig:pk_like}.
-
+no change from the non-Gaussian likelihood. %These joint posteriors corroborate our conclusion from Figure~\ref{fig:pk_like}.
 Despite its impact on $f \sigma_8$ and $b_2^\mathrm{SGC} \sigma_8$, 
 overall, likelihood non-Gaussianity does \emph{not}
 significantly impact the parameter constraints of the $P_\ell$ 
 analysis. $b_2^\mathrm{SGC} \sigma_8$ is a poorly constrained nuisance 
-parameter. Although using the pseudo-likelihood noticeably biases 
-the $f \sigma_8$ constraint, the impact relative to its uncertainty 
-is small --- less than $0.5 \sigma$. In retrospect, the fact that 
-the $P_\ell$ analysis is largely unaffected by likelihood 
-non-Gaussianity is not a big surprise. It's consistent with the divergences in 
+parameter. Although using the pseudo-likelihood biases $f \sigma_8$, 
+the impact relative to its uncertainty is small --- less than $0.5 \sigma$. 
+The fact that the $P_\ell$ analysis is largely unaffected by likelihood 
+non-Gaussianity is consistent with the divergences in 
 Figure~\ref{fig:div_gauss}, which found relatively small discrepancies 
-between the likelihood and pseudo-likelihood. Furthermore, 
-the Gaussian pseudo-likelihood assumption for $P_\ell$ 
-is motivated by the Central Limit Theorem: if enough modes contribute  
-to the powerspectrum, then the likelihood approaches a Gaussian. In 
-the restrictive $k$ range of the \Beut~analysis ($0.01 < k < 0.15$), 
-one would expect this to be the case. 
-\todo{When we repeat the comparison for the $P_\ell$ analysis without 
-the hexadecapole, we see even less impact on the parameter constraints. 
-This suggests that most of the non-Gaussianity in the likelihood comes 
-from the hexadecapole which has the lowest signal to noise.} 
+between the likelihood and pseudo-likelihood. 
+
+%Furthermore, the Gaussian pseudo-likelihood assumption for $P_\ell$ 
+%is motivated by the Central Limit Theorem: if enough modes contribute  
+%to the powerspectrum, then the likelihood approaches a Gaussian. In 
+%the restrictive $k$ range of the \Beut~analysis ($0.01 < k < 0.15$), 
+%one would expect this to be the case. 
+%\todo{When we repeat the comparison for the $P_\ell$ analysis without 
+%the hexadecapole, we see even less impact on the parameter constraints. 
+%This suggests that most of the non-Gaussianity in the likelihood comes 
+%from the hexadecapole which has the lowest signal to noise.} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 5 
@@ -1070,7 +1068,7 @@ distributions of the HOD parameters. Each of the parameter constraints
 for $\log\,M_\mathrm{min}$, $\log M_1$, and $\alpha$, are significantly 
 broader and also shifted compared to the pseudo-likelihood constraints
 (see Table~\ref{tab:posterior} for details). 
-The impact of likelihood non-Gaussianity is further emphasized by 
+The impact of likelihood non-Gaussianity is further emphasized in 
 the joint posterior distributions in Figure~\ref{fig:gmf_contour}.
 The $\log\,M_\mathrm{min}$ versus $\sigma_{\log M}$ and 
 $\log\,M_\mathrm{min}$ versus $\alpha$ contours are both shifted 
@@ -1081,10 +1079,10 @@ underestimates the uncertainty and biases the HOD parameter constraints
 of the \Sinh~$\zeta$ analysis.}
 
 The contrast between the pseudo-likelihood posteriors and our posteriors
-in Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~appropriately reflect 
+in Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~reflect 
 the divergences in Figure~\ref{fig:div_gauss}, which revealed significant
-discrepancy between the $\zeta$ likelihood distribution and the 
-pseudo-likelihood. These divergences and posteriors are consistent 
+discrepancy between the $\zeta$ likelihood and the pseudo-likelihood. 
+These divergences and posteriors are consistent 
 with the expectation that the true $\zeta$ likelihood distribution is likely Poisson, 
 rather than Gaussian, similar to the likelihood of observed cluster
 counts~\citep{cash1979,planckcollaboration2014,ade2016}. However, 
@@ -1112,8 +1110,9 @@ on the parameter constraints cannot be easily dismissed as we demand
 increasingly more precise constraints from future experiments. Using the 
 pseudo-likelihood biases the $f\sigma_8$ constraints by $0.5\%$. Meanwhile, 
 the Dark Energy Spectroscopic Instrument~\citep[DESI;][]{levi2013}, for 
-instance, seeks to constrain $f\sigma_8$ to within a percent 
-\footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}. The future, however, is encouraging in this regard. 
+instance, seeks to constrain $f\sigma_8$ to within a 
+percent\footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}. 
+The future, however, is encouraging in this regard. 
 Future surveys will expand the cosmic volumes probed by galaxies 
 and therefore increase the number of modes on all scales. Even as they
 seek to extend the $k$ range of analyses, thanks to the Central Limit 
@@ -1122,7 +1121,8 @@ smaller effect. For higher order statistics, however, likelihood
 non-Gaussianity may still have a significant effect. After all, even 
 for the same survey, \cite{scoccimarro2000} found that the bispectrum
 likelihood is more non-Gaussian than the powerspectrum likelihood.  
-%non-Gaussianity bispectrum, which has lower signal-to-noise on large scales~\citep{sefusatti2005},
+%non-Gaussianity bispectrum, which has lower signal-to-noise on 
+%large scales~\citep{sefusatti2005},
 Fortunately the methods we present in this paper
 can easily be extended to other observables and analyses. 
 
