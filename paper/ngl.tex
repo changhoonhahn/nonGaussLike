@@ -106,15 +106,31 @@ large-scale structure of universe
 }
 
 \section{Introduction}
+Bayesian parameter inferece has become the standard framework for 
+deriving cosmological parameters of interest from observed 
+measurements such as the galaxy powerspectrum or two-point correlation 
+function in large scale scturture (LSS) studies and cosmology analyses 
+in general. From Bayes rule, 
+\beq
+p( \theta\,|\,x) \propto p( x\,|\,\theta) p(\theta).
+\eeq
+the posterior parameter constraints can be calculated from the prior 
+and the likelihood -- probability of the data given the theoretical model.
+Since anlayses choose priors, parameter inference ultimately boils down 
+to evaluating the likelihood. Hence it goes without say that our analyses can 
+only lead to unbiased constraints if the employed likelihood is correct. 
 
-
-\begin{itemize}
-    \item Talk about the use of Bayesian parameter inference and getting the posterior in LSS cosmology 
-    \item Explain the two major assumptions that go into evaluating the likelihood
-    \item Emphasize that we are not talking about non-Gaussian contributions to the likelihood
-    \item Emphasize the scope of this paper is to address whether one of the assumptions matters for 
-        galaxy clustering analyses. 
-\end{itemize}
+In present day LSS analyses, two major assumptions go into evaluating the 
+likelihood. First, the likelihood is assumed to have a Gaussian functional 
+form. LSS analyses employ a Gaussian \emph{pseudo}-likelihood. 
+\todo{sentence about how this is different than non-Gaussian terms in the covariance matrix}.
+Second, the covariance matrix used in evaluating the Gaussian pseudo-likelihood
+is assumed to be independent of the parameters $\theta$. \todo{explain 
+in more detail}. The dependence of the covariance matrix 
+on cosmological parameters has been shown to have a significant effect
+on parameter constraints~\citep[\emph{e.g.}][]{eifler2009}. In this paper, 
+we focus on evaluating the impact of the first assumption (\emph{i.e.} the 
+Gaussian pseudo-likleihood) on cosmological parameter constraints. 
 
 The motivation for the Gaussian pseudo-likelihood ultimately stems 
 from the Central Limit Theorem. The powerspectrum of the density field, 
@@ -991,8 +1007,8 @@ the impact relative to its uncertainty is small --- less than $0.5 \sigma$.
 The fact that the $P_\ell$ analysis is largely unaffected by likelihood 
 non-Gaussianity is consistent with the divergences in 
 Figure~\ref{fig:div_gauss}, which found relatively small discrepancies 
-between the likelihood and pseudo-likelihood. 
-\todo{an extra sentence?}
+between the likelihood and pseudo-likelihood. It also illustrates
+the remarkable effectiveness of the Central Limit Theorem. %for the powerspectrum multipole over the \Beut~$k$ range. 
 
 %Furthermore, the Gaussian pseudo-likelihood assumption for $P_\ell$ 
 %is motivated by the Central Limit Theorem: if enough modes contribute  
@@ -1117,7 +1133,7 @@ the number of modes on all scales. Even as they seek to extend the $k$
 range of analyses, thanks to the Central Limit Theorm, we consequently expect 
 likelihood non-Gaussianity to have a smaller effect. For higher order statistics, 
 however, likelihood non-Gaussianity will still have a significant effect. After 
-all, even for the same survey, \cite{scoccimarro2000} found that the reduced 
+all, for a given survey, \cite{scoccimarro2000} found that the reduced 
 bispectrum likelihood is significantly more non-Gaussian than the powerspectrum 
 likelihood.  
 %non-Gaussianity bispectrum, which has lower signal-to-noise on large scales~\citep{sefusatti2005},
@@ -1231,9 +1247,10 @@ for covariance matrix estimation in these analyses, with non-parametric
 divergence estimators to measure the divergences between the $P_\ell$ and 
 $\zeta$ likelihoods and the Gaussian pseudo-likelihoods from \Beut~and~\Sinh. 
 For both the $P_\ell$ and $\zeta$ likelihoods, the divergences reveal 
-significant likelihood non-Gaussianity. \todo{More details on how 
-the $\zeta$ likelihood is more non-Gaussian than the $P_\ell$ 
-likelihood}
+significant likelihood non-Gaussianity. For the $P_\ell$ likelihood,
+large scales (low $k$) and the hexadecapole contribute most to the
+relatively small non-Gaussianity. Meanwhile, for the $\zeta$ likelihood, 
+the high richness end of $\zeta$ contribute most to the non-Gaussianity. 
 
 From the same mock catalogs of~\Beut~and~\Sinh, we use non-parametric density 
 estimation to construct estimates of the likelihood distribution 
@@ -1258,7 +1275,7 @@ they allow us to derive more accurate posterior probability distributions
 than with Gaussian pseudo-likelihoods. By comparing our posteriors to the
 parameter constraints from \Beut~and~\Sinh, we find that likelihood 
 non-Gaussianity does not significantly impact the $P_\ell$ analysis of \Beut. 
-Among the non-nuissance parameters, only $f\sigma_8$ is impacted by \todo{number}. 
+Among the non-nuissance parameters, only $f\sigma_8$ is impacted by $0.44\sigma$. 
 Meanwhile for the \Sinh~$\zeta$ analysis, likelihood non-Gaussianity 
 significant impacts the posterior distributions of the HOD parameter. 
 Using the pseudo-likelihood significantly underestimates the width of the 
@@ -1278,10 +1295,10 @@ to reduce the impact of likelihood non-Gaussianity. Likewise, we expect
 future surveys to also reduce the impact of likelihood non-Gaussianity on 
 $\zeta$ analysis with the same multiplicity range, since larger cosmic 
 volumes will probe more high multiplicity groups. For a wider multiplicity 
-range, however, likelihood non-Gaussianity may still be a 
-significant effect. For higher order statistics such as the galaxy bispectrum 
-or three-point function, even for future surveys, likelihood non-Gaussianity 
-may still be a significant effect to consider for parameter inference.  
+range, however, likelihood non-Gaussianity may still be a significant effect. 
+For higher order statistics such as the galaxy bispectrum or three-point 
+function, even for future surveys, likelihood non-Gaussianity 
+will likely be a significant effect to consider for parameter inference.  
 Regardless of our expectation, for ever more precise parameter inference the Gaussian 
 likelihood assumption must be extensively tested. The divergence and likelihood 
 estimations we introduce in this paper provide a straightforward framework
@@ -1295,7 +1312,7 @@ write down, methods for likelihood-free inference such as Approximate Bayesian
 Computation~\citep[ABC;][]{hahn2017a,kacprzak2017,alsing2017} have recently 
 been introduced to LSS studies. 
 Although as a likelihood-free inference method, ABC has the advantage 
-of relaxing any assumption on the likelihood, even with smart sampling methods 
+of relaxing \emph{any} assumption on the likelihood, even with smart sampling methods 
 like Population Monte Carlo, it requires an expensive generative forward 
 model to be computed far more times than the number of mocks required for 
 covariance matrix estimation. Our methods (especially the ICA method)
