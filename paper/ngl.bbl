@@ -209,14 +209,14 @@ Guo, H., Zehavi, I., \& Zheng, Z. 2012,
   Astrophysical Journal}, 756, 127}
 
 \bibitem[{Hahn {et~al.}(2017{\natexlab{a}})Hahn, Scoccimarro, Blanton, Tinker,
-  \& Rodr{\'\i}guez-Torres}]{hahn2017}
+  \& Rodr{\'\i}guez-Torres}]{hahn2017c}
 Hahn, C., Scoccimarro, R., Blanton, M.~R., Tinker, J.~L., \&
   Rodr{\'\i}guez-Torres, S.~A. 2017{\natexlab{a}},
   \href{http://dx.doi.org/10.1093/mnras/stx185}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 467, 1940}
 
 \bibitem[{Hahn {et~al.}(2017{\natexlab{b}})Hahn, Vakili, Walsh, Hearin, Hogg,
-  \& Campbell}]{hahn2017a}
+  \& Campbell}]{hahn2017b}
 Hahn, C., Vakili, M., Walsh, K., {et~al.} 2017{\natexlab{b}},
   \href{http://dx.doi.org/10.1093/mnras/stx894}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 469, 2791}
@@ -249,6 +249,11 @@ H{\'e}rault, J., \& Ans, B. 1984, \JournalTitle{Comptes Rendus de
 \bibitem[{Hogg {et~al.}(2010)Hogg, Bovy, \& Lang}]{hogg2010}
 Hogg, D.~W., Bovy, J., \& Lang, D. 2010, \JournalTitle{ArXiv e-prints}, 1008,
   arXiv:1008.4686
+
+\bibitem[{Hu \& White(2001)}]{hu2001}
+Hu, W., \& White, M. 2001,
+  \href{http://dx.doi.org/10.1086/321380}{\JournalTitle{The Astrophysical
+  Journal}, 554, 67}
 
 \bibitem[{Hyv{\"a}rinen(1998)}]{hyvarinen1998}
 Hyv{\"a}rinen, A. 1998, in Advances in {{Neural Information Processing
@@ -334,6 +339,13 @@ Leroux, B.~G. 1992,
   \href{http://dx.doi.org/10.1214/aos/1176348772}{\JournalTitle{The Annals of
   Statistics}, 20, 1350}
 
+\bibitem[{Levi {et~al.}(2013)Levi, Bebek, Beers, Blum, Cahn, Eisenstein,
+  Flaugher, Honscheid, Kron, Lahav, McDonald, Roe, Schlegel, \&
+  {collaboration}}]{levi2013}
+Levi, M., Bebek, C., Beers, T., {et~al.} 2013, \JournalTitle{arXiv:1308.0847
+  [astro-ph]}, \href{http://arxiv.org/abs/1308.0847}{{\sffamily arXiv:1308.0847
+  [astro-ph]}}
+
 \bibitem[{Liddle(2007)}]{liddle2007}
 Liddle, A.~R. 2007,
   \href{http://dx.doi.org/10.1111/j.1745-3933.2007.00306.x}{\JournalTitle{Monthly
@@ -358,6 +370,11 @@ Mohammed, I., Seljak, U., \& Vlah, Z. 2017,
   \href{http://dx.doi.org/10.1093/mnras/stw3196}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 466, 780}
 
+\bibitem[{Morrison \& Schneider(2013)}]{morrison2013}
+Morrison, C.~B., \& Schneider, M.~D. 2013,
+  \href{http://dx.doi.org/10.1088/1475-7516/2013/11/009}{\JournalTitle{Journal
+  of Cosmology and Astro-Particle Physics}, 11, 009}
+
 \bibitem[{Neal \& Hinton(1998)}]{neal1998}
 Neal, R.~M., \& Hinton, G.~E. 1998,
   \href{http://dx.doi.org/10.1007/978-94-011-5014-9_12}{in Learning in
@@ -381,6 +398,12 @@ Ntampaka, M., Trac, H., Sutherland, D.~J., {et~al.} 2015,
   \href{http://dx.doi.org/10.3847/0004-637X/831/2/135}{\JournalTitle{The
   Astrophysical Journal}, 831, 135}
 
+\bibitem[{O'Connell {et~al.}(2016)O'Connell, Eisenstein, Vargas, Ho, \&
+  Padmanabhan}]{oconnell2016}
+O'Connell, R., Eisenstein, D., Vargas, M., Ho, S., \& Padmanabhan, N. 2016,
+  \href{http://dx.doi.org/10.1093/mnras/stw1821}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 462, 2681}
+
 \bibitem[{Parkinson {et~al.}(2012)Parkinson, Riemer-S{\o}rensen, Blake, Poole,
   Davis, Brough, Colless, Contreras, Couch, Croom, Croton, Drinkwater, Forster,
   Gilbank, Gladders, Glazebrook, Jelliffe, Jurek, Li, Madore, Martin, Pimbblet,
@@ -400,7 +423,7 @@ P{\'o}czos, B., Szab{\'o}, Z., \& Schneider, J. 2011, in 2011 19th {{European
   Signal Processing Conference}}, 1718
 
 \bibitem[{Poczos {et~al.}(2012{\natexlab{a}})Poczos, Xiong, \&
-  Schneider}]{poczos2012a}
+  Schneider}]{poczos2012}
 Poczos, B., Xiong, L., \& Schneider, J. 2012{\natexlab{a}},
   \JournalTitle{arXiv:1202.3758 [cs, stat]},
   \href{http://arxiv.org/abs/1202.3758}{{\sffamily arXiv:1202.3758 [cs, stat]}}
@@ -409,12 +432,6 @@ Poczos, B., Xiong, L., \& Schneider, J. 2012{\natexlab{a}},
   Schneider}]{poczos2012b}
 Poczos, B., Xiong, L., Sutherland, D., \& Schneider, J. 2012{\natexlab{b}},
   \JournalTitle{Machine Learning Department}
-
-\bibitem[{P{\'o}czos {et~al.}(2012)P{\'o}czos, Xiong, Sutherland, \&
-  Schneider}]{poczos2012}
-P{\'o}czos, B., Xiong, L., Sutherland, D.~J., \& Schneider, J. 2012,
-  \href{http://dx.doi.org/10.1109/CVPR.2012.6248028}{in 2012 {{IEEE
-  Conference}} on {{Computer Vision}} and {{Pattern Recognition}}}, 2989
 
 \bibitem[{Press {et~al.}(1992)Press, Teukolsky, Vetterling, \&
   Flannery}]{Press:1992:NRC:148286}
@@ -470,18 +487,23 @@ Scoccimarro, R. 1998,
   Review D}, 92}, \href{http://arxiv.org/abs/1506.02729}{{\sffamily
   arXiv:1506.02729}}
 
+\bibitem[{Scoccimarro {et~al.}(1999)Scoccimarro, Couchman, \&
+  Frieman}]{scoccimarro1999}
+Scoccimarro, R., Couchman, H. M.~P., \& Frieman, J.~A. 1999,
+  \href{http://dx.doi.org/10.1086/307220}{\JournalTitle{The Astrophysical
+  Journal}, 517, 531}
+
 \bibitem[{Scott(1992)}]{scott1992}
 Scott, D.~W. 1992, Multivariate {{Density Estimation}}: {{Theory}},
   {{Practice}}, and {{Visualization}} ({Wiley})
 
-\bibitem[{Sellentin {et~al.}(2017)Sellentin, Jaffe, \& Heavens}]{sellentin2017}
-Sellentin, E., Jaffe, A.~H., \& Heavens, A.~F. 2017,
-  \JournalTitle{arXiv:1709.03452 [astro-ph, stat]},
-  \href{http://arxiv.org/abs/1709.03452}{{\sffamily arXiv:1709.03452 [astro-ph,
-  stat]}}
+\bibitem[{Sellentin \& Heavens(2017)}]{sellentin2017}
+Sellentin, E., \& Heavens, A.~F. 2017, \JournalTitle{arXiv:1707.04488
+  [astro-ph]}, \href{http://arxiv.org/abs/1707.04488}{{\sffamily
+  arXiv:1707.04488 [astro-ph]}}
 
 \bibitem[{Sinha {et~al.}(2017)Sinha, Berlind, McBride, Scoccimarro, Piscionere,
-  \& Wibking}]{sinha2017a}
+  \& Wibking}]{sinha2017}
 Sinha, M., Berlind, A.~A., McBride, C.~K., {et~al.} 2017,
   \JournalTitle{arXiv:1708.04892 [astro-ph]},
   \href{http://arxiv.org/abs/1708.04892}{{\sffamily arXiv:1708.04892
@@ -534,6 +556,11 @@ Wang, Q., Sanjeev, K., \& Sergio, V. 2009, \JournalTitle{IEEE TRANSACTIONS ON
 Wasserman, L. 2004, All of {{Statistics}}: {{A Concise Course}} in
   {{Statistical Inference}} ({{Springer Texts}} in {{Statistics}}) ({Springer})
 
+\bibitem[{White \& Padmanabhan(2015)}]{white2015}
+White, M., \& Padmanabhan, N. 2015,
+  \href{http://dx.doi.org/10.1088/1475-7516/2015/12/058}{\JournalTitle{Journal
+  of Cosmology and Astro-Particle Physics}, 12, 058}
+
 \bibitem[{Wilkinson {et~al.}(2015)Wilkinson, Maraston, Thomas, Coccato,
   Tojeiro, Cappellari, Belfiore, Bershady, Blanton, Bundy, Cales, Cherinka,
   Drory, Emsellem, Fu, Law, Li, Maiolino, Masters, Tremonti, Wake, Wang,
@@ -560,9 +587,9 @@ Zhao, C., Kitaura, F.-S., Chuang, C.-H., {et~al.} 2015,
   \href{http://dx.doi.org/10.1093/mnras/stv1262}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 451, 4266}
 
-\bibitem[{Zheng {et~al.}(2007)Zheng, Coil, \& Zehavi}]{zheng2007}
-Zheng, Z., Coil, A.~L., \& Zehavi, I. 2007,
-  \href{http://dx.doi.org/10.1086/521074}{\JournalTitle{The Astrophysical
-  Journal}, 667, 760}
+\bibitem[{Zheng \& Weinberg(2007)}]{zheng2007}
+Zheng, Z., \& Weinberg, D.~H. 2007,
+  \href{http://dx.doi.org/10.1086/512151}{\JournalTitle{The Astrophysical
+  Journal}, 659, 1}
 
 \end{thebibliography}

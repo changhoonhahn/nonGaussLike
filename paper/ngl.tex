@@ -24,7 +24,7 @@
 
 % citation alias
 \defcitealias{beutler2017}{B2017}
-\defcitealias{sinha2017a}{S2017}
+\defcitealias{sinha2017}{S2017}
 
 % math shih
 \newcommand{\setof}[1]{\left\{{#1}\right\}}
@@ -51,7 +51,7 @@
 \newcommand{\Yref}{{\bf Y}^\mathrm{ref}}
 \newcommand{\Ralpha}{R\'enyi-$\alpha$}
 \newcommand{\Beut}{\citetalias{beutler2017}}
-\newcommand{\Sinh}{\citetalias{sinha2017a}}
+\newcommand{\Sinh}{\citetalias{sinha2017}}
 
 \newcommand{\patchy}{{\fontshape\scdefault\selectfont patchy}}
 
@@ -69,7 +69,7 @@
     assumption in their Bayesian parameter inference --- the likelihood has 
     a Gaussian functional-form. We investigate the impact of this assumption 
     on two recent LSS analyses: the \cite{beutler2017}~powerspectrum multipole ($P_\ell$) analysis and 
-    the \cite{sinha2017a}~group multiplicity function ($\zeta$) analysis. Using non-parametric 
+    the \cite{sinha2017}~group multiplicity function ($\zeta$) analysis. Using non-parametric 
     divergence estimators on mock catalogs originally constructed for covariance matrix 
     estimation in these analyses, we identify significant non-Gaussianity for both 
     $P_\ell$ and $\zeta$ 
@@ -106,46 +106,59 @@ large-scale structure of universe
 }
 
 \section{Introduction}
-Bayesian parameter inferece has become the standard framework for 
-deriving cosmological parameters of interest from observed 
-measurements such as the galaxy powerspectrum or two-point correlation 
-function in large scale scturture (LSS) studies and cosmology analyses 
-in general. From Bayes rule, 
+Bayesian parameter inference provides the standard framework for 
+deriving cosmological parameters from observation in large scale 
+structure (LSS) studies and cosmology in general (\todo{citations}). 
+%observed measurements such as the galaxy powerspectrum or two-point correlation function in large scale scturture (LSS) studies and cosmology analyses in general. 
+Using Bayes' rule, 
 \beq
-p( \theta\,|\,x) \propto p( x\,|\,\theta) p(\theta).
+p( \theta\,|\,x) \propto p( x\,|\,\theta) \, p(\theta)
 \eeq
-the posterior parameter constraints can be calculated from the prior 
-and the likelihood -- probability of the data given the theoretical model.
-Since anlayses choose priors, parameter inference ultimately boils down 
-to evaluating the likelihood. Hence it goes without say that our analyses can 
-only lead to unbiased constraints if the employed likelihood is correct. 
+the posterior probabilisty distributions of cosmological parameters
+can be derived from observed measurements such as the galaxy 
+powerspectrum. All that's required is the prior distribution of the 
+parameters, $p(\theta)$, and the likelihood, $p( x\,|\,\theta)$ --- 
+probability of the data (obsevation) given the theoretical model.
+Priors are selected in analyses; so parameter inference ultimately 
+boils down to evaluating the likelihood. It consequently goes without 
+say that our analyses can only lead to unbiased constraints if the our 
+likelihood is correct. 
 
 In present day LSS analyses, two major assumptions go into evaluating the 
 likelihood. First, the likelihood is assumed to have a Gaussian functional 
-form. LSS analyses employ a Gaussian \emph{pseudo}-likelihood. 
-\todo{sentence about how this is different than non-Gaussian terms in the covariance matrix}.
-Second, the covariance matrix used in evaluating the Gaussian pseudo-likelihood
-is assumed to be independent of the parameters $\theta$. \todo{explain 
-in more detail}. The dependence of the covariance matrix 
-on cosmological parameters has been shown to have a significant effect
-on parameter constraints~\citep[\emph{e.g.}][]{eifler2009}. In this paper, 
-we focus on evaluating the impact of the first assumption (\emph{i.e.} the 
-Gaussian pseudo-likleihood) on cosmological parameter constraints. 
+form: 
+\beq
+p(x\,|\,\theta) = \frac{1}{(2\pi)^{d/2} \sqrt{\mathrm{det}(C(\theta))}}\,\,\mathrm{exp}\bigg[\frac{1}{2}(x - m(\theta))^{t} C(\theta)^{-1} (x - m(\theta))\bigg].
+\eeq
+$d$ is the dimension of $x$, $m(\theta)$ is the theoretical model, and $C$ 
+is the covariance matrix. Even if analyses use covariance matrices 
+that account for non-Gaussiance covariance~\citep[\emph{e.g.}][]{scoccimarro1999, hu2001, oconnell2016}, 
+they still use a Gaussian functional form for the likelihood. They 
+therefore still employ a Gaussian \emph{pseudo}-likelihood. Second, the 
+covariance matrix used in evaluating the Gaussian pseudo-likelihood
+is assumed to be independent of cosmology. The covariance matrix is 
+evaluated only at a selected fiducial cosmology and used throughout 
+the analysis. However, in principle, the covariance matrix depends on $\theta$, 
+and the dependence has been shown to have a significant effect 
+on parameter constraints~\citep[\emph{e.g.}][]{eifler2009, morrison2013, white2015}. 
+In this paper, we focus on the, first, Gaussian pseudo-likelihood assumption. 
+We will test the assumption and quantify the impact of it on cosmological 
+parameter constraints. 
 
 The motivation for the Gaussian pseudo-likelihood ultimately stems 
-from the Central Limit Theorem. The powerspectrum of the density field, 
-for instance, is the correlation function of the density field. Assuming 
-that the density field is a Gaussian random field, which it approximately 
-is, the powerspectrum of a specific mode would follow a chi-squared 
-distribution. With sufficiently many independent modes contributing, 
-from Central Limit Theorem, the likelihood of the powerspectrum would 
-\emph{approach} a Gaussian distribution. In practice, due to finite 
-survey volume, shot noise, and systematic effects different modes
-are correlated and the Gaussian likelihood assumption cannot be true 
-for the powerspectrum. In low signal-to-noise regimes we explicitly 
+from the Central Limit Theorem. Let's take the powerspectrum of the density 
+field as an example. Assuming that the density field is a Gaussian random field, 
+which it approximately is on large scales, the powerspectrum of a specific 
+Fourier mode would follow a chi-squared distribution, \emph{not} a Gaussian. 
+However, with sufficiently many independent 
+modes contributing, by the Central Limit Theorem, the likelihood of the 
+powerspectrum would \emph{approach} a Gaussian distribution. In practice, 
+due to finite survey volume, shot noise, and systematic effects different 
+modes are correlated and the Gaussian likelihood assumption cannot be true 
+in detail for the powerspectrum. In low signal-to-noise regimes we explicitly 
 expect the Gaussian assumption to fail. \cite{scoccimarro2000} 
 \todo{provides an excellent example of how the Gaussianity 
-illustrates how the }
+}
 this for the powerspectrum. 
 %At scales where non-linear effects become important, k ≈ 0.2 − 0.3 h/Mpc, the density field cannot be assumed to be Gaussian anymore. A complementary approach at these scales is to consider that the power spectrum distribution about its mean is Gaussian; if there are enough independent modes contributing to a given shell in Fourier space, by the central limit theorem the distribution of the power spectrum should approach Gaussianity. However, due to the finite volume of the survey and shot noise, different modes are correlated, so it is not clear a priori at what scales Gaussianity applies. 
 
@@ -155,11 +168,9 @@ pseudo-likelihood must insure that their analysis is conducted in sufficiently h
 signal-to-noise regimes and test the impact of likelihood non-Gaussianity. 
 This is unfortunately not a part of the standard practice in LSS studies. 
 
-% Data analysis can only lead to unbiased constraints on a physical theory if the employed likelihood is correct (e.g.  Trotta 2008; Mardia et al. 1979; Anderson 2003; Cramer 1946; Jeffreys 1961; Sun & Berger 2006). 
-
 In this paper we investigate the impact of the likelihood Gaussianity
 assumption on the two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut)
-and \cite{sinha2017a} (hereafter~\Sinh). \Beut~analyzes the powerspectrum 
+and \cite{sinha2017} (hereafter~\Sinh). \Beut~analyzes the powerspectrum 
 multipoles ($P_\ell$; monopole, quadrupole, and hexadecapole) to measure
 redshift-space distortions along with the Alcock–Paczynski effect and baryon 
 acoustic oscillation scale. Meanwhile \Sinh~analyzes the group multiplicity 
@@ -184,9 +195,9 @@ of~\Beut~and~\Sinh. We discuss and conclude the paper in Section~\ref{sec:summar
 Mock catalogs play an indispensable role in standard cosmological 
 anslyses of LSS studies. They're used for testing analysis 
 pipelines~\citep[][]{beutler2017, grieb2017, tinkerinpreparation}, 
-testing the effect of systematics~\citep{guo2012, vargas-magana2014, hahn2017, pinol2017, ross2017}, 
+testing the effect of systematics~\citep{guo2012, vargas-magana2014, hahn2017c, pinol2017, ross2017}, 
 and, most relevantly for this paper, estimating the covariance 
-matrix~\citep[][]{parkinson2012, kazin2014, grieb2017, alam2017, beutler2017, sinha2017a}. 
+matrix~\citep[][]{parkinson2012, kazin2014, grieb2017, alam2017, beutler2017, sinha2017}. 
 In fact, nearly all current state-of-the-art LSS analyses use
 covariance matrices estimated from mocks to evaluate the likelihood 
 for parameter inference. 
@@ -249,8 +260,8 @@ $0.4 < z < 0.6$, and $0.5 < z < 0.75$. In this paper we focus on
 one of these analyses: the analysis of the powerspectrum monopole, 
 quadrupole, and hexadecapole for the $0.2 < z < 0.5$ bin.  
 
-\subsection{\cite{sinha2017a} Mocks} \label{sec:gmf} 
-The simulations used in the small-scale clustering analysis of \cite{sinha2017a} 
+\subsection{\cite{sinha2017} Mocks} \label{sec:gmf} 
+The simulations used in the small-scale clustering analysis of \cite{sinha2017} 
 are from the Large Suite of Dark Matter Simulations project~\citep[LasDamas;][]{mcbride2009} 
 designed to model galaxy samples from SDSS DR7. They use initial conditions derived from 
 second order Lagrangian Perturbation Theory using the 2LTPIC code~\citep{scoccimarro1998, crocce2006}
@@ -781,7 +792,7 @@ estimating 37 one dimensional distributions with $2048$ samples
 each. The challenge, however, is in finding the transformation. 
 
 Efforts in the past have attempted to tackle this sort of 
-high-dimensional problem~\citep[\emph{e.g.}][]{scoccimarro2000,eisenstein2001,gaztanaga2005,norberg2009,sinha2017a}.
+high-dimensional problem~\citep[\emph{e.g.}][]{scoccimarro2000,eisenstein2001,gaztanaga2005,norberg2009,sinha2017}.
 They typically use singular value decomposition or principal 
 component analysis~\citep[PCA;][]{Press:1992:NRC:148286}. For a Gaussian
 likelihood, the PCA components of it are statistically independent. 
@@ -1309,7 +1320,7 @@ Our likelihood estimation methods allow us to go beyond the pseudo-likelihood
 and derive more accurate estimates of the likelihood. With a similar 
 motivation at addressing likelihoods that are non-Gaussian or difficult to 
 write down, methods for likelihood-free inference such as Approximate Bayesian 
-Computation~\citep[ABC;][]{hahn2017a,kacprzak2017,alsing2017} have recently 
+Computation~\citep[ABC;][]{hahn2017b,kacprzak2017,alsing2017} have recently 
 been introduced to LSS studies. 
 Although as a likelihood-free inference method, ABC has the advantage 
 of relaxing \emph{any} assumption on the likelihood, even with smart sampling methods 
