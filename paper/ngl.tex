@@ -69,25 +69,22 @@
     assumption in their Bayesian parameter inference --- the likelihood has 
     a Gaussian functional-form. We investigate the impact of this assumption 
     on two recent LSS analyses: the \cite{beutler2017}~powerspectrum multipole ($P_\ell$) analysis and 
-    the \cite{sinha2017}~group multiplicity function ($\zeta$) analysis. Using non-parametric 
-    divergence estimators on mock catalogs originally constructed for covariance matrix 
-    estimation in these analyses, we identify significant non-Gaussianity for both 
-    $P_\ell$ and $\zeta$ 
-    %quantify the non-Gaussianity of the $P_\ell$ and $\zeta$ likelihoods. We 
-    likelihoods. Afterwards, we use Gaussian mixture density estimation and 
-    Independent Component Analysis to construct likelihood estimates that better 
-    approximate the true likelihood than the Gaussian \emph{pseudo}-likelihood. 
-    We then use the likelihood estimates to derive the true posterior probability 
+    the \cite{sinha2017}~group multiplicity function ($\zeta$) analysis. For both 
+    $P_\ell$ and $\zeta$ likelihoods, we identify significant non-Gaussianity using
+    non-parametric divergence estimators on mock catalogs originally constructed 
+    for covariance matrix estimation. We then use Gaussian mixture density estimation and 
+    Independent Component Analysis to construct likelihood estimates that 
+    approximate the true likelihood better than the Gaussian \emph{pseudo}-likelihood. 
+    Using these likelihood estimates, we derive the true posterior probability 
     distribution of the \Beut~and~\Sinh~parameters. Our parameter constraints reveal 
     the impact of likelihood non-Gaussianity on the posterior parameter constraints 
     of \Beut~and~\Sinh. For \Beut, likelihood non-Gaussianity shifts the $f\sigma_8$ 
-    constraint by $0.44\sigma$. Otherwise, likelihood non-Gaussianity does not 
-    significantly impact the overall \Beut~parameter constraints. For the $\zeta$ analysis, 
-    however, using the pseudo-likelihood significantly underestimates the 
-    uncertainties and biases the constraints of \Sinh~halo occupation parameters: 
-    $\log\,M_\mathrm{min}$, $\log\,M_1$ and $\alpha$. The divergence and 
-    likelihood estimation methods we present provides a straightforward framework
-    for quantifying the impact of likelihood non-Gaussianity and deriving more 
+    constraint by $0.44\sigma$, but otherwise, does not significantly impact the 
+    overall parameter constraints. For the $\zeta$ analysis, using the pseudo-likelihood 
+    significantly underestimates the uncertainties and biases the constraints of 
+    \Sinh~halo occupation parameters: $\log\,M_\mathrm{min}$, $\log\,M_1$ and $\alpha$. 
+    The divergence and likelihood estimation methods we present provides a straightforward 
+    framework for quantifying the impact of likelihood non-Gaussianity and deriving more 
     accurate parameter constraints. 
 \end{abstract}
 
@@ -108,7 +105,7 @@ large-scale structure of universe
 \section{Introduction}
 Bayesian parameter inference provides the standard framework for 
 deriving cosmological parameters from observation in large scale 
-structure (LSS) studies and cosmology in general (\todo{citations}). 
+structure (LSS) studies and cosmology in general. 
 %observed measurements such as the galaxy powerspectrum or two-point correlation function in large scale scturture (LSS) studies and cosmology analyses in general. 
 Using Bayes' rule, 
 \beq
@@ -128,32 +125,32 @@ In present day LSS analyses, two major assumptions go into evaluating the
 likelihood. First, the likelihood is assumed to have a Gaussian functional 
 form: 
 \beq
-p(x\,|\,\theta) = \frac{1}{(2\pi)^{d/2} \sqrt{\mathrm{det}(C(\theta))}}\,\,\mathrm{exp}\bigg[\frac{1}{2}(x - m(\theta))^{t} C(\theta)^{-1} (x - m(\theta))\bigg].
+p(x\,|\,\theta) = \frac{1}{(2\pi)^{d/2} \sqrt{\mathrm{det}(C(\theta))}}\,\,\mathrm{exp}\bigg[\frac{1}{2}(x - m(\theta))^{t} C(\theta)^{-1} (x - m(\theta))\bigg]
 \eeq
-$d$ is the dimension of $x$, $m(\theta)$ is the theoretical model, and $C$ 
-is the covariance matrix. Even if analyses use covariance matrices 
-that account for non-Gaussiance covariance~\citep[\emph{e.g.}][]{scoccimarro1999, hu2001, oconnell2016}, 
-they still use a Gaussian functional form for the likelihood. They 
-therefore still employ a Gaussian \emph{pseudo}-likelihood. Second, the 
-covariance matrix used in evaluating the Gaussian pseudo-likelihood
+where $d$ is the dimension of $x$, $m(\theta)$ is the theoretical model, and $C$ 
+is the covariance matrix. Second, the covariance matrix used in evaluating the Gaussian pseudo-likelihood
 is assumed to be independent of cosmology. The covariance matrix is 
 evaluated only at a selected fiducial cosmology and used throughout 
-the analysis. However, in principle, the covariance matrix depends on $\theta$, 
+the analysis. In principle, the covariance matrix depends on $\theta$, 
 and the dependence has been shown to have a significant effect 
 on parameter constraints~\citep[\emph{e.g.}][]{eifler2009, morrison2013, white2015}. 
 In this paper, we focus on the, first, Gaussian pseudo-likelihood assumption. 
+Even if analyses use covariance matrices 
+that account for non-Gaussiance covariance~\citep[\emph{e.g.}][]{scoccimarro1999, hu2001, oconnell2016}, 
+they still use a Gaussian functional form for the likelihood. They 
+therefore still employ a Gaussian \emph{pseudo}-likelihood. 
 We will test the assumption and quantify the impact of it on cosmological 
 parameter constraints. 
 
 The motivation for the Gaussian pseudo-likelihood ultimately stems 
-from the Central Limit Theorem. Let's take the powerspectrum of the density 
-field as an example. Assuming that the density field is a Gaussian random field, 
-which it approximately is on large scales, the powerspectrum of a specific 
-Fourier mode would follow a chi-squared distribution, \emph{not} a Gaussian. 
-With sufficiently many independent modes contributing, however, by the Central 
+from the Central Limit Theorem. Take the powerspectrum of the density 
+field for example. On large scales, the density field is approximately a 
+Gaussian random field. Then the powerspectrum of a specific Fourier 
+mode would follow a chi-squared distribution, \emph{not} a Gaussian. 
+However, with sufficiently many independent modes contributing, by the Central 
 Limit Theorem the likelihood of the powerspectrum would \emph{approach} a 
-Gaussian distribution. That means in practice we expect the Gaussian assumption 
-to fail in low signal-to-noise regimes. The assumption is further invalidated 
+Gaussian distribution. In practice, we expect the Gaussian assumption 
+to fail in low signal-to-noise regimes. The assumption is also further invalidated 
 by finite survey volume, shot noise, and systematic effects, which correlate
 different modes. The breakdown of Gaussianity is clearly illustrated in earlier 
 surveys such as IRAS where limited survey volume and sparse sampling cause the 
@@ -164,8 +161,8 @@ of the Gaussian likelihood assumption for the cosmic shear correlation function
 likelihood.
 %At scales where non-linear effects become important, k ≈ 0.2 − 0.3 h/Mpc, the density field cannot be assumed to be Gaussian anymore. A complementary approach at these scales is to consider that the power spectrum distribution about its mean is Gaussian; if there are enough independent modes contributing to a given shell in Fourier space, by the central limit theorem the distribution of the power spectrum should approach Gaussianity. However, due to the finite volume of the survey and shot noise, different modes are correlated, so it is not clear a priori at what scales Gaussianity applies. 
 
-Even if the likelihood were Gaussian, \cite{sellentin2016} argue that 
-since an estiamte of the covariance matrix is used for the likelihood, 
+Even if the likelihood is Gaussian, \cite{sellentin2016} argue that 
+since an estimate of the covariance matrix is used for the likelihood, 
 the true covariance matrix must be marginalized for accurate parameter 
 inference. This leads to a likelihood that is no longer Gaussian, but rather a 
 multivariate $t$-distribution. Fortunately, the Gaussian pseudo-likelihood 
@@ -176,8 +173,8 @@ for $C_\ell$ on small scales~(\citealt{ade2014,aghanim2016}; see
 also~\citealt{efstathiou2004, efstathiou2006}). On large scales (low-$\ell$), 
 the likelihood is instead computed directly in pixel-space and extensively 
 validated. Testing for likelihood non-Gaussianity and non-Gaussian likelihoods 
-in general are not currently part of standard practice in LSS studies. However, 
-for more precise parameter constraints from LSS, analyses must go beyond the 
+in general are not currently part of standard practice in LSS studies. For 
+more precise parameter constraints from LSS, however, analyses must go beyond the 
 Gaussian pseudo-likelihood.
 %Hence for precise parameter constraints, LSS analyses using the Gaussian pseudo-likelihood must insure that their analysis is conducted in sufficiently high signal-to-noise regimes and test the impact of likelihood non-Gaussianity.  This is unfortunately not a part of the standard practice in LSS studies. 
 
@@ -185,17 +182,17 @@ In this paper we investigate the impact of the likelihood Gaussianity
 assumption on the two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut)
 and \cite{sinha2017} (hereafter~\Sinh). \Beut~analyzes the powerspectrum 
 multipoles ($P_\ell$; monopole, quadrupole, and hexadecapole) to measure
-redshift-space distortions along with the Alcock–Paczynski effect and baryon 
+redshift-space distortions along with the Alcock-Paczynski effect and baryon 
 acoustic oscillation scale. Meanwhile \Sinh~analyzes the group multiplicity 
 function ($\zeta$) in order constrain parameters of the halo model.
 Using the~\Beut~and~\Sinh~analyses, we show in this paper that the assumption 
 of likelihood Gaussianity in LSS is not necessary. We will also show that 
 the mock catalogs used in standard LSS analyses for covariance matrix estimation 
-can be used to quantify the non-Gaussianity. More importantly the mocks can be 
-used to estimate the ``true'' non-Gaussian likelihood. 
+can be used to quantify the non-Gaussianity. More importantly we will use the 
+mocks to estimate the ``true'' non-Gaussian likelihood. 
 
-We begin in Section~\ref{sec:mocks} by describing the mock catalogs, 
-which we use throughout the paper, constructed originally for covariance 
+We begin in Section~\ref{sec:mocks} by describing the mock catalogs that
+we use throughout the paper, constructed originally for covariance 
 matrix estimation in~\Beut~and~\Sinh. Next in Section~\ref{sec:div}, we present
 non-parametric divergence estimators and quantify the non-Gaussianity of
 the $P_\ell$ and $\zeta$ likelihoods using them. Then in Section~\ref{sec:likeest}, 
@@ -220,7 +217,7 @@ matrix~\citep[e.g.][]{mohammed2017} or estimates directly from data
 by subsampling~\citep[e.g.][]{norberg2009}, covariance matrices 
 from mocks have a number of advantages. Mocks allow us 
 to incorporate detailed systematic errors present in the 
-data and variance beyond the volume of the data. Even for analytic 
+data and also variance beyond the volume of the data. Even for analytic 
 estimates, a large ensemble of mocks are crucial for validation~\citep[\emph{e.g.}][]{slepian2017}. 
 Moreover, as we show later in this paper, mocks present an
 additional advantage: they allow us to 
@@ -232,16 +229,14 @@ multipole ($P_\ell$) analysis of \Beut~and group multiplicity
 function ($\zeta$) analysis of \Sinh. Throughout the paper we will 
 make extensive use of the mock catalogs used in these analyses. 
 In this section, we give a brief description of these mocks and how 
-the observables used in the analysis --- the powerspectrum 
-multipole ($P_\ell$) and group multiplicity function ($\zeta$) ---
+the observables used in the analysis --- $P_\ell(k)$ and $\zeta(N)$ ---
 are calculated from them. Afterwards, we will describe how we compute 
 the covariance matrix from the mocks and pre-process the mock observable
 data.
 
 \subsection{MultiDark-PATCHY~Mock Catalog} \label{sec:patchy}
-In their powerspectrum multipole analysis, \Beut~use 
-the MultiDark-\patchy~mock catalogs from \cite{kitaura2016}. 
-These mocks are generated using the \patchy~code \citep{kitaura2014,kitaura2015}. 
+\Beut~use the MultiDark-\patchy~mock catalogs from \cite{kitaura2016}  mocks
+generated using the \patchy~code \citep{kitaura2014,kitaura2015}. 
 They rely on large-scale density fields generated using augmented
 Lagrangian Perturbation Theory~\citep[ALPT;][]{kitaura2013} on a mesh,
 which they then populate with galaxies based on a combined non-linear
@@ -274,11 +269,12 @@ one of these analyses: the analysis of the powerspectrum monopole,
 quadrupole, and hexadecapole for the $0.2 < z < 0.5$ bin.  
 
 \subsection{\cite{sinha2017} Mocks} \label{sec:gmf} 
-The simulations used in the small-scale clustering analysis of \cite{sinha2017} 
-are from the Large Suite of Dark Matter Simulations project~\citep[LasDamas;][]{mcbride2009} 
-designed to model galaxy samples from SDSS DR7. They use initial conditions derived from 
-second order Lagrangian Perturbation Theory using the 2LTPIC code~\citep{scoccimarro1998, crocce2006}
-and evolved them using the $N$-body $\mathtt{GADGET}$-$2$ code~\citep{springel2005}.
+The simulations used in the \cite{sinha2017} analysis are from the
+Large Suite of Dark Matter Simulations project~\citep[LasDamas;][]{mcbride2009}, 
+which were designed to model galaxy samples from SDSS DR7. They use 
+initial conditions derived from second order Lagrangian Perturbation 
+Theory using the 2LTPIC code~\citep{scoccimarro1998, crocce2006}, 
+which are then evolved using the $N$-body $\mathtt{GADGET}$-$2$ code~\citep{springel2005}.
 Halos are then identified from the dark matter distribution outputs using 
 the $\mathtt{ntropy-fofsv}$ code~\citep{gardner2007}, which uses a 
 friend-of-friends algorithm~\citep[FoF;][]{davis1985} with a linking length of $0.2$
@@ -293,7 +289,7 @@ of $4.938 \times 10^{10}\,h^{-1} M_\odot$ in a cubic volume of
 $1000\,h^{-1} Mpc$ per side evolved from $z_\mathrm{init} = 49$. 
 %They use the following cosmological parameters, which are motivated by the WMAP3 constraints \citep{spergel2007}: $\Omega_m = 0.25, \Omega_\Lambda = 0.75, \Omega_b = 0.04, h = 0.7, \sigma_8 = 0.8,\;\mathrm{and}\;n_s = 1.0.$
 
-The FoF halo catalogs are then populated with galaxies using the 
+The FoF halo catalogs are populated with galaxies using the 
 `Halo Occupation Distribution` (HOD) framework. The 
 number, positions, and velocities of galaxies are described statistically 
 by an HOD model. \Sinh~adopts the `vanilla' HOD model of \cite{zheng2007}, 
@@ -309,11 +305,11 @@ details regarding the mocks, we refer readers to \Sinh.
 To calculate their covariance matrix, \Sinh~produced 200 
 independent mock catalogs from 50 simulations using a single set of 
 HOD model parameters. To take advantage of the methods we later 
-present, we require a large 
+present, we use a large 
 number of mocks. Our methods rely on using the mocks to sample high 
 dimensional distributions, so incorporating more mocks improves their 
-accuracy. We utilize an addition $99$ sets of HOD parameters with $200$
-mocks each. These parameters are sampled from the MCMC chain used to 
+accuracy. We utilize an addition $99$ sets of HOD parameters of $200$
+mocks each. The HOD parameters are sampled from the MCMC chain used to 
 produce the posterior in~\Sinh. In total we use $20,000$ mocks. 
 Among the multiple analyses in \Sinh, in this paper we focus on the 
 GMF analysis of the SDSS DR7 $M_r < -19$ sample. 
@@ -331,14 +327,13 @@ and the MutliDark-\patchy~mocks (Section~\ref{sec:patchy}), \Beut~uses a
 fast Fourier transform (FFT) based anisotropic powerspectrum estimator 
 based on \cite{bianchi2015} and \cite{scoccimarro2015}. This estimator 
 estimates the  monopole, quadrupole, and hexadecapole 
-($\ell = 0, 2,\,\mathrm{and}\,4$) of the powerspectrum using FFTs of the 
+($\ell = 0, 2, 4$) of the powerspectrum using FFTs of the 
 overdensity field multipoles for a given survey geometry. For further 
-details on the estimator we refer readers to~\Beut~Section 3. \Beut~compute
-the powerspectrum over the range $k = 0.01 - 0.15\, h\,\mathrm{Mpc}^{-1}$
+details on the estimator we refer readers to Section 3 of~\Beut. The
+powerspectrum is computed in bins of $\Delta k = 0.01\,h\,\mathrm{Mpc}^{-1}$
+over the range $k = 0.01 - 0.15\, h\,\mathrm{Mpc}^{-1}$
 for $\ell = 0,\,\mathrm{and}\,2$ and $k = 0.01 - 0.10\, h\,\mathrm{Mpc}^{-1}$.
-for $\ell = 4$. The powerspectrum multipoles are calculated in bins of 
-$\Delta k = 0.01\,h\,\mathrm{Mpc}^{-1}$.
-
+for $\ell = 4$. 
 From the $\vec{P}^{(n)} = \big[P^{(n)}_{0}(k), P^{(n)}_{2}(k), P^{(n)}_{4}(k) \big]$ 
 of the MultiDark-\patchy~mocks, \Beut~computes the $(i, j)$ element of the 
 covariance matrix of all multipoles as 
@@ -352,11 +347,11 @@ Since $P_0$ and $P_2$ each have $14$ bins and $P_4$ has $9$ bins,
 $\mathbb{C}$ is a $37 \times 37$ matrix.
 In this work, we compute the $P_\ell(k)$ using a similar FFT-based 
 estimator of \cite{hand2017a} instead of the~\Beut~estimator. Our choice 
-is based on computational convenience. A python implementation
+is purely based on computational convenience. A python implementation
 of the \cite{hand2017a} estimator is publicly available in the $\mathtt{NBODYKIT}$ 
 package\footnote{http://nbodykit.readthedocs.io/en/latest/index.html}~\citep{hand2017b}. 
 We confirm that the resulting $P_\ell(k)s$ and covariance matrices from 
-the two estimators are consistent with one another. 
+the \cite{hahnd2017a} and \Beut~estimators are consistent with one another. 
 
 Next, for the \Sinh~group multiplicity function analysis, they start 
 with the \cite{berlind2006} FoF algorithm to identify groups in the 
@@ -367,10 +362,10 @@ sample correspond to $(r_\perp, r_\parallel) = (0.57, 3.05)h^{-1}\,\mathrm{Mpc}$
 Once the groups are identified in the SDSS and mock data, $\zeta(N)$
 is derived by calculating the comoving number density of groups 
 in bins of richness $N$ --- the number of galaxies in the group. 
-For the $M_r < −19$ SDSS sample, \Sinh~uses eight $N$ bins: 
+For the $M_r < −19$ sample, \Sinh~uses eight $N$ bins: 
 $(5 - 6), (7 - 9), (10 - 13), (14 - 19), (20 - 32), (33 - 52), (53 - 84), (85 - 220)$.
 For further details on the GMF calculation, we refer readers to 
-\Sinh~Section 4.2.  
+Section 4.2 of \Sinh.  
 From the $\zeta^{(n)}(N)s$ of each mock, \Sinh~computes the $(i, j)$ element of
 the covariance matrix as 
 \beq \label{eq:gmf_cov} 
@@ -443,12 +438,12 @@ of the data vector. These indirect measures of non-Gaussianity
 are challenging to interpret and extend more generally to LSS studies. 
 %Sellentin & Heavens (2018) presented stringent tests that characterize non-Gaussian statistical behaviour, and any sound weak lensing likelihood should hence pass these tests.  The methods derived in Sellentin & Heavens (2018) test whether all pairwise combinations of data elements display the correct statistical behaviour under addition, division and multiplication, and whether the correct marginal distribution ensues for each data point. 
 
-A more direct approach, however, can be taken to quantify the 
+A more direct approach can be taken to quantify the 
 non-Gaussianity of the likelihood. We can calculate the divergence between 
 the distribution of our observable, $p(x)$, and $q(x)$ a multivariate Gaussian described 
-by the average of the mocks and the covariance matrix.
-The following are two of the most commonly used divergences: 
-the Kullback-Leibler (KL) divergence
+by the average of the mocks and the covariance matrix --- \emph{i.e.} 
+the pseudo-likelihood. The following are two of the most commonly used 
+divergences: the Kullback-Leibler (KL) divergence
 \beq \label{eq:kl} 
 D_{KL} ( p \parallel q ) = \int p(x)\,\log \frac{p(x)}{q(x)}\,{\rm d}x
 \eeq
@@ -464,7 +459,7 @@ equivalent to the KL divergence.
 %D_{\alpha} ( p \parallel q ) = \int p^\alpha(x) q^{1-\alpha}(x)\,{\rm d}x. 
 %\eeq
 
-Of course, in our case, we don't know $p(x)$ --- \emph{i.e.} the distribution of
+Of course, in our case, we don't know $p(x)$ --- \emph{i.e.} the probability distribution function of
 our observable. If we did, we would simply use that instead of bothering with 
 the covariance matrix or this paper. We can, however, still estimate the 
 divergence using nonparametric divergence estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
