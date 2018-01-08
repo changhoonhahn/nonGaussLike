@@ -2,6 +2,47 @@
 \providecommand\natexlab[1]{#1}
 \providecommand\JournalTitle[1]{#1}
 
+\bibitem[{Ade {et~al.}(2014)Ade, Aghanim, Armitage-Caplan, Arnaud, Ashdown,
+  Atrio-Barandela, Aumont, Baccigalupi, Banday, Barreiro, Bartlett, Battaner,
+  Benabed, Beno{\^\i}t, Benoit-L{\'e}vy, Bernard, Bersanelli, Bielewicz, Bobin,
+  Bock, Bonaldi, Bonavera, Bond, Borrill, Bouchet, Boulanger, Bridges, Bucher,
+  Burigana, Butler, Calabrese, Cardoso, Catalano, Challinor, Chamballu, Chiang,
+  Chiang, Christensen, Church, Clements, Colombi, Colombo, Combet, Couchot,
+  Coulais, Crill, Curto, Cuttaia, Danese, Davies, Davis, de~Bernardis, de~Rosa,
+  de~Zotti, Delabrouille, Delouis, D{\'e}sert, Dickinson, Diego, Dole,
+  Donzelli, Dor{\'e}, Douspis, Dunkley, Dupac, Efstathiou, Elsner, En{\ss}lin,
+  Eriksen, Finelli, Forni, Frailis, Fraisse, Franceschi, Gaier, Galeotta,
+  Galli, Ganga, Giard, Giardino, Giraud-H{\'e}raud, Gjerl{\o}w,
+  Gonz{\'a}lez-Nuevo, G{\'o}rski, Gratton, Gregorio, Gruppuso, Gudmundsson,
+  Hansen, Hanson, Harrison, Helou, Henrot-Versill{\'e},
+  Hern{\'a}ndez-Monteagudo, Herranz, Hildebrandt, Hivon, Hobson, Holmes,
+  Hornstrup, Hovest, Huffenberger, Hurier, Jaffe, Jaffe, Jewell, Jones, Juvela,
+  Keih{\"a}nen, Keskitalo, Kiiveri, Kisner, Kneissl, Knoche, Knox, Kunz,
+  Kurki-Suonio, Lagache, L{\"a}hteenm{\"a}ki, Lamarre, Lasenby, Lattanzi,
+  Laureijs, Lawrence, Jeune, Leach, Leahy, Leonardi, Le{\'o}n-Tavares,
+  Lesgourgues, Liguori, Lilje, Linden-V{\o}rnle, Lindholm, L{\'o}pez-Caniego,
+  Lubin, Mac{\'\i}as-P{\'e}rez, Maffei, Maino, Mandolesi, Marinucci, Maris,
+  Marshall, Martin, Mart{\'\i}nez-Gonz{\'a}lez, Masi, Massardi, Matarrese,
+  Matthai, Mazzotta, Meinhold, Melchiorri, Mendes, Menegoni, Mennella,
+  Migliaccio, Millea, Mitra, Miville-Desch{\^e}nes, Molinari, Moneti, Montier,
+  Morgante, Mortlock, Moss, Munshi, Murphy, Naselsky, Nati, Natoli,
+  Netterfield, N{\o}rgaard-Nielsen, Noviello, Novikov, Novikov, O'Dwyer,
+  Orieux, Osborne, Oxborrow, Paci, Pagano, Pajot, Paladini, Paoletti,
+  Partridge, Pasian, Patanchon, Paykari, Perdereau, Perotto, Perrotta,
+  Piacentini, Piat, Pierpaoli, Pietrobon, Plaszczynski, Pointecouteau, Polenta,
+  Ponthieu, Popa, Poutanen, Pratt, Pr{\'e}zeau, Prunet, Puget, Rachen, Rahlin,
+  Rebolo, Reinecke, Remazeilles, Renault, Ricciardi, Riller, Ringeval,
+  Ristorcelli, Rocha, Rosset, Roudier, Rowan-Robinson, Rubi{\~n}o-Mart{\'\i}n,
+  Rusholme, Sandri, Sanselme, Santos, Savini, Scott, Seiffert, Shellard,
+  Spencer, Starck, Stolyarov, Stompor, Sudiwala, Sureau, Sutton, Suur-Uski,
+  Sygnet, Tauber, Tavagnacco, Terenzi, Toffolatti, Tomasi, Tristram, Tucci,
+  Tuovinen, T{\"u}rler, Valenziano, Valiviita, Tent, Varis, Vielva, Villa,
+  Vittorio, Wade, Wandelt, Wehus, White, White, Yvon, Zacchei, \&
+  Zonca}]{ade2014}
+Ade, P. a.~R., Aghanim, N., Armitage-Caplan, C., {et~al.} 2014,
+  \href{http://dx.doi.org/10.1051/0004-6361/201321573}{\JournalTitle{Astronomy
+  \& Astrophysics}, 571, A15}
+
 \bibitem[{Ade {et~al.}(2016)Ade, Aghanim, Arnaud, Ashdown, Aumont, Baccigalupi,
   Banday, Barreiro, Bartlett, Bartolo, Battaner, Battye, Benabed, Beno{\^\i}t,
   Benoit-L{\'e}vy, Bernard, Bersanelli, Bielewicz, Bock, Bonaldi, Bonavera,
@@ -53,10 +94,10 @@ Alam, S., Ata, M., Bailey, S., {et~al.} 2017,
   \href{http://dx.doi.org/10.1093/mnras/stx721}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 470, 2617}
 
-\bibitem[{Alsing \& Wandelt(2017)}]{alsing2017}
-Alsing, J., \& Wandelt, B. 2017, \JournalTitle{arXiv:1712.00012 [astro-ph]},
-  \href{http://arxiv.org/abs/1712.00012}{{\sffamily arXiv:1712.00012
-  [astro-ph]}}
+\bibitem[{Alsing {et~al.}(2018)Alsing, Wandelt, \& Feeney}]{alsing2018}
+Alsing, J., Wandelt, B., \& Feeney, S. 2018, \JournalTitle{arXiv:1801.01497
+  [astro-ph]}, \href{http://arxiv.org/abs/1801.01497}{{\sffamily
+  arXiv:1801.01497 [astro-ph]}}
 
 \bibitem[{Arthur \& Vassilvitskii(2007)}]{arthur2007}
 Arthur, D., \& Vassilvitskii, S. 2007, in Proceedings of the {{Eighteenth
@@ -165,6 +206,11 @@ Davison, A.~C. 2008, Statistical {{Models}} ({{Cambridge Series}} in
 \bibitem[{Dempster {et~al.}(1977)Dempster, Laird, \& Rubin}]{dempster1977}
 Dempster, A.~P., Laird, N.~M., \& Rubin, D.~B. 1977, \JournalTitle{Journal of
   the Royal Statistical Society. Series B (Methodological)}, 39, 1
+
+\bibitem[{Efstathiou(2004)}]{efstathiou2004}
+Efstathiou, G. 2004,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2004.07530.x}{\JournalTitle{Monthly
+  Notices of the Royal Astronomical Society}, 349, 603}
 
 \bibitem[{Eifler {et~al.}(2009)Eifler, Schneider, \& Hartlap}]{eifler2009}
 Eifler, T., Schneider, P., \& Hartlap, J. 2009,
@@ -497,10 +543,15 @@ Scoccimarro, R., Couchman, H. M.~P., \& Frieman, J.~A. 1999,
 Scott, D.~W. 1992, Multivariate {{Density Estimation}}: {{Theory}},
   {{Practice}}, and {{Visualization}} ({Wiley})
 
+\bibitem[{Sellentin \& Heavens(2016)}]{sellentin2016}
+Sellentin, E., \& Heavens, A.~F. 2016,
+  \href{http://dx.doi.org/10.1093/mnrasl/slv190}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 456, L132}
+
 \bibitem[{Sellentin \& Heavens(2017)}]{sellentin2017}
-Sellentin, E., \& Heavens, A.~F. 2017, \JournalTitle{arXiv:1707.04488
-  [astro-ph]}, \href{http://arxiv.org/abs/1707.04488}{{\sffamily
-  arXiv:1707.04488 [astro-ph]}}
+---. 2017, \JournalTitle{arXiv:1707.04488 [astro-ph]},
+  \href{http://arxiv.org/abs/1707.04488}{{\sffamily arXiv:1707.04488
+  [astro-ph]}}
 
 \bibitem[{Sinha {et~al.}(2017)Sinha, Berlind, McBride, Scoccimarro, Piscionere,
   \& Wibking}]{sinha2017}

@@ -80,9 +80,9 @@
     We then use the likelihood estimates to derive the true posterior probability 
     distribution of the \Beut~and~\Sinh~parameters. Our parameter constraints reveal 
     the impact of likelihood non-Gaussianity on the posterior parameter constraints 
-    of \Beut~and~\Sinh. Despite some impact on the $f\sigma_8$ constraint, 
-    likelihood non-Gaussianity does not significantly impact the overall 
-    \Beut~parameter constraints. For the $\zeta$ analysis, 
+    of \Beut~and~\Sinh. For \Beut, likelihood non-Gaussianity shifts the $f\sigma_8$ 
+    constraint by $0.44\sigma$. Otherwise, likelihood non-Gaussianity does not 
+    significantly impact the overall \Beut~parameter constraints. For the $\zeta$ analysis, 
     however, using the pseudo-likelihood significantly underestimates the 
     uncertainties and biases the constraints of \Sinh~halo occupation parameters: 
     $\log\,M_\mathrm{min}$, $\log\,M_1$ and $\alpha$. The divergence and 
@@ -150,23 +150,36 @@ from the Central Limit Theorem. Let's take the powerspectrum of the density
 field as an example. Assuming that the density field is a Gaussian random field, 
 which it approximately is on large scales, the powerspectrum of a specific 
 Fourier mode would follow a chi-squared distribution, \emph{not} a Gaussian. 
-However, with sufficiently many independent 
-modes contributing, by the Central Limit Theorem, the likelihood of the 
-powerspectrum would \emph{approach} a Gaussian distribution. In practice, 
-due to finite survey volume, shot noise, and systematic effects different 
-modes are correlated and the Gaussian likelihood assumption cannot be true 
-in detail for the powerspectrum. In low signal-to-noise regimes we explicitly 
-expect the Gaussian assumption to fail. \cite{scoccimarro2000} 
-\todo{provides an excellent example of how the Gaussianity 
-}
-this for the powerspectrum. 
+With sufficiently many independent modes contributing, however, by the Central 
+Limit Theorem the likelihood of the powerspectrum would \emph{approach} a 
+Gaussian distribution. That means in practice we expect the Gaussian assumption 
+to fail in low signal-to-noise regimes. The assumption is further invalidated 
+by finite survey volume, shot noise, and systematic effects, which correlate
+different modes. The breakdown of Gaussianity is clearly illustrated in earlier 
+surveys such as IRAS where limited survey volume and sparse sampling cause the 
+probability distribution function of the galaxy powerspectrum to deviate 
+significantly from Gaussian~\citep[see Figure 9 in][]{scoccimarro2000}. 
+\cite{hartlap2009} and \cite{sellentin2017} similiarly illustrate the breakdown
+of the Gaussian likelihood assumption for the cosmic shear correlation function 
+likelihood.
 %At scales where non-linear effects become important, k ≈ 0.2 − 0.3 h/Mpc, the density field cannot be assumed to be Gaussian anymore. A complementary approach at these scales is to consider that the power spectrum distribution about its mean is Gaussian; if there are enough independent modes contributing to a given shell in Fourier space, by the central limit theorem the distribution of the power spectrum should approach Gaussianity. However, due to the finite volume of the survey and shot noise, different modes are correlated, so it is not clear a priori at what scales Gaussianity applies. 
 
-\todo{talk about CMB likelihood analyses? Bring up sellentin et al.'s t-distribution stuff?}
-Hence for precise parameter constraints, LSS analyses using the Gaussian 
-pseudo-likelihood must insure that their analysis is conducted in sufficiently high 
-signal-to-noise regimes and test the impact of likelihood non-Gaussianity. 
-This is unfortunately not a part of the standard practice in LSS studies. 
+Even if the likelihood were Gaussian, \cite{sellentin2016} argue that 
+since an estiamte of the covariance matrix is used for the likelihood, 
+the true covariance matrix must be marginalized for accurate parameter 
+inference. This leads to a likelihood that is no longer Gaussian, but rather a 
+multivariate $t$-distribution. Fortunately, the Gaussian pseudo-likelihood 
+assumption is not necessary parameter inference. Outside of LSS, in CMB 
+powerspecturm analyses for instance, the Planck collaboration 
+uses a hybrid likelihood, which only assumes a Gaussian pseudo-likelihood 
+for $C_\ell$ on small scales~(\citealt{ade2014,aghanim2016}; see 
+also~\citealt{efstathiou2004, efstathiou2006}). On large scales (low-$\ell$), 
+the likelihood is instead computed directly in pixel-space and extensively 
+validated. Testing for likelihood non-Gaussianity and non-Gaussian likelihoods 
+in general are not currently part of standard practice in LSS studies. However, 
+for more precise parameter constraints from LSS, analyses must go beyond the 
+Gaussian pseudo-likelihood.
+%Hence for precise parameter constraints, LSS analyses using the Gaussian pseudo-likelihood must insure that their analysis is conducted in sufficiently high signal-to-noise regimes and test the impact of likelihood non-Gaussianity.  This is unfortunately not a part of the standard practice in LSS studies. 
 
 In this paper we investigate the impact of the likelihood Gaussianity
 assumption on the two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut)
@@ -1320,7 +1333,7 @@ Our likelihood estimation methods allow us to go beyond the pseudo-likelihood
 and derive more accurate estimates of the likelihood. With a similar 
 motivation at addressing likelihoods that are non-Gaussian or difficult to 
 write down, methods for likelihood-free inference such as Approximate Bayesian 
-Computation~\citep[ABC;][]{hahn2017b,kacprzak2017,alsing2017} have recently 
+Computation~\citep[ABC;][]{hahn2017b,kacprzak2017,alsing2018} have recently 
 been introduced to LSS studies. 
 Although as a likelihood-free inference method, ABC has the advantage 
 of relaxing \emph{any} assumption on the likelihood, even with smart sampling methods 
