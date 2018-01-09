@@ -468,16 +468,10 @@ Pinol, L., Cahn, R.~N., Hand, N., Seljak, U., \& White, M. 2017,
 P{\'o}czos, B., Szab{\'o}, Z., \& Schneider, J. 2011, in 2011 19th {{European
   Signal Processing Conference}}, 1718
 
-\bibitem[{Poczos {et~al.}(2012{\natexlab{a}})Poczos, Xiong, \&
-  Schneider}]{poczos2012}
-Poczos, B., Xiong, L., \& Schneider, J. 2012{\natexlab{a}},
-  \JournalTitle{arXiv:1202.3758 [cs, stat]},
-  \href{http://arxiv.org/abs/1202.3758}{{\sffamily arXiv:1202.3758 [cs, stat]}}
-
-\bibitem[{Poczos {et~al.}(2012{\natexlab{b}})Poczos, Xiong, Sutherland, \&
-  Schneider}]{poczos2012b}
-Poczos, B., Xiong, L., Sutherland, D., \& Schneider, J. 2012{\natexlab{b}},
-  \JournalTitle{Machine Learning Department}
+\bibitem[{Poczos {et~al.}(2012)Poczos, Xiong, \& Schneider}]{poczos2012}
+Poczos, B., Xiong, L., \& Schneider, J. 2012, \JournalTitle{arXiv:1202.3758
+  [cs, stat]}, \href{http://arxiv.org/abs/1202.3758}{{\sffamily arXiv:1202.3758
+  [cs, stat]}}
 
 \bibitem[{Press {et~al.}(1992)Press, Teukolsky, Vetterling, \&
   Flannery}]{Press:1992:NRC:148286}

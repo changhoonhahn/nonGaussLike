@@ -70,10 +70,10 @@
     a Gaussian functional-form. We investigate the impact of this assumption 
     on two recent LSS analyses: the \cite{beutler2017}~powerspectrum multipole ($P_\ell$) analysis and 
     the \cite{sinha2017}~group multiplicity function ($\zeta$) analysis. For both 
-    $P_\ell$ and $\zeta$ likelihoods, we identify significant non-Gaussianity using
-    non-parametric divergence estimators on mock catalogs originally constructed 
-    for covariance matrix estimation. We then use Gaussian mixture density estimation and 
-    Independent Component Analysis to construct likelihood estimates that 
+    $P_\ell$ and $\zeta$ likelihoods, we identify significant non-Gaussianity with 
+    non-parametric divergence estimators used in Machine Learning on mock catalogs 
+    originally constructed for covariance matrix estimation. We then use Gaussian mixture 
+    density estimation and Independent Component Analysis to construct likelihood estimates that 
     approximate the true likelihood better than the Gaussian \emph{pseudo}-likelihood. 
     Using these likelihood estimates, we derive the true posterior probability 
     distribution of the \Beut~and~\Sinh~parameters. Our parameter constraints reveal 
@@ -459,13 +459,13 @@ equivalent to the KL divergence.
 %D_{\alpha} ( p \parallel q ) = \int p^\alpha(x) q^{1-\alpha}(x)\,{\rm d}x. 
 %\eeq
 
-Of course, in our case, we don't know $p(x)$ --- \emph{i.e.} the probability distribution function of
-our observable. If we did, we would simply use that instead of bothering with 
-the covariance matrix or this paper. We can, however, still estimate the 
-divergence using nonparametric divergence estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
+Of course, in our case, we don't know $p(x)$ --- \emph{i.e.} the probability 
+distribution function of our observable. If we did, we would simply use that 
+instead of bothering with the covariance matrix or this paper. We can, however, 
+still estimate the divergence using nonparametric divergence estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
 These estimators allow us to estimate the divergence directly from 
 samples $X_{1:n} = \{ X_1, ... X_n \}$ and $Y_{1:m} = \{ Y_1, ... Y_m \}$ 
-drawn from $p$ and $q$ respectively: $\hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m})$. 
+drawn from $p$ and $q$ respectively: $\hat{D}(X_{1:n} \parallel Y_{1:m})$. 
 For instance, the estimator presented in \cite{poczos2012} allows us to estimate 
 the kernel function of the R\'enyi-$\alpha$ divergence,
 \beq \label{eq:d_alpha}
@@ -490,24 +490,24 @@ a similar estimator for the KL divergence~(Eq.~\ref{eq:kl}).
 %We note that while the divergence estimators converge to the true divergence with a large enough samples, with a limited number of samples from the distribution, the estimators are noisy. 
 These divergence estimates have been applied to Support Distribution Machines 
 and used in the machine learning and astronomical literature with great success
-\citep[\emph{e.g.}][]{poczos2011, poczos2012, poczos2012a, poczos2012b, xu2013, ntampaka2015, ntampaka2016, ravanbakhsh2017a}.
+\citep[\emph{e.g.}][]{poczos2011, poczos2012, poczos2012a, xu2013, ntampaka2015, ntampaka2016, ravanbakhsh2017a}. %poczos2012b, 
 For more details on the non-parametric divergence estimators, we refer readers to 
 \cite{poczos2012} and \cite{krishnamurthy2014}.
 
 With these estimators, we can now explicitly quantify the 
 non-Gaussianity of the likelihood by computing the divergence 
 between the likelihood distribution and the Gaussian 
-pseudo-likelihood distribution, $\mathcal{L}^\mathrm{pseudo}$:
-$D(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$.%  \mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C}\,))$. 
+pseudo-likelihood distribution, $\mathcal{L}^\mathrm{pseudo}$.
 We draw a reference sample ${\bf Y}^\mathrm{ref}$ from 
 $\mathcal{L}^\mathrm{pseudo}$ then %\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$ 
 since $\Xmock$ is in principle sampled from $p(x)$, we can use the 
-estimators to compute $\hat{D}(\Xmock \parallel \mathcal{L}^\mathrm{pseudo})$.
+estimators to compute 
+$D(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo}) \approx \hat{D}(\Xmock \parallel \mathcal{L}^\mathrm{pseudo})$. %\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C}\,))$.
 Similar to the experiments detailed in \cite{poczos2012}, 
 we construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as $\Xmock$: 
 $2000$ and $10,000$ for the $P_\ell$ and $\zeta$ analyses respectively. 
-Furthermore, based on the sample size of $\Xmock$ we calculate the 
-divergences using the $k=10$ nearest neighbors. 
+Based on the sample size of $\Xmock$ we calculate the divergences using 
+the $k=10$ nearest neighbors. 
 
 In Figure~\ref{fig:div_gauss}, we present the resulting \Ralpha~(left) 
 and KL (right) divergences (orange) between the likelihood and the 
@@ -515,11 +515,11 @@ Gaussian pseudo-likelihood for the \Beut~$P_\ell$ (top) and \Sinh~$\zeta$ (botto
 analyses: $\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$. For reference, we also 
 include (in blue) divergence estimates of the pseudo-likelihood onto itself, 
 which we calculate as $\hat{D}(\Xref \parallel \Yref)$. $\Xref$ is a 
-data vector with the same dimension as $\Xmock$ sampled from the pseudo-likelihood 
-$\mathcal{N}$. $\hat{D}$s are \emph{estimates} of the true divergence, 
-therefore we resample $\Yref$ and compute each $\hat{D}$ \todo{100} times. 
-Figure~\ref{fig:div_gauss} actually presents the $\hat{D}$ distributions, 
-which also illustrate the uncertainty of $\hat{D}$. The discrepancy between 
+data vector with the same dimension as $\Xmock$ sampled from the pseudo-likelihood. 
+$\hat{D}$s are \emph{estimates} of the true divergence, therefore we 
+resample $\Yref$ and compute each $\hat{D}$ estimate \todo{100} times. 
+In Figure~\ref{fig:div_gauss}, we present the resultings distributions of $\hat{D}$,
+which illustrate the uncertainty of $\hat{D}$. The discrepancy between 
 the $\hat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$
 distributions and the reference $\hat{D}(\Xref \parallel \Yref)$ distributions 
 ($\Delta \hat{D}$) quantify the discrepancy between the pseudo-likelihood
@@ -536,12 +536,13 @@ survey volume of BOSS DR12 and the restrictive $k$ range of the \Beut~analysis
 one would expect this to be mostly true. Although relatively small, we
 still find significant $\Delta \hat{D}$ and therefore likelihood non-Gaussinaity. 
 In order to better understand the source of this non-Gaussianity, 
-we repeat the divergence comparisons 
-for different $k$ ranges. If we set $k_\mathrm{min} = 0.05$, $\Delta \hat{D}$ 
-decreases. Meanwhile, when we set $k_\mathrm{max} = 0.1$ for all 
-multipoles, $\Delta \hat{D}$ increases. This suggests that the $P_\ell$ 
-likelihood is most non-Gaussian on large scales (low $k$). Furthermore,
-when we compare the divergences for just the monopole and quadrupole, 
+we repeat the divergence comparisons for different $k$ ranges. If we 
+exclude the largest scales and set 
+$k_\mathrm{min} = 0.05$, $\Delta \hat{D}$ decreases. Meanwhile, if we 
+exclude the smallest scales and set $k_\mathrm{max} = 0.1$ for all 
+multipoles, $\Delta \hat{D}$ increases. This suggests that the largest 
+scales (low $k$) contribute most to the $P_\ell$ likelihood non-Gaussianity.
+Furthermore, when we compare the divergences for just the monopole and quadrupole, 
 $\Delta \hat{D}$ decreases. Among the multipole, the hexadecapole 
 contributes most to the non-Gaussianity of the $P_\ell$ likelihood. 
 
@@ -575,7 +576,7 @@ the non-Gaussianity of the $\zeta$ likelihood.
     the mock data $\Xmock$ and a referece sample $\Yref$ drawn
     from the pseudo-likelihood. We compute $\hat{D}_{R\alpha}$ and
     $\hat{D}_{KL}$ \todo{100} times and plot their distribution 
-    in order to illustrate the uncertainty in the $\hat{D}$ 
+    in order to illustrate the uncertainty of the $\hat{D}$ 
     estimator. The significant discrepancy between 
     the two divergence distributions in each of the panels, identifies 
     the \emph{significant non-Gaussianity of the $P_\ell(k)$ and $\zeta(N)$ 
@@ -588,17 +589,17 @@ the non-Gaussianity of the $\zeta$ likelihood.
 
 \section{Estimating the Non-Gaussian Likelihood} \label{sec:likeest}
 In the previous section, we estimate the divergence between the 
-$P_\ell$ and $\zeta$ likelihoods sampled by mocks and their respective 
-Gaussian pseudo-likelihoods. These divergences identify and quantify 
+$P_\ell$ and $\zeta$ likelihoods and their respective Gaussian 
+pseudo-likelihoods. These divergences identify and quantify 
 the significant non-Gaussianity in the likelihoods of LSS studies.   
 Our ultimate goal, however, is to quantify the impact of likelihood 
 non-Gaussianity on the final cosmological parameter constrains and
 to develop more accurate methods for parameter inference in LSS. 
 From the divergence estimates alone, it's not obvious how they propagate 
 onto the final parameter constraints. Therefore in this section, 
-we present two methods for more accurately estimating the non-Gaussian 
-likelihoods of $P_\ell$ and $\zeta$ from the corresponding mocks.
-These methods provide a more accurate estmiate of the likelihood than 
+we present two methods for more accurately estimating the true non-Gaussian 
+likelihoods of $P_\ell$ and $\zeta$ from their corresponding mocks.
+These methods provide more accurate estmiates of the likelihood than 
 the Gaussian pseudo-likelihood. Moreover, we will use them later to 
 quantify the impact of likelihood non-Gaussianity on the 
 \Beut~and \Sinh~parameter constraints. 
@@ -607,10 +608,10 @@ quantify the impact of likelihood non-Gaussianity on the
 When mock catalogs are used for parameter inference in LSS analyses, 
 they essentially serve as data points sampling the likelihood distribution. 
 For the pseudo-likelihood, this distribution is assumed to have a 
-Gaussian functional form. Hence, why we estimate the covariance matrix 
+Gaussian functional form, which is why we estimate the covariance matrix 
 from mocks. However, the Gaussian functional form, or any functional form for 
 that matter, is \emph{not} necessary to estimate the likelihood distribution. 
-Instead, the multidimensional likelihood distribution 
+Instead, the multi-dimensional likelihood distribution 
 can be directly estimated from the set of mock catalogs using --- for 
 instance using Gaussian mixture density 
 estimation~\citep{Press:1992:NRC:148286,9780471006268}. 
@@ -618,14 +619,13 @@ Besides its extensive use in machine learning and statistics,
 in astronomy, Gaussian mixture density estimation has been used for 
 inferring the velocity distribution of stars from the Hipparcos 
 satellite~\citep{bovy2011}, classifying galaxies in the Galaxy And Mass Assembly 
-Survey~\citep{taylor2015}, and classifying pulsars~(\citealt{lee2012}; see
-also~\citealt{hogg2010,kuhn2017}). 
+Survey~\citep{taylor2015}, classifying pulsars~\citep{lee2012}, and much more~\citep[see also][]{hogg2010,kuhn2017}. 
 
 Gaussian mixture density estimation is a ``semi-parametric'' method 
 that uses a weighted sum of $k$ Gaussian component densities, a Gaussian 
 mixture model (hereafter GMM)
 \beq
-p(x; \bm{\theta}) = \sum\limits_{i=1}^{k} \pi_i\, \mathcal{N}(x; \bm{\theta}_i),
+\hat{p}(x; \bm{\theta}) = \sum\limits_{i=1}^{k} \pi_i\, \mathcal{N}(x; \bm{\theta}_i),
 \eeq
 to estimate the density. 
 The component weights ($\pi_i$; also known as mixing weights) and the 
@@ -635,7 +635,7 @@ these free GMM parameters are, most popularly, estimated
 through an expectation-maximization algorithm~\citep[EM;][]{dempster1977, neal1998}.
 The EM algorithm begins by randomly assigning $\bm{\theta}^0_i$ to the 
 $k$ Gaussian components. The algorithm then iterates between two steps. 
-In the first step, the algorithm computes for each data point, ${\bf x}_n$, 
+In the first step, the algorithm computes for every data point, ${\bf x}_n$, 
 a probability of being generated by each component of the model. These 
 probabilities can be thought of as weighted assignments of the points 
 to the components. Next, given the ${\bf x}_n$ assignment to the 
@@ -655,7 +655,7 @@ $\mathtt{k}$-$\mathtt{means}$ algorithm clusters the data ${\bf X}_N$ into $k$
 clusters, each described by the mean (or centroid) $\mu_i$ of the
 samples in the cluster. The algorithm then iteratively chooses centroids that 
 minimize the average squared distance between points in the same cluster.
-For our GMMs, we set the initialize the EM algorithm using 
+For our GMMs, we initialize the EM algorithm using 
 the $\mathtt{k}$-$\mathtt{means}{\tiny ++}$ algorithm of ~\cite{arthur2007}. 
 In Figure~\ref{fig:gmm_ped}, we illustrate Gaussian mixture 
 density estimation in action. We use GMMs with $k = 1$ (top), $
@@ -686,7 +686,7 @@ components.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 So far in our description of GMMs, we have kept
-the number of components $k$ fixed. However, $k$ is a free 
+the number of components $k$ fixed. $k$, however, is a free 
 parameter and selecting it is a crucial step in Gaussian mixture
 density estimation. With too many components the model may overfit 
 the data; with too few components, 
@@ -707,17 +707,18 @@ for the number of parameters in the model:
 We select $k$ based on the number of components in the model with the 
 lowest BIC. Of the three panels in Figure~\ref{fig:gmm_ped}, the GMM 
 model with $k=3$ components has the lowest BIC and therefore would be 
-selected. At least in this example, the choice of $k=3$ is 
-obviously justified. The $k = 1$ GMM is definitely not flexible enough 
-to characterize the underlying distribution and the $k=10$ GMM clearly
-overfits the distribution. 
+selected. The choice of $k=3$ here is obviously justified. The $k = 1$ 
+GMM is definitely not flexible enough to characterize the underlying 
+distribution and the $k=10$ GMM clearly overfits the distribution. In 
+this example, GMM with $k$ selected by BIC correctly identifies the three 
+Gaussian distributions from which the data is drawn. 
 
 With Gaussian mixture density estimation we can directly estimate 
 the likelihood distribution using the mock catalogs. We first fit 
 GMMs with $k\mathrm{s} < 30$ components to the whitened 
 mock data $\Xmock$ using the EM algorithm for each model. For each of the 
-converged GMMs, we calculate the BIC. Afterwards we select 
-the model with the lowest BIC as the best density estimate of the likelihood 
+converged GMMs, we calculate the BIC and then select the model with the 
+lowest BIC as the best density estimate of the likelihood 
 distribution: $\hat{p}_\mathrm{\tiny GMM}(x)$. The selected density estimate can 
 then be used to calculate the
 likelihood and quantify the impact of likelihood non-Gaussianity on the 
@@ -728,7 +729,7 @@ to the divergence estimates of Section~\ref{sec:div}.
 
 To estimate the divergence between our Gaussian mixture density estimate,
 $\hat{p}_\mathrm{\tiny GMM}$, and the likelihood distribution, we take 
-the same approach as our $\hat{D}$ calculation in Section~\ref{sec:div}. 
+the same approach as our $\hat{D}(\Xmock | \Yref)$ calculation in Section~\ref{sec:div}. 
 Instead of $\Yref$ drawn from the pseudo-likelihood, we draw 
 samples from $\hat{p}_\mathrm{\tiny GMM}(x)$ with the same 
 dimensions. Then we calculate $k$-NN~\Ralpha~and KL 
@@ -739,7 +740,7 @@ reflects the scatter in the estimator. In Figure~\ref{fig:div_gmm},
 we present the resulting distribution of divergences between 
 $\hat{p}_\mathrm{\tiny GMM}$ and the likelihood distribution in \todo{green} 
 for the $P_\ell(k)$ (top) and $\zeta(N)$ (bottom) analyses. For comparison, 
-we include the distributions from Figure~\ref{fig:div_gauss}. 
+we include the $\hat{D}$ distributions from Figure~\ref{fig:div_gauss}. 
 
 For the $\zeta(N)$ analysis of \Sinh, our Gaussian mixture density 
 estimate significantly improves the divergence discrepancy compared to the 
@@ -772,7 +773,7 @@ method for estimating the non-Gaussian likelihood.
     Figure~\ref{fig:div_gauss} for comparison. The Gaussian mixture
     likelihood does not significantly improve the discrepancy in 
     divergence for the $P_\ell$ analysis. This is due to the high-dimensionality 
-    (37 dimensions) of the $P_\ell$ likelihood. However, for the $\zeta$ 
+    (37 dimensions) of the $P_\ell$ likelihood. For the $\zeta$ 
     analysis, \emph{our Gaussian mixture likelihood estimate is 
     a significantly better estimate of the likelihood
     than the pseudo-likelihood.}
@@ -789,11 +790,12 @@ Rather than estimating the likelihood distribution directly,
 if we can transform the observable ${\bf x}$ (\emph{e.g.} $P_\ell$) 
 into statistically independent components ${\bf x}^\mathrm{IC}$ 
 the problem becomes considerably simpler. Since ${\bf x}^\mathrm{IC}$ 
-is statistically independent the likelihood distribution becomes 
+is statistically independent, the likelihood distribution becomes 
 \beq \label{eq:ica_like}
 p(x) = \prod\limits_{n=1}^{N_\mathrm{bin}} p_{x^\mathrm{IC}_n} (x) 
 \eeq
-where $N_\mathrm{bin}$ is the number of bins in the observable. 
+where $N_\mathrm{bin}$ is the number of bins in the observable 
+and the number of independent components. 
 For the \Beut~case, this reduces the problem of estimating a 37 
 dimensional distribution with $2048$ samples to a problem of 
 estimating 37 one dimensional distributions with $2048$ samples 
@@ -813,9 +815,9 @@ hyvarinen2001independent}.
 
 In order to find the transformation of ${\bf x}$ to ${\bf x}^\mathrm{IC}$ 
 we first assume that ${\bf x}$ is generated by some linear transformation
-${\bf x} = {\bf M}\,{\bf x}^\mathrm{IC}$. The goal of ICA is to invert 
+${\bf x} = {\bf M}\,{\bf x}^\mathrm{IC}$. Then the goal of ICA is to invert 
 this problem, ${\bf y} = {\bf W}\,{\bf x}$, and find ${\bf W}$ and ${\bf y}$ 
-that best estimate ${\bf y} \approx {\bf x}^\mathrm{IC}$. The basic 
+that best estimate ${\bf x}^\mathrm{IC} \approx {\bf y}$. The basic 
 premise of ICA is simple, \emph{maximizing non-Gaussianity maximizes the 
 statistical independence}. Consider a single component of ${\bf y}$: 
 \beq
@@ -823,11 +825,11 @@ statistical independence}. Consider a single component of ${\bf y}$:
 \eeq
 where ${\bf w}_n^{\tiny t}$ is the $n^\mathrm{th}$ row of ${\bf W}$. 
 Since ${\bf y}_n$ is a linear combination of the independent 
-components ${\bf x}^\mathrm{IC}$, due to the Central Limit Theorem 
+components ${\bf x}^\mathrm{IC}$, from the Central Limit Theorem 
 ${\bf y}_n$ is necessarily more Gaussian than any of the 
 components \emph{unless} ${\bf y}_n$ is equal to one of the 
 ${\bf x}^\mathrm{IC}$ components. In other words, we can achieve 
-${\bf y} \approx {\bf x}^\mathrm{IC}$ by finding ${\bf W}$ that 
+${\bf x}^\mathrm{IC} \approx {\bf y}$ by finding ${\bf W}$ that 
 maximizes the non-Gaussianity of ${\bf y}$. For a more rigorous 
 justification of ICA we refer readers to~\cite{hyvarinen2001independent}. 
 In practice, non-Gaussianity is commonly measured using differential
