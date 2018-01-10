@@ -79,6 +79,41 @@ Ade, P. a.~R., Aghanim, N., Arnaud, M., {et~al.} 2016,
   \href{http://dx.doi.org/10.1051/0004-6361/201525833}{\JournalTitle{Astronomy
   \& Astrophysics}, 594, A24}
 
+\bibitem[{Aghanim {et~al.}(2016)Aghanim, Arnaud, Ashdown, Aumont, Baccigalupi,
+  Banday, Barreiro, Bartlett, Bartolo, Battaner, Benabed, Beno{\^\i}t,
+  Benoit-L{\'e}vy, Bernard, Bersanelli, Bielewicz, Bock, Bonaldi, Bonavera,
+  Bond, Borrill, Bouchet, Boulanger, Bucher, Burigana, Butler, Calabrese,
+  Cardoso, Catalano, Challinor, Chiang, Christensen, Clements, Colombo, Combet,
+  Coulais, Crill, Curto, Cuttaia, Danese, Davies, Davis, de~Bernardis, de~Rosa,
+  de~Zotti, Delabrouille, D{\'e}sert, Valentino, Dickinson, Diego, Dolag, Dole,
+  Donzelli, Dor{\'e}, Douspis, Ducout, Dunkley, Dupac, Efstathiou, Elsner,
+  En{\ss}lin, Eriksen, Fergusson, Finelli, Forni, Frailis, Fraisse, Franceschi,
+  Frejsel, Galeotta, Galli, Ganga, Gauthier, Gerbino, Giard, Gjerl{\o}w,
+  Gonz{\'a}lez-Nuevo, G{\'o}rski, Gratton, Gregorio, Gruppuso, Gudmundsson,
+  Hamann, Hansen, Harrison, Helou, Henrot-Versill{\'e},
+  Hern{\'a}ndez-Monteagudo, Herranz, Hildebrandt, Hivon, Holmes, Hornstrup,
+  Huffenberger, Hurier, Jaffe, Jones, Juvela, Keih{\"a}nen, Keskitalo, Kiiveri,
+  Knoche, Knox, Kunz, Kurki-Suonio, Lagache, L{\"a}hteenm{\"a}ki, Lamarre,
+  Lasenby, Lattanzi, Lawrence, Jeune, Leonardi, Lesgourgues, Levrier, Lewis,
+  Liguori, Lilje, Lilley, Linden-V{\o}rnle, Lindholm, L{\'o}pez-Caniego,
+  Mac{\'\i}as-P{\'e}rez, Maffei, Maggio, Maino, Mandolesi, Mangilli, Maris,
+  Martin, Mart{\'\i}nez-Gonz{\'a}lez, Masi, Matarrese, Meinhold, Melchiorri,
+  Migliaccio, Millea, Mitra, Miville-Desch{\^e}nes, Moneti, Montier, Morgante,
+  Mortlock, Mottet, Munshi, Murphy, Narimani, Naselsky, Nati, Natoli, Noviello,
+  Novikov, Novikov, Oxborrow, Paci, Pagano, Pajot, Paoletti, Partridge, Pasian,
+  Patanchon, Pearson, Perdereau, Perotto, Pettorino, Piacentini, Piat,
+  Pierpaoli, Pietrobon, Plaszczynski, Pointecouteau, Polenta, Ponthieu, Pratt,
+  Prunet, Puget, Rachen, Reinecke, Remazeilles, Renault, Renzi, Ristorcelli,
+  Rocha, Rossetti, Roudier, {d'Orfeuil}, Rubi{\~n}o-Mart{\'\i}n, Rusholme,
+  Salvati, Sandri, Santos, Savelainen, Savini, Scott, Serra, Spencer, Spinelli,
+  Stolyarov, Stompor, Sunyaev, Sutton, Suur-Uski, Sygnet, Tauber, Terenzi,
+  Toffolatti, Tomasi, Tristram, Trombetti, Tucci, Tuovinen, Umana, Valenziano,
+  Valiviita, Tent, Vielva, Villa, Wade, Wandelt, Wehus, Yvon, Zacchei, \&
+  Zonca}]{aghanim2016}
+Aghanim, N., Arnaud, M., Ashdown, M., {et~al.} 2016,
+  \href{http://dx.doi.org/10.1051/0004-6361/201526926}{\JournalTitle{Astronomy
+  \& Astrophysics}, 594, A11}
+
 \bibitem[{Alam {et~al.}(2017)Alam, Ata, Bailey, Beutler, Bizyaev, Blazek,
   Bolton, Brownstein, Burden, Chuang, Comparat, Cuesta, Dawson, Eisenstein,
   Escoffier, Gil-Mar{\'\i}n, Grieb, Hand, Ho, Kinemuchi, Kirkby, Kitaura,
@@ -211,6 +246,11 @@ Dempster, A.~P., Laird, N.~M., \& Rubin, D.~B. 1977, \JournalTitle{Journal of
 Efstathiou, G. 2004,
   \href{http://dx.doi.org/10.1111/j.1365-2966.2004.07530.x}{\JournalTitle{Monthly
   Notices of the Royal Astronomical Society}, 349, 603}
+
+\bibitem[{Efstathiou(2006)}]{efstathiou2006}
+---. 2006,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2006.10486.x}{\JournalTitle{Monthly
+  Notices of the Royal Astronomical Society}, 370, 343}
 
 \bibitem[{Eifler {et~al.}(2009)Eifler, Schneider, \& Hartlap}]{eifler2009}
 Eifler, T., Schneider, P., \& Hartlap, J. 2009,
@@ -472,6 +512,12 @@ P{\'o}czos, B., Szab{\'o}, Z., \& Schneider, J. 2011, in 2011 19th {{European
 Poczos, B., Xiong, L., \& Schneider, J. 2012, \JournalTitle{arXiv:1202.3758
   [cs, stat]}, \href{http://arxiv.org/abs/1202.3758}{{\sffamily arXiv:1202.3758
   [cs, stat]}}
+
+\bibitem[{P{\'o}czos {et~al.}(2012)P{\'o}czos, Xiong, Sutherland, \&
+  Schneider}]{poczos2012a}
+P{\'o}czos, B., Xiong, L., Sutherland, D.~J., \& Schneider, J. 2012,
+  \href{http://dx.doi.org/10.1109/CVPR.2012.6248028}{in 2012 {{IEEE
+  Conference}} on {{Computer Vision}} and {{Pattern Recognition}}}, 2989
 
 \bibitem[{Press {et~al.}(1992)Press, Teukolsky, Vetterling, \&
   Flannery}]{Press:1992:NRC:148286}

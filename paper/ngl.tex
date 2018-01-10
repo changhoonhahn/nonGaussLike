@@ -351,7 +351,7 @@ is purely based on computational convenience. A python implementation
 of the \cite{hand2017a} estimator is publicly available in the $\mathtt{NBODYKIT}$ 
 package\footnote{http://nbodykit.readthedocs.io/en/latest/index.html}~\citep{hand2017b}. 
 We confirm that the resulting $P_\ell(k)s$ and covariance matrices from 
-the \cite{hahnd2017a} and \Beut~estimators are consistent with one another. 
+the \cite{hand2017a} and \Beut~estimators are consistent with one another. 
 
 Next, for the \Sinh~group multiplicity function analysis, they start 
 with the \cite{berlind2006} FoF algorithm to identify groups in the 
@@ -866,7 +866,7 @@ function of the $n^\mathrm{th}$ ICA component. This distribution
 is sampled by ${\bf X}^\mathrm{ICA}_n$, the transformed mock data. 
 That means ${\bf X}^\mathrm{ICA}_n$ can be used to estimate 
 $p_{x^\mathrm{ICA}_n}$ using a method like kernel 
-density estimation~\citep[KDE; \emph{e.g.}][]{9780387848587,feigelson2012}. 
+density estimation~\citep[KDE;][]{9780387848587,feigelson2012}. 
 With KDE, the density estimate, $\hat{p}_{x^\mathrm{ICA}_n}$, is constructed by 
 smoothing the empirical distribution of the ICA component $x^\mathrm{ICA}_n$ 
 using a smooth kernel: 
@@ -876,12 +876,12 @@ using a smooth kernel:
 $b$ is the bandwidth and $K$ is the kernel function. Following the 
 choices of \cite{hartlap2009}, we use a Gaussian distribution for $K$ and the 
 ``rule of thumb'' bandwidth~\cite[also known as Scott's rule;][]{scott1992,davison2008} 
-for $b$. Combining $\hat{p}_{x^\mathrm{ICA}_n}s$ estimates for 
+for $b$. Combining the $\hat{p}_{x^\mathrm{ICA}_n}$ estimates for 
 all $n = 1, ..., N_\mathrm{bin}$ into Eq.~\ref{eq:ica_like}, we 
 can estimate the likelihood distribution $p(x) \approx \prod\limits_n \hat{p}_{x^\mathrm{ICA}_n}(x)$
 
-We again test whether the likelihood estimate from ICA is actually 
-a better estimate of the likelihood distribution than the Gaussian 
+We again check whether the likelihood estimate from ICA is actually 
+a better estimate of the true likelihood distribution than the Gaussian 
 pseudo-likelihood. Following the same procedure as we 
 did for the Gaussian mixture likelihood in Section~\ref{sec:gmm}, we 
 calculate the divergence between our ICA likelihood, $\prod \hat{p}_{x^\mathrm{ICA}_n}(x)$, 
@@ -913,8 +913,10 @@ For comparison, we include the distributions from Figure~\ref{fig:div_gauss}.
     $P_\ell$ and $\zeta$ analyses. For $\zeta$, the improvement of 
     the ICA likelihood over the pseudo-likelihood is more modest than 
     our GMM estimate from Section~\ref{sec:gmm}. However, for 
-    $P_\ell$, where the GMM method struggled, our ICA likelihood 
-    provides a significant improvement.
+    $P_\ell$ where the GMM method struggled, our ICA likelihood 
+    provides a significant improvement. Our ICA likelihood provides
+    a significantly better estimate of the true $P_\ell$ likelihood
+    than the pseudo-likelihood.
     }
 \label{fig:div_ica}
 \end{center}
@@ -925,20 +927,20 @@ For \emph{both} \Beut~and~\Sinh, our ICA likelihood significantly
 improves the divergence discrepancy compared to the pseudo-likelihood. For 
 \Sinh, however, the ICA likelihood proves to be less accurate than 
 the Gaussian mixture likelihood in Section~\ref{sec:gmm}. More importantly, 
-for \Beut, where the Gaussian mixture likelihood did not improve 
+for \Beut where the Gaussian mixture likelihood did not improve 
 upon the pseudo-likelihood, the ICA method provides a significantly 
 more accurate likelihood estimate. This demonstrates that the ICA 
-method is an alterative to the more direct Gaussian mixture method. 
+method is an effective alterative to the more direct Gaussian mixture method. 
 Furthermore, the effectiveness of the ICA method in estimating
 higher dimensional likelihoods with fewer samples (mocks) is  
 particularly appealing for LSS, since analyses continue to 
-increase the size of their observable data vector. However, as 
+increase the size of their observable data vector. As 
 the divergence estimation framework we present makes it easy to test the accuracy of different methods, a hard 
 choice is not necessary and multiple methods can easily be tested to construct 
 the best estimate of the likelihood distribution for each specific analysis. 
 Based on the performances of the GMM and ICA methods, in the following
-sections we use the ICA method for the~\Beut~analysis and the GMM 
-method for the~\Sinh~analysis. 
+sections we use the ICA likelihood for the~\Beut~analysis and the GMM 
+likelihood for the~\Sinh~analysis. 
 
 \section{Impact on Parameter Inference}
 To derive the posterior distribution of their model parameters,
@@ -959,7 +961,7 @@ and~\ref{sec:ica}, we can now better estimate the true posterior distributions
 of these parameters and quantify the impact of likelihood non-Gaussianity 
 on parameter constraints. The most straightforward 
 approach to do this would be to use the likelihood estimates to compute 
-MCMC samples from scratch. While this is relatively doable for the~\Beut~analysis, 
+MCMC samples from scratch. While this is relatively tractable for the~\Beut~analysis, 
 for~\Sinh~this is \emph{significantly} more involved. Rather than a perturbation 
 theory based model from~\Beut, the \Sinh~model is a forward model, same as 
 their mocks (Section~\ref{sec:gmf}). Rerunning the MCMC samples would involve
@@ -971,36 +973,36 @@ The \emph{target} distribution we want is the new posterior. To sample this
 distribution, we sample the original posterior as the \emph{proposal} 
 distribution with importance weights, which in our case is the ratio 
 of our likelihood estimates over the pseudo-likelihood. If we let 
-$P({\bf x} | \bm{\theta})$ be the original pseudo-likelihood and 
-$P'({\bf x} | \bm{\theta})$ be our ``new'' likelihood, then the new 
+$\mathrm{P}({\bf x} | \bm{\theta})$ be the original pseudo-likelihood and 
+$\mathrm{P}'({\bf x} | \bm{\theta})$ be our ``new'' likelihood, then the new 
 marginal likelihood can be calculated through importance sampling:   
 \beq
-P'({\bf x} | \theta_1) = \int P'({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_m = \int \frac{P'({\bf x} | \bm{\theta})}{P({\bf x} | \bm{\theta})}\, P({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_m \\
+\mathrm{P}'({\bf x} | \theta_1) = \int \mathrm{P}'({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_m = \int \frac{\mathrm{P}'({\bf x} | \bm{\theta})}{\mathrm{P}({\bf x} | \bm{\theta})}\, \mathrm{P}({\bf x} | \bm{\theta})\,\mathrm{d}\theta_2...\mathrm{d}\theta_m. \\
 \eeq
-Through Monte Carlo integration, this becomes 
+Then through Monte Carlo integration, 
 \beq
-P'({\bf x} | \theta_1) \approx \sum\limits_{\bm{\theta}^{(i)} \in S} \frac{P'({\bf x} | \bm{\theta}^{(i)})}{P({\bf x} | \bm{\theta}^{(i)})}. \label{eq:impsamp}
+\mathrm{P}'({\bf x} | \theta_1) \approx \sum\limits_{\bm{\theta}^{(i)} \in S} \frac{\mathrm{P}'({\bf x} | \bm{\theta}^{(i)})}{\mathrm{P}({\bf x} | \bm{\theta}^{(i)})}. \label{eq:impsamp}
 \eeq
-where $S$ is the sample drawn from $P({\bf x} | \bm{\theta})$. In our 
+where $S$ is the sample drawn from $\mathrm{P}({\bf x} | \bm{\theta})$. In our 
 case $S$ is just the original MCMC chain. The only calculation required 
 is the importance weights in Eq.~\ref{eq:impsamp}, 
-${P'({\bf x} | \bm{\theta}^{(i)})}/{P({\bf x} | \bm{\theta}^{(i)})}$ for 
+${\mathrm{P}'({\bf x} | \bm{\theta}^{(i)})}/{\mathrm{P}({\bf x} | \bm{\theta}^{(i)})}$ for 
 each sample $\bm{\theta}^{(i)}$ of the original MCMC chain. 
-For \Beut, $P({\bf x} | \bm{\theta}^{(i)})$ is the ICA likelihood;  
-for \Sinh, $P({\bf x} | \bm{\theta}^{(i)})$ is the GMM likelihood.
+For \Beut, $\mathrm{P}({\bf x} | \bm{\theta}^{(i)})$ is the ICA likelihood;  
+for \Sinh, $\mathrm{P}({\bf x} | \bm{\theta}^{(i)})$ is the GMM likelihood.
 
 We present in Figure~\ref{fig:pk_like} the resulting posterior 
 distributions using the non-Gaussian ICA likelihood for the 
 $\big \{f \sigma_8$, $\alpha_\parallel$, $\alpha_\perp$, 
 $b_1^\mathrm{NGC} \sigma_8$, $b_1^\mathrm{SGC} \sigma_8$, 
-$b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8,\big \}$
+$b_2^\mathrm{NGC} \sigma_8$, $b_2^\mathrm{SGC} \sigma_8\big \}$
 parameters in the \Beut~$P_\ell$ analysis (orange). We include 
 the original~\Beut~posteriors for comparison in blue. On the 
 bottom of each panel, we also include box plots marking the 
 confidence intervals of the updated and original posteriors. 
 The boxes and ``whiskers'' repesent the $68\%$ and $95\%$ 
 confidence intervals, respectively. The median and $68\%$ 
-confidence intervals of the posteriors are listed in Table~\ref{tab:posterior}.
+confidence intervals of the posteriors are also listed in Table~\ref{tab:posterior}.
 $f \sigma_8$ and $b_2^\mathrm{SGC} \sigma_8$ are the main parameters with 
 noticeable change in their posteriors. The posterior of $b_2^\mathrm{SGC} \sigma_8$
 broadens from $0.476^{+1.262}_{-1.175}$ to $0.422^{+1.517}_{-1.377}$ once likelihood 
@@ -1055,8 +1057,9 @@ the remarkable effectiveness of the Central Limit Theorem. %for the powerspectru
     likelihood (orange). We include in blue the original~\Beut~posteriors 
     for comparison. On the bottom of each panel we include box 
     plots that mark the $68\%$ and $95\%$ confidence intervals of
-    the posterior. The discrepancy between the posteriors is most 
+    the posterior. The discrepancies between the posteriors are most 
     evident for the parameters $f\sigma_8$ and and $b^\mathrm{SGC}_2 \sigma_8$.  
+    The $f\sigma_8$ constraint shifts by $0.44\sigma$. 
     Hence, using the pseudo-likelihood in the $P_\ell$ analysis 
     biases the posteriors of these parameters. 
     Overall, however, likelihood non-Gaussianity does \emph{not} 
@@ -1096,7 +1099,7 @@ for comparison in blue. The box plots on the bottom of each plot
 mark the $68\%$ and $95\%$ confidence intervals of the posteriors. 
 In the dotted lines, we plot the original \Sinh~posteriors, 
 which differ slightly from the blue distribution.
-This difference is caused by the difference in the covariance 
+This discrepancy is caused by the difference in the covariance 
 matrix we use in the pseudo-likelihood~(see Section~\ref{sec:xmock}).  
 The difference, however, is negligible. 
 
@@ -1104,7 +1107,7 @@ Besides the poorly constrained parameters $\sigma_{\log M}$ and $\log\, M_0$,
 likelihood non-Gaussianity significantly impacts the posterior 
 distributions of the HOD parameters. Each of the parameter constraints 
 for $\log\,M_\mathrm{min}$, $\log M_1$, and $\alpha$, are significantly 
-broader and also shifted compared to the pseudo-likelihood constraints
+broadened and shifted from the pseudo-likelihood constraints
 (see Table~\ref{tab:posterior} for details). 
 The impact of likelihood non-Gaussianity is further emphasized in 
 the joint posterior distributions in Figure~\ref{fig:gmf_contour}.
@@ -1128,15 +1131,15 @@ matter overdensity makes writing down the exact $\zeta$ likelihood function
 tremendously difficult. Nonetheless, the GMM likelihood estimation method we 
 present provides an accurate estimate of the non-Gaussian likelihood. 
 
-The posteriors of the \Sinh~$\zeta$ analysis, highlights the importance of 
+The posteriors of the \Sinh~$\zeta$ analysis highlight the importance of 
 accounting for likelihood non-Gaussianity in parameter inference of 
 LSS studies. One of the main results of the \Sinh~HOD analysis 
 is that the $\Lambda$CDM + HOD model can successful 
 fit either $\zeta(N)$ or the project two-point correlation function 
 $w_p(r_p)$, separately but struggles to jointly fit both (see Figure~10). 
 This tension suggests that the `vanilla' HOD model is insufficiently 
-flexible in describing the galaxy-halo connection. Likelihood non-Gaussianity,
-however, impacts this result. Once the non-Gaussianity is included in 
+flexible in describing the galaxy-halo connection. Likelihood non-Gaussianity
+impacts this result. Once the non-Gaussianity is included in 
 the analysis, the posteriors are broadened and shifted towards 
 relaxing the tensions. We examine the effect of likelihood non-Gaussianity 
 for HOD parameter constraints in more detail in Hahn et al. (in prep.). 
@@ -1256,18 +1259,19 @@ observables and analyses.
 
 
 \section{Summary and Discussion} \label{sec:summary}
-Standard present day LSS analyses makes a major assumption in their 
+Current standard LSS analyses makes a major assumption in their 
 parameter inference --- the likelihood has a Gaussian functional-form. 
 Although this assumption is motivated by the Central Limit Theorem, 
-in detail this assumption cannot be true. 
+in detail the assumption cannot be true. 
 In this paper, we investigate the impact of this assumption on two recent 
 LSS analyses: the \Beut~powerspectrum multipole ($\ell = 0, 2$, and $4$) 
 analysis and the \Sinh~group multiplicity function analysis. We combine 
 mock catalogs, originally constructed 
 for covariance matrix estimation in these analyses, with non-parametric 
-divergence estimators to measure the divergences between the $P_\ell$ and 
-$\zeta$ likelihoods and the Gaussian pseudo-likelihoods from \Beut~and~\Sinh. 
-For both the $P_\ell$ and $\zeta$ likelihoods, the divergences reveal 
+divergence estimators, used in Machine Learning, to measure the divergences 
+between the $P_\ell$ and $\zeta$ likelihoods and the Gaussian 
+pseudo-likelihoods from \Beut~and~\Sinh. For both the $P_\ell$ and $\zeta$ likelihoods, 
+the divergences reveal 
 significant likelihood non-Gaussianity. For the $P_\ell$ likelihood,
 large scales (low $k$) and the hexadecapole contribute most to the
 relatively small non-Gaussianity. Meanwhile, for the $\zeta$ likelihood, 
@@ -1284,7 +1288,7 @@ likelihood, we use Independent Component Analysis to transform the
 likelihood distribution into statistically independent components. 
 By estimating the one-dimensional distribution of these independent 
 components, we derive an estimate of the high-dimensional likelihood 
-distribution. The divergence between these two likelihood estimates and 
+distribution. The divergence between our two likelihood estimates and 
 the $P_\ell$ and $\zeta$ likelihoods demonstrate that we derive 
 \emph{more accurate} estimates of the true likelihoods than the 
 pseudo-likelihoods. 
@@ -1301,10 +1305,10 @@ Meanwhile for the \Sinh~$\zeta$ analysis, likelihood non-Gaussianity
 significant impacts the posterior distributions of the HOD parameter. 
 Using the pseudo-likelihood significantly underestimates the width of the 
 $\log\,M_\mathrm{min}$, $\log\, M_1$, and $\alpha$ posteriors. It also 
-significantly biases their constraints. In fact, accounting for likelihood 
+significantly biases their constraints. Accounting for likelihood 
 non-Gaussianity, significantly eases the tension between the $\zeta$ and 
 $w_p(r_p)$ constraints found in \Sinh. Our comparisons of the posteriors 
-ultimately highlight the significance of likelihood non-Gaussianity in 
+highlight the importance of incorporating likelihood non-Gaussianity in 
 parameter inference of LSS studies. 
 
 Based on our results, $P_\ell$ analyses using future surveys (\emph{e.g.} 
@@ -1326,7 +1330,7 @@ estimations we introduce in this paper provide a straightforward framework
 for testing and quantifying the impact of likelihood non-Gaussianity on 
 the final parameter constraints. 
 
-Our likelihood estimation methods allow us to go beyond the pseudo-likelihood 
+Our likelihood estimation methods also allow us to go beyond the pseudo-likelihood 
 and derive more accurate estimates of the likelihood. With a similar 
 motivation at addressing likelihoods that are non-Gaussian or difficult to 
 write down, methods for likelihood-free inference such as Approximate Bayesian 
