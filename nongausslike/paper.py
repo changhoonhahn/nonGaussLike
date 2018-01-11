@@ -185,7 +185,7 @@ def div_GMM(K=10):
                 if ii == 2: 
                     _lbls = [lbl, None]
                     sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], 
-                            facecolor=pretty_colors[7], alpha=0.75, label=_lbls[i_obv]) 
+                            facecolor=pretty_colors[9], alpha=0.85, label=_lbls[i_obv]) 
                 else: 
                     sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
                 y_max = max(y_max, bp[1].max()) 
@@ -231,8 +231,11 @@ def div_ICA(K=10):
 
         for i_div, div_func in enumerate(['renyi0.5', 'kl']): 
             divs = []  
-            for f in fs: 
-                f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.', div_func, '.dat']) 
+            for i_f, f in enumerate(fs): 
+                if i_f == 2: 
+                    f_div = ''.join([UT.dat_dir(), 'diverg/diverg.', obv, '.', f, '.Nref', str(Nref), '.', div_func, '.dat']) 
+                else: 
+                    f_div = ''.join([UT.dat_dir(), 'diverg.', obv, '.', f, '.Nref', str(Nref), '.', div_func, '.dat']) 
                 try: 
                     div = np.loadtxt(f_div)
                 except IOError: 
@@ -249,7 +252,7 @@ def div_ICA(K=10):
                 if ii == 2: 
                     _lbls = [lbl, None]
                     sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], 
-                            facecolor=pretty_colors[5], alpha=0.75, label=_lbls[i_obv]) 
+                            facecolor=pretty_colors[5], alpha=0.85, label=_lbls[i_obv]) 
                 else: 
                     sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none') 
                 y_max = max(y_max, bp[1].max()) 
@@ -315,7 +318,7 @@ def GMM_pedagog():
         sub.plot(xx, gg_tot, c='r', lw=1)#, ls=':')  
 
         for icomp in range(len(gmm.means_)): 
-            sub.plot(xx, ggs[icomp], c='k', ls=lstyles[i])#, lw=1)
+            sub.plot(xx, ggs[icomp], c='k', ls=':')#, lw=1)
 
         bic = gmm.bic(X_reshape)
         sub.text(0.05, 0.85, r'$k = '+str(ncomp)+'$', ha='left', va='top', 
@@ -774,9 +777,9 @@ if __name__=="__main__":
     #_div_Gauss_gmf(K=10)
     #div_Gauss(K=10)
     #div_GMM()
-    #div_ICA()
+    div_ICA()
     #GMF_contours()
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
-    Like_RSD()
+    #Like_RSD()
     #RSD_contours()
     #Like_GMF()

@@ -31,6 +31,7 @@
 \newcommand{\given}{\,|\,}
 \newcommand{\pseudo}{{\mathrm{pseudo}}}
 \newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Nd}{100}
 
 \newcommand{\specialcell}[2][c]{%
   \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
@@ -517,7 +518,7 @@ include (in blue) divergence estimates of the pseudo-likelihood onto itself,
 which we calculate as $\hat{D}(\Xref \parallel \Yref)$. $\Xref$ is a 
 data vector with the same dimension as $\Xmock$ sampled from the pseudo-likelihood. 
 $\hat{D}$s are \emph{estimates} of the true divergence, therefore we 
-resample $\Yref$ and compute each $\hat{D}$ estimate \todo{100} times. 
+resample $\Yref$ and compute each $\hat{D}$ estimate \Nd times. 
 In Figure~\ref{fig:div_gauss}, we present the resultings distributions of $\hat{D}$,
 which illustrate the uncertainty of $\hat{D}$. The discrepancy between 
 the $\hat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$
@@ -575,7 +576,7 @@ the non-Gaussianity of the $\zeta$ likelihood.
     non-parametric $k$-NN estimator (Section~\ref{sec:div}) on 
     the mock data $\Xmock$ and a referece sample $\Yref$ drawn
     from the pseudo-likelihood. We compute $\hat{D}_{R\alpha}$ and
-    $\hat{D}_{KL}$ \todo{100} times and plot their distribution 
+    $\hat{D}_{KL}$ \Nd times and plot their distribution 
     in order to illustrate the uncertainty of the $\hat{D}$ 
     estimator. The significant discrepancy between 
     the two divergence distributions in each of the panels, identifies 
@@ -675,7 +676,7 @@ components.
     We use GMMs with $k = 1$ (top), $3$ (middle), $10$ (bottom) 
     components to estimate the distribution of data (blue) drawn from three 
     Gaussian distributions. The GMM outputs of the EM algorithm 
-    are plotted in red with \todo{dotted lines} representing each of their 
+    are plotted in red with dotted lines representing each of their 
     components (Section~\ref{sec:gmm}). We also include the BIC of 
     the GMMs, which we use to select the number of components $k$. 
     Of the three panels, $k=3$ has the lowest BIC and therefore 
@@ -734,11 +735,11 @@ Instead of $\Yref$ drawn from the pseudo-likelihood, we draw
 samples from $\hat{p}_\mathrm{\tiny GMM}(x)$ with the same 
 dimensions. Then we calculate $k$-NN~\Ralpha~and KL 
 divergence estimates between this sample and $\Xmock$. As we did in Figure~\ref{fig:div_gauss}, 
-we repeat this process \todo{100} times, resampling $\hat{p}_\mathrm{\tiny GMM}$
+we repeat this process \Nd times, resampling $\hat{p}_\mathrm{\tiny GMM}$
 each time, in order get a distribution of divergence estimates that 
 reflects the scatter in the estimator. In Figure~\ref{fig:div_gmm}, 
 we present the resulting distribution of divergences between 
-$\hat{p}_\mathrm{\tiny GMM}$ and the likelihood distribution in \todo{green} 
+$\hat{p}_\mathrm{\tiny GMM}$ and the likelihood distribution in purple 
 for the $P_\ell(k)$ (top) and $\zeta(N)$ (bottom) analyses. For comparison, 
 we include the $\hat{D}$ distributions from Figure~\ref{fig:div_gauss}. 
 
@@ -766,7 +767,7 @@ method for estimating the non-Gaussian likelihood.
 \begin{center}
 \includegraphics[width=0.9\textwidth]{figs/kNNdiverg_gmm.pdf}
 \caption{R\'enyi-$\alpha$ and KL divergence estimates 
-    ($\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$; \todo{green}) between 
+    ($\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$; purple) between 
     the likelihood distribution and the Section~\ref{sec:gmm} GMM 
     likelihood estimate for the \Beut~$P_\ell$ (top) and \Sinh~$\zeta$ 
     (bottom) analyses. We include the divergence estimates from 
@@ -890,11 +891,11 @@ $\prod \hat{p}_{x^\mathrm{ICA}_n}$ with the same dimensions as
 $\Yref$ (Section~\ref{sec:div}), apply the mixing matrix 
 (undoing the ICA transformation), and then calculate the 
 $k$-NN~\Ralpha~and KL divergence estimates between the sample and $\Xmock$. 
-We repeat these steps \todo{100} times to get the distribution of estimates 
+We repeat these steps \Nd times to get the distribution of estimates 
 that reflects the scatter in the estimator. In Figure~\ref{fig:div_ica}, 
 we present the resulting distribution of 
 $\hat{D}\left(\Xmock \parallel \sim \prod \hat{p}_{x^\mathrm{ICA}_n} \right)$
-in \todo{green} for the $P_\ell(k)$ (top) and $\zeta(N)$ (bottom) analyses. 
+in green for the $P_\ell(k)$ (top) and $\zeta(N)$ (bottom) analyses. 
 For comparison, we include the distributions from Figure~\ref{fig:div_gauss}. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -904,7 +905,7 @@ For comparison, we include the distributions from Figure~\ref{fig:div_gauss}.
 \begin{center}
 \includegraphics[width=0.9\textwidth]{figs/kNNdiverg_ica.pdf}
 \caption{R\'enyi-$\alpha$ and KL divergence estimates 
-    ($\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$; \todo{green}) between 
+    ($\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$; green) between 
     the likelihood distribution and the Section~\ref{sec:ica} ICA 
     likelihood estimate for the \Beut~$P_\ell$ (top) and \Sinh~$\zeta$ 
     (bottom) analyses. We include the divergence estimates from 
@@ -1221,36 +1222,48 @@ observables and analyses.
 \begin{table}
 \caption{Impact of likelihood non-Gaussianity on the posterior parameter constraints of \Beut~and~\Sinh}
 \begin{center}
-\begin{tabular}{cccccccc} \toprule
-    \multicolumn{8}{c}{\Beut~$P_\ell$ analysis} \\%[-7pt]
+\begin{tabular}{cccccc} \toprule
+    \multicolumn{6}{c}{\Beut~$P_\ell$ analysis} \\[5pt]
+    \multicolumn{1}{c}{} & 
+    \multicolumn{1}{c}{$b_1^\mathrm{NGC} \sigma_8$} & 
+    \multicolumn{1}{c}{$b_1^\mathrm{SGC} \sigma_8$} &
+    \multicolumn{1}{c}{$b_2^\mathrm{NGC} \sigma_8$} & 
+    \multicolumn{1}{c}{$b_2^\mathrm{SGC} \sigma_8$} &
+    \multicolumn{1}{c}{} \\
     \multicolumn{1}{c}{} & 
     \multicolumn{1}{c}{$f \sigma_8$} & 
     \multicolumn{1}{c}{$\alpha_\parallel$} & 
-    \multicolumn{1}{c}{$\alpha_\perp$} & 
-    \multicolumn{1}{c}{$b_1^\mathrm{NGC} \sigma_8$} & 
-    \multicolumn{1}{c}{$b_1^\mathrm{SGC} \sigma_8$} &
-    \multicolumn{1}{c}{$b_2^\mathrm{NGC} \sigma_8$} & 
-    \multicolumn{1}{c}{$b_2^\mathrm{SGC} \sigma_8$} \\
-    \hline
+    \multicolumn{1}{c}{$\alpha_\perp$} &
+    \multicolumn{1}{c}{} & 
+    \multicolumn{1}{c}{} \\ [2pt]
+    \hline \\[-10pt]
     \multicolumn{1}{c}{\Beut} & 
-    \multicolumn{1}{c}{0.478} & 
-    \multicolumn{1}{c}{$\alpha_\parallel$} & 
-    \multicolumn{1}{c}{$\alpha_\perp$} & 
-    \multicolumn{1}{c}{$b_1^\mathrm{NGC} \sigma_8$} & 
-    \multicolumn{1}{c}{$b_1^\mathrm{SGC} \sigma_8$} &
-    \multicolumn{1}{c}{$b_2^\mathrm{NGC} \sigma_8$} & 
-    \multicolumn{1}{c}{$b_2^\mathrm{SGC} \sigma_8$} \\ 
-    \multicolumn{1}{c}{\specialcell{non-Gaussian\\ $\mathcal{L}_\mathrm{ICA}$}} &  
-    \multicolumn{1}{c}{0.478} & 
-    \multicolumn{1}{c}{$\alpha_\parallel$} & 
-    \multicolumn{1}{c}{$\alpha_\perp$} & 
-    \multicolumn{1}{c}{$b_1^\mathrm{NGC} \sigma_8$} & 
-    \multicolumn{1}{c}{$b_1^\mathrm{SGC} \sigma_8$} &
-    \multicolumn{1}{c}{$b_2^\mathrm{NGC} \sigma_8$} & 
-    \multicolumn{1}{c}{$b_2^\mathrm{SGC} \sigma_8$} \\[10pt]
+    \multicolumn{1}{c}{$1.341^{+0.040}_{-0.042}$} & 
+    \multicolumn{1}{c}{$1.333^{+0.056}_{-0.062}$} &
+    \multicolumn{1}{c}{$1.293^{+0.697}_{-0.752}$} & 
+    \multicolumn{1}{c}{$0.476^{+1.262}_{-1.175}$} &
+    \multicolumn{1}{c}{} \\ [3pt]
+    \multicolumn{1}{c}{} & 
+    \multicolumn{1}{c}{$0.478^{+0.053}_{-0.049}$} & 
+    \multicolumn{1}{c}{$1.003^{+0.038}_{-0.032}$} & 
+    \multicolumn{1}{c}{$1.014^{+0.025}_{-0.025}$} & 
+    \multicolumn{1}{c}{} & 
+    \multicolumn{1}{c}{} \\ [5pt]
+    \multicolumn{1}{c}{\specialcell{non-Gaussian}} &  
+    \multicolumn{1}{c}{$1.351^{+}_{-}$} & 
+    \multicolumn{1}{c}{$1.335^{+}_{-}$} &
+    \multicolumn{1}{c}{$1.293^{+}_{-}$} & 
+    \multicolumn{1}{c}{$0.422^{+}_{-}$} &
+    \multicolumn{1}{c}{} \\
+    \multicolumn{1}{c}{$\mathcal{L}_\mathrm{ICA}$} & 
+    \multicolumn{1}{c}{$0.456^{+}_{-}$} & 
+    \multicolumn{1}{c}{$1.001^{+}_{-}$} & 
+    \multicolumn{1}{c}{$1.014^{+}_{-}$} & 
+    \multicolumn{1}{c}{} & 
+    \multicolumn{1}{c}{} \\ [10pt]
     \hline 
     \hline
-    \multicolumn{8}{c}{\Sinh~$\zeta$ analysis} \\%[-7pt]
+    \multicolumn{6}{c}{\Sinh~$\zeta$ analysis} \\%[-7pt]
 \hline
 \end{tabular} \label{tab:posterior} 
 \end{center}
