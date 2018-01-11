@@ -16,3 +16,5 @@ run/*
 *.blg
 *.log
 *.out
+
+_*
