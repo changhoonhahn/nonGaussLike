@@ -134,6 +134,21 @@ Alsing, J., Wandelt, B., \& Feeney, S. 2018, \JournalTitle{arXiv:1801.01497
   [astro-ph]}, \href{http://arxiv.org/abs/1801.01497}{{\sffamily
   arXiv:1801.01497 [astro-ph]}}
 
+\bibitem[{Amendola {et~al.}(2016)Amendola, Appleby, Avgoustidis, Bacon, Baker,
+  Baldi, Bartolo, Blanchard, Bonvin, Borgani, Branchini, Burrage, Camera,
+  Carbone, Casarini, Cropper, {de Rham}, Dietrich, Di~Porto, Durrer, Ealet,
+  Ferreira, Finelli, Garcia-Bellido, Giannantonio, Guzzo, Heavens, Heisenberg,
+  Heymans, Hoekstra, Hollenstein, Holmes, Horst, Hwang, Jahnke, Kitching,
+  Koivisto, Kunz, La~Vacca, Linder, March, Marra, Martins, Majerotto, Markovic,
+  Marsh, Marulli, Massey, Mellier, Montanari, Mota, Nunes, Percival, Pettorino,
+  Porciani, Quercellini, Read, Rinaldi, Sapone, Sawicki, Scaramella, Skordis,
+  Simpson, Taylor, Thomas, Trotta, Verde, Vernizzi, Vollmer, Wang, Weller, \&
+  Zlosnik}]{amendola2016}
+Amendola, L., Appleby, S., Avgoustidis, A., {et~al.} 2016,
+  \JournalTitle{arXiv:1606.00180 [astro-ph]},
+  \href{http://arxiv.org/abs/1606.00180}{{\sffamily arXiv:1606.00180
+  [astro-ph]}}
+
 \bibitem[{Arthur \& Vassilvitskii(2007)}]{arthur2007}
 Arthur, D., \& Vassilvitskii, S. 2007, in Proceedings of the {{Eighteenth
   Annual ACM}}-{{SIAM Symposium}} on {{Discrete Algorithms}}, SODA '07
@@ -228,6 +243,13 @@ Crocce, M., Pueblas, S., \& Scoccimarro, R. 2006,
   \href{http://dx.doi.org/10.1111/j.1365-2966.2006.11040.x}{\JournalTitle{Monthly
   Notices of the Royal Astronomical Society}, 373, 369}
 
+\bibitem[{Dalal {et~al.}(2008)Dalal, Dor{\'e}, Huterer, \&
+  Shirokov}]{dalal2008}
+Dalal, N., Dor{\'e}, O., Huterer, D., \& Shirokov, A. 2008,
+  \href{http://dx.doi.org/10.1103/PhysRevD.77.123514}{\JournalTitle{Physical
+  Review D}, 77}, \href{http://arxiv.org/abs/0710.4560}{{\sffamily
+  arXiv:0710.4560}}
+
 \bibitem[{Davis {et~al.}(1985)Davis, Efstathiou, Frenk, \& White}]{davis1985}
 Davis, M., Efstathiou, G., Frenk, C.~S., \& White, S. D.~M. 1985,
   \href{http://dx.doi.org/10.1086/163168}{\JournalTitle{The Astrophysical
@@ -279,6 +301,19 @@ Gardner, J.~P., Connolly, A., \& McBride, C. 2007, in Astronomical {{Data
 Gazta{\~n}aga, E., \& Scoccimarro, R. 2005,
   \href{http://dx.doi.org/10.1111/j.1365-2966.2005.09234.x}{\JournalTitle{Monthly
   Notices of the Royal Astronomical Society}, 361, 824}
+
+\bibitem[{Giannantonio {et~al.}(2012)Giannantonio, Porciani, Carron, Amara, \&
+  Pillepich}]{giannantonio2012}
+Giannantonio, T., Porciani, C., Carron, J., Amara, A., \& Pillepich, A. 2012,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2012.20604.x}{\JournalTitle{Monthly
+  Notices of the Royal Astronomical Society}, 422, 2854}
+
+\bibitem[{Giannantonio {et~al.}(2014)Giannantonio, Ross, Percival, Crittenden,
+  Bacher, Kilbinger, Nichol, \& Weller}]{giannantonio2014}
+Giannantonio, T., Ross, A.~J., Percival, W.~J., {et~al.} 2014,
+  \href{http://dx.doi.org/10.1103/PhysRevD.89.023511}{\JournalTitle{Physical
+  Review D}, 89}, \href{http://arxiv.org/abs/1303.1349}{{\sffamily
+  arXiv:1303.1349}}
 
 \bibitem[{Grieb {et~al.}(2017)Grieb, S{\'a}nchez, Salazar-Albornoz,
   Scoccimarro, Crocce, Dalla~Vecchia, Montesano, Gil-Mar{\'\i}n, Ross, Beutler,
@@ -544,6 +579,16 @@ Roeder, K., \& Wasserman, L. 1997,
   \href{http://dx.doi.org/10.1080/01621459.1997.10474044}{\JournalTitle{Journal
   of the American Statistical Association}, 92, 894}
 
+\bibitem[{Ross {et~al.}(2013)Ross, Percival, Carnero, Zhao, Manera, Raccanelli,
+  Aubourg, Bizyaev, Brewington, Brinkmann, Brownstein, Cuesta, {da Costa},
+  Eisenstein, Ebelke, Guo, Hamilton, Maga{\~n}a, Malanushenko, Malanushenko,
+  Maraston, Montesano, Nichol, Oravetz, Pan, Prada, S{\'a}nchez, Samushia,
+  Schlegel, Schneider, Seo, Sheldon, Simmons, Snedden, Swanson, Thomas, Tinker,
+  Tojeiro, \& Zehavi}]{ross2013}
+Ross, A.~J., Percival, W.~J., Carnero, A., {et~al.} 2013,
+  \href{http://dx.doi.org/10.1093/mnras/sts094}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 428, 1116}
+
 \bibitem[{Ross {et~al.}(2017)Ross, Beutler, Chuang, Pellejero-Ibanez, Seo,
   Vargas-Maga{\~n}a, Cuesta, Percival, Burden, S{\'a}nchez, Grieb, Reid,
   Brownstein, Dawson, Eisenstein, Ho, Kitaura, Nichol, Olmstead, Prada,
@@ -606,6 +651,12 @@ Sinha, M., Berlind, A.~A., McBride, C.~K., {et~al.} 2017,
 Slepian, Z., Eisenstein, D.~J., Brownstein, J.~R., {et~al.} 2017,
   \href{http://dx.doi.org/10.1093/mnras/stx488}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 469, 1738}
+
+\bibitem[{Slosar {et~al.}(2008)Slosar, Hirata, Seljak, Ho, \&
+  Padmanabhan}]{slosar2008}
+Slosar, A., Hirata, C., Seljak, U., Ho, S., \& Padmanabhan, N. 2008,
+  \href{http://dx.doi.org/10.1088/1475-7516/2008/08/031}{\JournalTitle{Journal
+  of Cosmology and Astroparticle Physics}, 2008, 031}
 
 \bibitem[{Springel(2005)}]{springel2005}
 Springel, V. 2005,
