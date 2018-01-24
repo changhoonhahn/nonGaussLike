@@ -69,19 +69,18 @@
     Standard present day large-scale structure (LSS) analyses make a major 
     assumption in their Bayesian parameter inference --- the likelihood has 
     a Gaussian functional-form. We investigate the impact of this assumption 
-    on two recent LSS analyses: the \cite{beutler2017}~powerspectrum multipole ($P_\ell$) analysis and 
-    the \cite{sinha2017}~group multiplicity function ($\zeta$) analysis. For both 
-    $P_\ell$ and $\zeta$ likelihoods, we identify significant non-Gaussianity with 
-    non-parametric divergence estimators used in Machine Learning on mock catalogs 
-    originally constructed for covariance matrix estimation. We then use Gaussian mixture 
+    on two recent LSS analyses: the \cite{beutler2017}~power spectrum multipole ($P_\ell$) analysis and 
+    the \cite{sinha2017}~group multiplicity function ($\zeta$) analysis. Using
+    non-parametric divergence estimators on mock catalogs originally constructed 
+    for covariance matrix estimation we identify significant non-Gaussianity in 
+    both the $P_\ell$ and $\zeta$ likelihoods. We then use Gaussian mixture 
     density estimation and Independent Component Analysis to construct likelihood estimates that 
     approximate the true likelihood better than the Gaussian \emph{pseudo}-likelihood. 
     Using these likelihood estimates, we derive the true posterior probability 
-    distribution of the \Beut~and~\Sinh~parameters. Our parameter constraints reveal 
-    the impact of likelihood non-Gaussianity on the posterior parameter constraints 
-    of \Beut~and~\Sinh. For \Beut, likelihood non-Gaussianity shifts the $f\sigma_8$ 
-    constraint by $0.44\sigma$, but otherwise, does not significantly impact the 
-    overall parameter constraints. For the $\zeta$ analysis, using the pseudo-likelihood 
+    distribution of the \Beut~and~\Sinh~parameters. Likelihood non-Gaussianity 
+    shifts the $f\sigma_8$ constraint by $0.44\sigma$, but otherwise, does not 
+    significantly impact the overall parameter constraints of~\Beut. For the 
+    $\zeta$ analysis, using the pseudo-likelihood 
     significantly underestimates the uncertainties and biases the constraints of 
     \Sinh~halo occupation parameters: $\log\,M_\mathrm{min}$, $\log\,M_1$ and $\alpha$. 
     The divergence and likelihood estimation methods we present provides a straightforward 
@@ -107,14 +106,14 @@ large-scale structure of universe
 Bayesian parameter inference provides the standard framework for 
 deriving cosmological parameters from observation in large scale 
 structure (LSS) studies and cosmology in general. 
-%observed measurements such as the galaxy powerspectrum or two-point correlation function in large scale scturture (LSS) studies and cosmology analyses in general. 
+%observed measurements such as the galaxy power spectrum or two-point correlation function in large scale scturture (LSS) studies and cosmology analyses in general. 
 Using Bayes' rule, 
 \beq
 p( \theta\,|\,x) \propto p( x\,|\,\theta) \, p(\theta)
 \eeq
 the posterior probabilisty distributions of cosmological parameters
 can be derived from observed measurements such as the galaxy 
-powerspectrum. All that's required is the prior distribution of the 
+power spectrum. All that's required is the prior distribution of the 
 parameters, $p(\theta)$, and the likelihood, $p( x\,|\,\theta)$ --- 
 probability of the data (obsevation) given the theoretical model.
 Priors are selected in analyses; so parameter inference ultimately 
@@ -125,10 +124,10 @@ likelihood is correct.
 In present day LSS analyses, two major assumptions go into evaluating the 
 likelihood. First, the likelihood is assumed to have a Gaussian functional 
 form: 
-\beq
+\beq \label{eq:gausslike}
 p(x\,|\,\theta) = \frac{1}{(2\pi)^{d/2} \sqrt{\mathrm{det}(C(\theta))}}\,\,\mathrm{exp}\bigg[\frac{1}{2}(x - m(\theta))^{t} C(\theta)^{-1} (x - m(\theta))\bigg]
 \eeq
-where $d$ is the dimension of $x$, $m(\theta)$ is the theoretical model, and $C$ 
+where $d$ is the dimension of the data vector $x$, $m(\theta)$ is the theoretical model, and $C$ 
 is the covariance matrix. Second, the covariance matrix used in evaluating the Gaussian pseudo-likelihood
 is assumed to be independent of cosmology. The covariance matrix is 
 evaluated only at a selected fiducial cosmology and used throughout 
@@ -136,26 +135,26 @@ the analysis. In principle, the covariance matrix depends on $\theta$,
 and the dependence has been shown to have a significant effect 
 on parameter constraints~\citep[\emph{e.g.}][]{eifler2009, morrison2013, white2015}. 
 In this paper, we focus on the, first, Gaussian pseudo-likelihood assumption. 
-Even if analyses use covariance matrices 
-that account for non-Gaussiance covariance~\citep[\emph{e.g.}][]{scoccimarro1999, hu2001, oconnell2016}, 
-they still use a Gaussian functional form for the likelihood. They 
-therefore still employ a Gaussian \emph{pseudo}-likelihood. 
+Even if analyses use covariance matrices that account for non-Gaussiance 
+covariance~\citep[\emph{e.g.}][]{scoccimarro1999, hu2001, oconnell2016}, 
+they still use a Gaussian functional form (Eq.~\ref{eq:gausslike}) for 
+the likelihood. They therefore still employ a Gaussian \emph{pseudo}-likelihood. 
 We will test the assumption and quantify the impact of it on cosmological 
 parameter constraints. 
 
 The motivation for the Gaussian pseudo-likelihood ultimately stems 
-from the Central Limit Theorem. Take the powerspectrum of the density 
+from the Central Limit Theorem. Take the power spectrum of the density 
 field for example. On large scales, the density field is approximately a 
-Gaussian random field. Then the powerspectrum of a specific Fourier 
+Gaussian random field. Then the power spectrum of a specific Fourier 
 mode would follow a chi-squared distribution, \emph{not} a Gaussian. 
 However, with sufficiently many independent modes contributing, by the Central 
-Limit Theorem the likelihood of the powerspectrum would \emph{approach} a 
+Limit Theorem the likelihood of the power spectrum would \emph{approach} a 
 Gaussian distribution. In practice, we expect the Gaussian assumption 
 to fail in low signal-to-noise regimes. The assumption is also further invalidated 
 by finite survey volume, shot noise, and systematic effects, which correlate
 different modes. The breakdown of Gaussianity is clearly illustrated in earlier 
 surveys such as IRAS where limited survey volume and sparse sampling cause the 
-probability distribution function of the galaxy powerspectrum to deviate 
+probability distribution function of the galaxy power spectrum to deviate 
 significantly from Gaussian~\citep[see Figure 9 in][]{scoccimarro2000}. 
 \cite{hartlap2009} and \cite{sellentin2017} similiarly illustrate the breakdown
 of the Gaussian likelihood assumption for the cosmic shear correlation function 
@@ -167,7 +166,7 @@ since an estimate of the covariance matrix is used for the likelihood,
 the true covariance matrix must be marginalized for accurate parameter 
 inference. This leads to a likelihood that is no longer Gaussian, but rather a 
 multivariate $t$-distribution. Fortunately, the Gaussian pseudo-likelihood 
-assumption is not necessary parameter inference. Outside of LSS, in CMB 
+assumption is not necessary for parameter inference. Outside of LSS, in CMB 
 powerspecturm analyses for instance, the Planck collaboration 
 uses a hybrid likelihood, which only assumes a Gaussian pseudo-likelihood 
 for $C_\ell$ on small scales~(\citealt{ade2014,aghanim2016}; see 
@@ -181,11 +180,11 @@ Gaussian pseudo-likelihood.
 
 In this paper we investigate the impact of the likelihood Gaussianity
 assumption on the two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut)
-and \cite{sinha2017} (hereafter~\Sinh). \Beut~analyzes the powerspectrum 
+and \cite{sinha2017} (hereafter~\Sinh). \Beut~analyzes the power spectrum 
 multipoles ($P_\ell$; monopole, quadrupole, and hexadecapole) to measure
 redshift-space distortions along with the Alcock-Paczynski effect and baryon 
 acoustic oscillation scale. Meanwhile \Sinh~analyzes the group multiplicity 
-function ($\zeta$) in order constrain parameters of the halo model.
+function ($\zeta$) in order to constrain parameters of the halo model.
 Using the~\Beut~and~\Sinh~analyses, we show in this paper that the assumption 
 of likelihood Gaussianity in LSS is not necessary. We will also show that 
 the mock catalogs used in standard LSS analyses for covariance matrix estimation 
@@ -200,7 +199,8 @@ the $P_\ell$ and $\zeta$ likelihoods using them. Then in Section~\ref{sec:likees
 we introduce two methods for estimating the ``true'' likelihood using the 
 mock catalogs. We then use the likelihood estimates to quantify the impact 
 of likelihood non-Gaussianity on the posterior parameter constraints 
-of~\Beut~and~\Sinh. We discuss and conclude the paper in Section~\ref{sec:summary}.  
+of~\Beut~and~\Sinh in Section~\ref{sec:parinf}. We discuss and conclude 
+the paper in Section~\ref{sec:summary}.  
 
 \section{Mock Catalogs} \label{sec:mocks}
 Mock catalogs play an indispensable role in standard cosmological 
@@ -225,7 +225,7 @@ additional advantage: they allow us to
 quantify the non-Gaussianity of the likelihood and more accurately 
 estimate the true likelihood distribution. 
 
-In this paper, we focus on two LSS analyses: the powerspectrum 
+In this paper, we focus on two LSS analyses: the power spectrum 
 multipole ($P_\ell$) analysis of \Beut~and group multiplicity 
 function ($\zeta$) analysis of \Sinh. Throughout the paper we will 
 make extensive use of the mock catalogs used in these analyses. 
@@ -262,11 +262,11 @@ southern galactic cap (SGC) of the LOWZ+CMASS combined sample.
 issues. These issues have since been addressed so in our analysis 
 we use all 2048 mocks for both the NGC and SGC of the LOWZ+CMASS
 combined sample. In \Beut, they conduct multiple analyses, 
-some using only the powerspectrum monopole and quadrupole 
+some using only the power spectrum monopole and quadrupole 
 and others using monopole, quadrupole, and hexadecapole. They 
 also separately analyze three redshift bins: $0.2 < z < 0.5$, 
 $0.4 < z < 0.6$, and $0.5 < z < 0.75$. In this paper we focus on 
-one of these analyses: the analysis of the powerspectrum monopole, 
+one of these analyses: the analysis of the power spectrum monopole, 
 quadrupole, and hexadecapole for the $0.2 < z < 0.5$ bin.  
 
 \subsection{\cite{sinha2017} Mocks} \label{sec:gmf} 
@@ -281,7 +281,7 @@ the $\mathtt{ntropy-fofsv}$ code~\citep{gardner2007}, which uses a
 friend-of-friends algorithm~\citep[FoF;][]{davis1985} with a linking length of $0.2$
 times the mean inter-particle separation. %The FoF halo masses are then adjusted using the \cite{warren2006} correction. 
 \Sinh~uses two configurations of the LasDamas simulations for the 
-$M_r < -19$ and $M_r < -21$ samples of SDSS DR7.
+SDSS DR7 samples with absolute magnitude limits $M_r < -19$ and $M_r < -21$.
 The Consuelo simulation contains $1400^3$ dark matter particles with 
 mass of $1.87 \times 10^9\,h^{-1} M_\odot$ in a cubic volume of 
 $420\,h^{-1} Mpc$ per side evolved from $z_\mathrm{init} = 99$. 
@@ -323,15 +323,15 @@ and their covariance matrices are measured in \Beut~and \Sinh. We then
 describe how we pre-process the mock observables for the methods we describe 
 in the next sections.
 
-To measure the powerspectrum multipoles of the BOSS DR12 galaxies
+To measure the power spectrum multipoles of the BOSS DR12 galaxies
 and the MutliDark-\patchy~mocks (Section~\ref{sec:patchy}), \Beut~uses a 
-fast Fourier transform (FFT) based anisotropic powerspectrum estimator 
+fast Fourier transform (FFT) based anisotropic power spectrum estimator 
 based on \cite{bianchi2015} and \cite{scoccimarro2015}. This estimator 
 estimates the  monopole, quadrupole, and hexadecapole 
-($\ell = 0, 2, 4$) of the powerspectrum using FFTs of the 
+($\ell = 0, 2, 4$) of the power spectrum using FFTs of the 
 overdensity field multipoles for a given survey geometry. For further 
 details on the estimator we refer readers to Section 3 of~\Beut. The
-powerspectrum is computed in bins of $\Delta k = 0.01\,h\,\mathrm{Mpc}^{-1}$
+power spectrum is computed in bins of $\Delta k = 0.01\,h\,\mathrm{Mpc}^{-1}$
 over the range $k = 0.01 - 0.15\, h\,\mathrm{Mpc}^{-1}$
 for $\ell = 0,\,\mathrm{and}\,2$ and $k = 0.01 - 0.10\, h\,\mathrm{Mpc}^{-1}$.
 for $\ell = 4$. 
@@ -420,7 +420,7 @@ The standard approach to parameter inference in LSS studies neglects
 to account for likelihood non-Gaussianity. 
 However, we are not the first to investigate likelihood non-Gaussianity 
 in LSS analyses. Nearly two decades ago, \cite{scoccimarro2000} examined 
-the likelihood non-Gaussianity for the powerspectrum and reduced bispectrum 
+the likelihood non-Gaussianity for the power spectrum and reduced bispectrum 
 using mock catalogs of the IRAS redshift catalogs. More recently, 
 \cite{hartlap2009} and \cite{sellentin2017} examined the non-Gaussianity 
 of the cosmic shear correlation function likelihood using simulations of 
@@ -519,7 +519,7 @@ which we calculate as $\hat{D}(\Xref \parallel \Yref)$. $\Xref$ is a
 data vector with the same dimension as $\Xmock$ sampled from the pseudo-likelihood. 
 $\hat{D}$s are \emph{estimates} of the true divergence, therefore we 
 resample $\Yref$ and compute each $\hat{D}$ estimate \Nd times. 
-In Figure~\ref{fig:div_gauss}, we present the resultings distributions of $\hat{D}$,
+In Figure~\ref{fig:div_gauss}, we present the resulting distributions of $\hat{D}$,
 which illustrate the uncertainty of $\hat{D}$. The discrepancy between 
 the $\hat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$
 distributions and the reference $\hat{D}(\Xref \parallel \Yref)$ distributions 
@@ -531,21 +531,24 @@ the $P_\ell(k)$ and $\zeta(N)$ likelihoods are significantly non-Gaussian}.
 %While signficant, the discrepancies between the $\hat{D}$ distributions for $P_\ell$ are relatively small. As we mention earlier, 
 The Gaussian pseudo-likelihood assumption for $P_\ell$ is motivated 
 by the Central Limit Theorem. If enough modes contribute to the 
-powerspectrum, then the likelihood approaches a Gaussian. Given the 
+power spectrum, then the likelihood approaches a Gaussian. Given the 
 survey volume of BOSS DR12 and the restrictive $k$ range of the \Beut~analysis 
 ($0.01 < k < 0.15$ for $\ell = 0$ and $2$; $0.01 < k < 0.15$ for $\ell = 4$), 
 one would expect this to be mostly true. Although relatively small, we
-still find significant $\Delta \hat{D}$ and therefore likelihood non-Gaussinaity. 
+find significant $\Delta \hat{D}$ and therefore likelihood non-Gaussinaity. 
 In order to better understand the source of this non-Gaussianity, 
 we repeat the divergence comparisons for different $k$ ranges. If we 
-exclude the largest scales and set 
-$k_\mathrm{min} = 0.05$, $\Delta \hat{D}$ decreases. Meanwhile, if we 
-exclude the smallest scales and set $k_\mathrm{max} = 0.1$ for all 
+exclude the largest scales and set $k_\mathrm{min} = 0.05$, $\Delta \hat{D}$ 
+decreases. Meanwhile, if we exclude the smallest scales and set 
+$k_\mathrm{max} = 0.1$ for all 
 multipoles, $\Delta \hat{D}$ increases. This suggests that the largest 
 scales (low $k$) contribute most to the $P_\ell$ likelihood non-Gaussianity.
 Furthermore, when we compare the divergences for just the monopole and quadrupole, 
 $\Delta \hat{D}$ decreases. Among the multipole, the hexadecapole 
 contributes most to the non-Gaussianity of the $P_\ell$ likelihood. 
+In both the low $k$ regimes and the hexadecapole, the contribution to 
+the non-Gaussianity is likely due to an insufficient number of modes 
+for satisfying the Central Limit Theorem.
 
 For $\zeta$, the discrepancies between the $\hat{D}$ distributions 
 are consistent with the fact that the true $\zeta$ likelihood 
@@ -558,7 +561,9 @@ to better understand the source of non-Gaussianity. Excluding the
 lowest $N$ bin does not significantly impact $\Delta \hat{D}$. However, 
 when we exclude the highest $N$ bin, $\Delta \hat{D}$ decreases significantly. 
 We therefore find that the high richness end of $\zeta$ contibute most to 
-the non-Gaussianity of the $\zeta$ likelihood.
+the non-Gaussianity of the $\zeta$ likelihood. The contribution to the 
+non-Gaussianity, similar to the $P_\ell$ case, comes most from the low 
+signal-to-noise regime. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 1 
@@ -574,7 +579,7 @@ the non-Gaussianity of the $\zeta$ likelihood.
     of the pseudo-likelihood onto itself.  
     $\hat{D}_{R\alpha}$ and $\hat{D}_{KL}$ are computed using the 
     non-parametric $k$-NN estimator (Section~\ref{sec:div}) on 
-    the mock data $\Xmock$ and a referece sample $\Yref$ drawn
+    the mock data $\Xmock$ and a reference sample $\Yref$ drawn
     from the pseudo-likelihood. We compute $\hat{D}_{R\alpha}$ and
     $\hat{D}_{KL}$ \Nd times and plot their distribution 
     in order to illustrate the uncertainty of the $\hat{D}$ 
@@ -613,7 +618,7 @@ Gaussian functional form, which is why we estimate the covariance matrix
 from mocks. However, the Gaussian functional form, or any functional form for 
 that matter, is \emph{not} necessary to estimate the likelihood distribution. 
 Instead, the multi-dimensional likelihood distribution 
-can be directly estimated from the set of mock catalogs using --- for 
+can be directly estimated from the set of mock catalogs --- for 
 instance using Gaussian mixture density 
 estimation~\citep{Press:1992:NRC:148286,9780471006268}. 
 Besides its extensive use in machine learning and statistics, 
@@ -647,10 +652,8 @@ normalizing it by the total number of data points, $N$. This entire
 process is repeated until convergence --- \emph{i.e.} when the log-likelihood of 
 given the mixture model $\log\,p({\bf X}_N; \bm{\theta}^t)$ %= \sum\limits_{n=1}^{N} \log\,p({\bf x}_n; \bm{\theta}^t)
 converges. The EM algorithm is guaranteed to converges to a local maximum 
-of the likelihood~\citep{wu1983}. 
-
-In practice, instead of arbitrarily assigning the initial condition, 
-$\bm{\theta}^0_i$ is derived from a $\mathtt{k}$-$\mathtt{means}$ 
+of the likelihood~\citep{wu1983}. In practice, instead of arbitrarily 
+assigning the initial condition, $\bm{\theta}^0_i$ is derived from a $\mathtt{k}$-$\mathtt{means}$ 
 clustering algorithm~\citep{lloyd1982}. Without going into details, the 
 $\mathtt{k}$-$\mathtt{means}$ algorithm clusters the data ${\bf X}_N$ into $k$ 
 clusters, each described by the mean (or centroid) $\mu_i$ of the
@@ -658,32 +661,27 @@ samples in the cluster. The algorithm then iteratively chooses centroids that
 minimize the average squared distance between points in the same cluster.
 For our GMMs, we initialize the EM algorithm using 
 the $\mathtt{k}$-$\mathtt{means}{\tiny ++}$ algorithm of ~\cite{arthur2007}. 
-In Figure~\ref{fig:gmm_ped}, we illustrate Gaussian mixture 
-density estimation in action. We use GMMs with $k = 1$ (top), $
-3$ (middle), and $10$ (bottom) components to estimate the
-distribution of one dimensional data (blue) drawn from three 
-separate Gaussian distributions. The GMM outputs of the EM algorithm 
-are plotted in red with dotted black lines representing each of their 
-components.  
+
+%In Figure~\ref{fig:gmm_ped}, we illustrate Gaussian mixture density estimation in action. We use GMMs with $k = 1$ (top), $ 3$ (middle), and $10$ (bottom) components to estimate the distribution of one dimensional data (blue) drawn from three separate Gaussian distributions. The GMM outputs of the EM algorithm are plotted in red with dotted black lines representing each of their components.  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 2 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.65\textwidth]{figs/GMM_pedagog.pdf}
-\caption{A pedagogical illustration of Gaussian mixture density estimation.
-    We use GMMs with $k = 1$ (top), $3$ (middle), $10$ (bottom) 
-    components to estimate the distribution of data (blue) drawn from three 
-    Gaussian distributions. The GMM outputs of the EM algorithm 
-    are plotted in red with dotted lines representing each of their 
-    components (Section~\ref{sec:gmm}). We also include the BIC of 
-    the GMMs, which we use to select the number of components $k$. 
-    Of the three panels, $k=3$ has the lowest BIC and therefore 
-    best represents the data according to our selection scheme.} 
-\label{fig:gmm_ped}
-\end{center}
-\end{figure}
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=0.65\textwidth]{figs/GMM_pedagog.pdf}
+%\caption{A pedagogical illustration of Gaussian mixture density estimation.
+%    We use GMMs with $k = 1$ (top), $3$ (middle), $10$ (bottom) 
+%    components to estimate the distribution of data (blue) drawn from three 
+%    Gaussian distributions. The GMM outputs of the EM algorithm 
+%    are plotted in red with dotted lines representing each of their 
+%    components (Section~\ref{sec:gmm}). We also include the BIC of 
+%    the GMMs, which we use to select the number of components $k$. 
+%    Of the three panels, $k=3$ has the lowest BIC and therefore 
+%    best represents the data according to our selection scheme.} 
+%\label{fig:gmm_ped}
+%\end{center}
+%\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 So far in our description of GMMs, we have kept
@@ -706,13 +704,9 @@ for the number of parameters in the model:
 \mathrm{BIC} = -2\,\mathrm{ln}\,\mathcal{L} + N_\mathrm{par}\,\mathrm{ln}\,N_\mathrm{data}.
 \eeq
 We select $k$ based on the number of components in the model with the 
-lowest BIC. Of the three panels in Figure~\ref{fig:gmm_ped}, the GMM 
-model with $k=3$ components has the lowest BIC and therefore would be 
-selected. The choice of $k=3$ here is obviously justified. The $k = 1$ 
-GMM is definitely not flexible enough to characterize the underlying 
-distribution and the $k=10$ GMM clearly overfits the distribution. In 
-this example, GMM with $k$ selected by BIC correctly identifies the three 
-Gaussian distributions from which the data is drawn. 
+lowest BIC. 
+
+%Of the three panels in Figure~\ref{fig:gmm_ped}, the GMM model with $k=3$ components has the lowest BIC and therefore would be selected. The choice of $k=3$ here is obviously justified. The $k = 1$ GMM is definitely not flexible enough to characterize the underlying distribution and the $k=10$ GMM clearly overfits the distribution. In this example, GMM with $k$ selected by BIC correctly identifies the three Gaussian distributions from which the data is drawn. 
 
 With Gaussian mixture density estimation we can directly estimate 
 the likelihood distribution using the mock catalogs. We first fit 
@@ -915,9 +909,8 @@ For comparison, we include the distributions from Figure~\ref{fig:div_gauss}.
     the ICA likelihood over the pseudo-likelihood is more modest than 
     our GMM estimate from Section~\ref{sec:gmm}. However, for 
     $P_\ell$ where the GMM method struggled, our ICA likelihood 
-    provides a significant improvement. Our ICA likelihood provides
-    a significantly better estimate of the true $P_\ell$ likelihood
-    than the pseudo-likelihood.
+    provides a significantly better estimate of the true $P_\ell$ 
+    likelihood than the pseudo-likelihood.
     }
 \label{fig:div_ica}
 \end{center}
@@ -943,7 +936,7 @@ Based on the performances of the GMM and ICA methods, in the following
 sections we use the ICA likelihood for the~\Beut~analysis and the GMM 
 likelihood for the~\Sinh~analysis. 
 
-\section{Impact on Parameter Inference}
+\section{Impact on Parameter Inference} \label{sec:parinf}
 To derive the posterior distribution of their model parameters,
 both~\Beut~and~\Sinh~use the standard Monte Carlo Markov Chain (MCMC) 
 approach with the Gaussian pseudo-likelihood. The \Beut~analysis 
@@ -1007,7 +1000,7 @@ confidence intervals of the posteriors are also listed in Table~\ref{tab:posteri
 $f \sigma_8$ and $b_2^\mathrm{SGC} \sigma_8$ are the main parameters with 
 noticeable change in their posteriors. The posterior of $b_2^\mathrm{SGC} \sigma_8$
 broadens from $0.476^{+1.262}_{-1.175}$ to $0.422^{+1.517}_{-1.377}$ once likelihood 
-non-Gaussianity is incorporated. Meanwhile, the $f \sigma_8$ posterior
+non-Gaussianity is incorporated. More importantly, the $f \sigma_8$ posterior
 shifts from $0.478^{+0.053}_{-0.049}$ to $0.456^{+0.059}_{-0.049}$, which 
 corresponds to a  shift of $0.44 \sigma$. The other parameter constraints, 
 however, remain largely unaffected by likelihood non-Gaussianity. 
@@ -1032,11 +1025,11 @@ The fact that the $P_\ell$ analysis is largely unaffected by likelihood
 non-Gaussianity is consistent with the divergences in 
 Figure~\ref{fig:div_gauss}, which found relatively small discrepancies 
 between the likelihood and pseudo-likelihood. It also illustrates
-the remarkable effectiveness of the Central Limit Theorem. %for the powerspectrum multipole over the \Beut~$k$ range. 
+the remarkable effectiveness of the Central Limit Theorem. %for the power spectrum multipole over the \Beut~$k$ range. 
 
 %Furthermore, the Gaussian pseudo-likelihood assumption for $P_\ell$ 
 %is motivated by the Central Limit Theorem: if enough modes contribute  
-%to the powerspectrum, then the likelihood approaches a Gaussian. In 
+%to the power spectrum, then the likelihood approaches a Gaussian. In 
 %the restrictive $k$ range of the \Beut~analysis ($0.01 < k < 0.15$), 
 %one would expect this to be the case. 
 %\todo{When we repeat the comparison for the $P_\ell$ analysis without 
@@ -1109,8 +1102,11 @@ likelihood non-Gaussianity significantly impacts the posterior
 distributions of the HOD parameters. Each of the parameter constraints 
 for $\log\,M_\mathrm{min}$, $\log M_1$, and $\alpha$, are significantly 
 broadened and shifted from the pseudo-likelihood constraints
-(see Table~\ref{tab:posterior} for details). 
-The impact of likelihood non-Gaussianity is further emphasized in 
+(see Table~\ref{tab:posterior} for details). The $\log M_1$ constraint, 
+for instance, is shifted by $0.43 \sigma$ and its $68\%$ confidence
+interval is expanded by $42\%$. Similarly, the $\alpha$ constraint is
+shifted by $0.51 \sigma$ and its $68\%$ confidence interval is expanded 
+by $66\%$. The impact of likelihood non-Gaussianity is further emphasized in 
 the joint posterior distributions in Figure~\ref{fig:gmf_contour}.
 The $\log\,M_\mathrm{min}$ versus $\sigma_{\log M}$ and 
 $\log\,M_\mathrm{min}$ versus $\alpha$ contours are both shifted 
@@ -1152,16 +1148,22 @@ pseudo-likelihood biases the $f\sigma_8$ constraints by $\sim 0.5\%$.
 Meanwhile, the Dark Energy Spectroscopic Instrument~\citep[DESI;][]{levi2013}, 
 for instance, seeks to constrain $f\sigma_8$ to within a 
 percent\footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}. 
-The future, however, is encouraging in this regard.  The next surveys 
+The future, however, is somewhat encouraging in this regard. The next surveys 
 will expand the cosmic volumes probed by galaxies and therefore increase 
 the number of modes on all scales. Even as they seek to extend the $k$ 
 range of analyses, thanks to the Central Limit Theorm, we consequently expect 
-likelihood non-Gaussianity to have a smaller effect. For higher order statistics, 
-however, likelihood non-Gaussianity will still have a significant effect. After 
-all, for a given survey, \cite{scoccimarro2000} found that the reduced 
-bispectrum likelihood is significantly more non-Gaussian than the powerspectrum 
-likelihood.  
+likelihood non-Gaussianity to have a smaller effect. However, without 
+precisely quantifying the impact, it remains to be determined whether
+likelihood non-Gaussianity will signficantly impact future $P_\ell$ analyses.  
+
+For higher order statistics beyond $P_\ell$, likelihood non-Gaussianity will 
+likely have a significant effect. After all, for a given survey, \cite{scoccimarro2000} 
+found that the reduced bispectrum likelihood is significantly more 
+non-Gaussian than the power spectrum likelihood. 
 %non-Gaussianity bispectrum, which has lower signal-to-noise on large scales~\citep{sefusatti2005},
+Likelihood non-Gaussianity will also significantly impact primordial 
+non-Gaussianity ($f_\mathrm{NL}$) constraints from LSS~\citep[\emph{e.g.}][]{dalal2008, slosar2008, ross2013, giannantonio2014}
+since the constraining power mainly come from large scales. 
 Fortunately the methods we present in this paper can easily be extended to other 
 observables and analyses. 
 
@@ -1302,18 +1304,19 @@ parameter inference --- the likelihood has a Gaussian functional-form.
 Although this assumption is motivated by the Central Limit Theorem, 
 in detail the assumption cannot be true. 
 In this paper, we investigate the impact of this assumption on two recent 
-LSS analyses: the \Beut~powerspectrum multipole ($\ell = 0, 2$, and $4$) 
+LSS analyses: the \Beut~power spectrum multipole ($\ell = 0, 2$, and $4$) 
 analysis and the \Sinh~group multiplicity function analysis. We combine 
 mock catalogs, originally constructed 
 for covariance matrix estimation in these analyses, with non-parametric 
 divergence estimators, used in Machine Learning, to measure the divergences 
 between the $P_\ell$ and $\zeta$ likelihoods and the Gaussian 
 pseudo-likelihoods from \Beut~and~\Sinh. For both the $P_\ell$ and $\zeta$ likelihoods, 
-the divergences reveal 
-significant likelihood non-Gaussianity. For the $P_\ell$ likelihood,
+the divergences reveal significant likelihood non-Gaussianity. For the $P_\ell$ likelihood,
 large scales (low $k$) and the hexadecapole contribute most to the
 relatively small non-Gaussianity. Meanwhile, for the $\zeta$ likelihood, 
 the high richness end of $\zeta$ contribute most to the non-Gaussianity. 
+In both likelihoods, the low signal-to-regime contribute most to the 
+non-Gaussianity.
 
 From the same mock catalogs of~\Beut~and~\Sinh, we use non-parametric density 
 estimation to construct estimates of the likelihood distribution 
