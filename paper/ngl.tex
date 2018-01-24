@@ -61,8 +61,34 @@
 %\title{How I Learned to Stop Worrying and Love The Central Limit Theorem}
 \title{Likelihood Non-Gaussianity in Large Scale Structure Analyses}
 \date{\texttt{DRAFT~---~\githash~---~\gitdate~---~NOT READY FOR DISTRIBUTION}}
-\author{ChangHoon~Hahn\refstepcounter{footnote}\refstepcounter{footnote}, Florian~Beutler, Manodeep~Sinha, Andreas~Berlind, Shirley~Ho}
-\affil{Lawrence Berkeley National Laboratory, 1 Cyclotron Rd, Berkeley CA 94720, USA}
+
+
+\newcounter{affilcounter}
+% \altaffiltext{1}{}
+
+\setcounter{affilcounter}{1}
+
+\edef \lbl {\arabic{affilcounter}}\stepcounter{affilcounter}
+\altaffiltext{\lbl}{Lawrence Berkeley National Laboratory, 1 Cyclotron Rd, Berkeley CA 94720, USA}
+
+\edef \icg {\arabic{affilcounter}}\stepcounter{affilcounter}
+\altaffiltext{\icg}{Institute of Cosmology \& Gravitation, Dennis Sciama Building, University of Portsmouth, Portsmouth, PO1 3FX, UK}
+
+\edef \swin {\arabic{affilcounter}}\stepcounter{affilcounter}
+\altaffiltext{\swin}{Centre for Astrophysics \& Supercomputing, Swinburne University of Technology, 1 Alfred St., Hawthorn, VIC 3122, Australia}
+
+\edef \vand {\arabic{affilcounter}}\stepcounter{affilcounter}
+\altaffiltext{\vand}{Department of Physics and Astronomy, Vanderbilt University, Nashville, TN 37235, USA}
+
+\edef \carn {\arabic{affilcounter}}\stepcounter{affilcounter}
+\altaffiltext{\carn}{Department of Physics, Carnegie Mellon University, 5000 Forbes Avenue, Pittsburgh, PA 15213, USA}
+
+\author{
+    ChangHoon~Hahn\altaffilmark{\lbl},
+    Florian~Beutler\altaffilmark{\icg},
+    Manodeep~Sinha\altaffilmark{\swin}, 
+    Andreas~Berlind\altaffilmark{\vand}, 
+    Shirley~Ho\altaffilmark{\lbl, \carn}}
 \email{changhoon.hahn@lbl.gov}
 
 \begin{abstract}
