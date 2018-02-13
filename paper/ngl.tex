@@ -967,9 +967,13 @@ increase the size of their observable data vector. As
 the divergence estimation framework we present makes it easy to test the accuracy of different methods, a hard 
 choice is not necessary and multiple methods can easily be tested to construct 
 the best estimate of the likelihood distribution for each specific analysis. 
-Based on the performances of the GMM and ICA methods, in the following
-sections we use the ICA likelihood for the~\Beut~analysis and the GMM 
-likelihood for the~\Sinh~analysis. 
+In~\cite{hartlap2009}, they suggest that a low $N_\mathrm{mock}$ may bias the 
+ICA likelihood estimate. However, by examining the divergence discrepancy
+as we did in Figures~\ref{fig:div_ica} and~\ref{fig:div_gmm}, we ensure that 
+our likelihoods provide a better estimate of the true likelihood than the 
+Gaussian pseudo-likelihood. Based on the performances of the GMM and ICA 
+methods, in the following sections we use the ICA likelihood for the~\Beut~analysis 
+and the GMM likelihood for the~\Sinh~analysis. 
 
 \section{Impact on Parameter Inference} \label{sec:parinf}
 To derive the posterior distribution of their model parameters,
