@@ -83,12 +83,20 @@
 \edef \carn {\arabic{affilcounter}}\stepcounter{affilcounter}
 \altaffiltext{\carn}{Department of Physics, Carnegie Mellon University, 5000 Forbes Avenue, Pittsburgh, PA 15213, USA}
 
+\edef \ccpp {\arabic{affilcounter}}\stepcounter{affilcounter}
+\altaffiltext{\ccpp}{Center for Cosmology and Particle Physics, Department of Physics, New York University, 726 Broadway, New York, NY 10003, USA} 
+
+\edef \cca {\arabic{affilcounter}}\stepcounter{affilcounter}
+\altaffiltext{\cca}{Flatiron Institute, 162 Fifth Avenue, New York, NY 10010, USA} 
+
 \author{
     ChangHoon~Hahn\altaffilmark{\lbl},
     Florian~Beutler\altaffilmark{\icg},
     Manodeep~Sinha\altaffilmark{\swin}, 
     Andreas~Berlind\altaffilmark{\vand}, 
-    Shirley~Ho\altaffilmark{\lbl, \carn}}
+    Shirley~Ho\altaffilmark{\lbl,\carn}, 
+    David~W.~Hogg\altaffilmark{\ccpp, \cca}
+}
 \email{changhoon.hahn@lbl.gov}
 
 \begin{abstract}
@@ -98,18 +106,18 @@
     on two recent LSS analyses: the \cite{beutler2017}~power spectrum multipole ($P_\ell$) analysis and 
     the \cite{sinha2017}~group multiplicity function ($\zeta$) analysis. Using
     non-parametric divergence estimators on mock catalogs originally constructed 
-    for covariance matrix estimation we identify significant non-Gaussianity in 
+    for covariance matrix estimation, we identify significant non-Gaussianity in 
     both the $P_\ell$ and $\zeta$ likelihoods. We then use Gaussian mixture 
     density estimation and Independent Component Analysis to construct likelihood estimates that 
     approximate the true likelihood better than the Gaussian \emph{pseudo}-likelihood. 
     Using these likelihood estimates, we derive the true posterior probability 
     distribution of the \Beut~and~\Sinh~parameters. Likelihood non-Gaussianity 
-    shifts the $f\sigma_8$ constraint by $0.44\sigma$, but otherwise, does not 
+    shifts the $f\sigma_8$ constraint by $-0.44\sigma$, but otherwise, does not 
     significantly impact the overall parameter constraints of~\Beut. For the 
     $\zeta$ analysis, using the pseudo-likelihood significantly underestimates 
     the uncertainties and biases the constraints of \Sinh~halo occupation parameters. %$\log\,M_\mathrm{min}$, $\log\,M_1$ and $\alpha$. 
-    For $\log\, M_1$ and $\alpha$, the posteriors are shifted by $0.43\sigma$ and 
-    $0.51\sigma$ and broadened by $42\%$ and $66\%$, respectively. The divergence 
+    For $\log\, M_1$ and $\alpha$, the posteriors are shifted by $+0.43\sigma$ and 
+    $-0.51\sigma$ and broadened by $42\%$ and $66\%$, respectively. The divergence 
     and likelihood estimation methods we present provides a straightforward framework 
     for quantifying the impact of likelihood non-Gaussianity and deriving more 
     accurate parameter constraints. 
@@ -1029,7 +1037,7 @@ noticeable change in their posteriors. The posterior of $b_2^\mathrm{SGC} \sigma
 broadens from $0.476^{+1.262}_{-1.175}$ to $0.422^{+1.517}_{-1.377}$ once likelihood 
 non-Gaussianity is incorporated. More importantly, the $f \sigma_8$ posterior
 shifts from $0.478^{+0.053}_{-0.049}$ to $0.456^{+0.059}_{-0.049}$, which 
-corresponds to a  shift of $0.44 \sigma$. The other parameter constraints, 
+corresponds to a shift of $-0.44 \sigma$. The other parameter constraints, 
 however, remain largely unaffected by likelihood non-Gaussianity. 
 
 Focusing on the main cosmological parameters $f \sigma_8$, 
@@ -1080,7 +1088,7 @@ the remarkable effectiveness of the Central Limit Theorem. %for the power spectr
     plots that mark the $68\%$ and $95\%$ confidence intervals of
     the posterior. The discrepancies between the posteriors are most 
     evident for the parameters $f\sigma_8$ and and $b^\mathrm{SGC}_2 \sigma_8$.  
-    The $f\sigma_8$ constraint shifts by $0.44\sigma$. 
+    The $f\sigma_8$ constraint shifts by $-0.44\sigma$. 
     Hence, using the pseudo-likelihood in the $P_\ell$ analysis 
     biases the posteriors of these parameters. 
     Overall, however, likelihood non-Gaussianity does \emph{not} 
@@ -1130,9 +1138,9 @@ distributions of the HOD parameters. Each of the parameter constraints
 for $\log\,M_\mathrm{min}$, $\log M_1$, and $\alpha$, are significantly 
 broadened and shifted from the pseudo-likelihood constraints
 (see Table~\ref{tab:posterior} for details). The $\log M_1$ constraint, 
-for instance, is shifted by $0.43 \sigma$ and its $68\%$ confidence
+for instance, is shifted by $+0.43 \sigma$ and its $68\%$ confidence
 interval is expanded by $42\%$. Similarly, the $\alpha$ constraint is
-shifted by $0.51 \sigma$ and its $68\%$ confidence interval is expanded 
+shifted by $-0.51 \sigma$ and its $68\%$ confidence interval is expanded 
 by $66\%$. The impact of likelihood non-Gaussianity is further emphasized in 
 the joint posterior distributions in Figure~\ref{fig:gmf_contour}.
 The $\log\,M_\mathrm{min}$ versus $\sigma_{\log M}$ and 
@@ -1373,13 +1381,13 @@ they allow us to derive more accurate posterior probability distributions
 than with Gaussian pseudo-likelihoods. By comparing our posteriors to the
 parameter constraints from \Beut~and~\Sinh, we find that likelihood 
 non-Gaussianity does not significantly impact the $P_\ell$ analysis of \Beut. 
-Among the non-nuissance parameters, only $f\sigma_8$ is impacted by $0.44\sigma$. 
+Among the non-nuissance parameters, only $f\sigma_8$ is impacted by $-0.44\sigma$. 
 Meanwhile for the \Sinh~$\zeta$ analysis, likelihood non-Gaussianity 
 significant impacts the posterior distributions of the HOD parameter. 
 Using the pseudo-likelihood significantly underestimates the width of the 
 $\log\,M_\mathrm{min}$, $\log\, M_1$, and $\alpha$ posteriors and
 significantly biases their constraints. For $\log\, M_1$ and $\alpha$, the posteriors
-are broadened by $42\%$ and $66\%$ and shifted by $0.43\sigma$ and $0.51\sigma$ 
+are broadened by $42\%$ and $66\%$ and shifted by $+0.43\sigma$ and $-0.51\sigma$ 
 respectively. Accounting for likelihood non-Gaussianity, significantly 
 eases the tension between the $\zeta$ and $w_p(r_p)$ constraints found 
 in \Sinh. Our comparisons of the posteriors highlight the importance of 
@@ -1428,14 +1436,21 @@ parameter inference in LSS.
 It's a pleasure to thank 
     Emanuele~Castorina,
     Simone~Ferraro,
+    Daniel~Foreman-Mackey, 
     David~W.~Hogg,
     Emmaneul~Schaan, 
+    Roman~Scoccimarro,
     Uro{\u s}~Seljak,
-    and Roman~Scoccimarro 
+    Sukhdeep~Singh, 
+    and Michael~Wilson
 for valuable discussions.
 \todo{more acknowledgements}
-This project made use of the NASA Astrophysics Data System
-and open-source software Python, numpy, SciPy, matplotlib, 
+This project used resources of the National Energy Research 
+Scientific Computing Center, a DOE Office of Science User 
+Facility supported by the Office of Science of the U.S. 
+Department of Energy under Contract No. DE-AC02-05CH11231.
+This project also made use of the NASA Astrophysics Data 
+System and open-source software Python, numpy, SciPy, matplotlib, 
 and Scikit-learn.
 
 \bibliographystyle{yahapj}
