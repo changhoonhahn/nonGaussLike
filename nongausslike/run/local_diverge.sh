@@ -3,7 +3,7 @@
 
 for div in "renyi:.5" "kl"; do 
     for K in 10; do #5 8 10 15; do 
-        for obv in "gmf" #"pk"
+        for obv in "pk" #"gmf" #"pk"
         do 
             if [ $obv = "pk" ]; then 
                 Nref=2000
@@ -15,6 +15,8 @@ for div in "renyi:.5" "kl"; do
             #    $obv $div ref $Nref $K 100 -1
             #python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py \
             #    $obv $div pX_gauss $Nref $K 100 -1
+            python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py \
+                $obv $div pX_gauss_hartlap $Nref $K 100 -1
             #python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py \
             #    $obv $div pX_GMM $Nref $K 100 -1 30
             #python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py \
@@ -32,8 +34,8 @@ for div in "renyi:.5" "kl"; do
             #    $obv $div pXi_ICA_scottKDE $Nref $K 100 6
             #python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py \
             #    $obv $div pXi_ICA_scottKDE_ref $Nref $K 100 6
-            python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py \
-                $obv $div pXi_parICA_scottKDE $Nref $K 100 6
+            #python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py \
+            #    $obv $div pXi_parICA_scottKDE $Nref $K 100 6
             #python /Users/chang/projects/nonGaussLike/nongausslike/run/run_diverge.py \
             #    $obv $div pXi_parICA_scottKDE_ref $Nref $K 100 6
         done 

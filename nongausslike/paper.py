@@ -94,6 +94,61 @@ def _div_Gauss_gmf(K=10):
     return None
 
 
+def _div_Gauss_Pk_hartlap(K=10):
+    ''' compare the renyi-alpha and KL divergence for the following  
+    - D( gauss(C_X) || gauss(C_X) ) 
+    - D( mock X || gauss(C_X))
+    for both P(k) and GMF 
+    '''
+    # D( gauss(C_X) || gauss(C_X) ) vs D( mock X || gauss(C_X))
+    fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K), 'pX_gauss_hartlap.K'+str(K)] 
+    lbls = ['Ref.', r'$D(\textbf{X}^\mathrm{mock} \parallel \textbf{Y}^\mathrm{ref})$', 
+            r'$D(\textbf{X}^\mathrm{mock} \parallel \textbf{Y}^\mathrm{ref}_\mathrm{hartlap})$'] 
+    
+    fig = plt.figure(figsize=(12,5))
+    for i_obv, obvs in enumerate(['pk']):#, 'gmf']): 
+        for i_div, div_func in enumerate(['renyi0.5', 'kl']): 
+            divs = []  
+            for f in fs: 
+                if obvs == 'pk': 
+                    f_div = ''.join([UT.dat_dir(), 
+                        'diverg.pk.ngc.', f, '.Nref2000.', div_func, '.dat']) 
+                elif obvs == 'gmf': 
+                    f_div = ''.join([UT.dat_dir(), 
+                        'diverg.gmf.', f, '.Nref10000.', div_func, '.dat']) 
+                div = np.loadtxt(f_div)
+                divs.append(div) 
+            
+            if obvs == 'pk': hrange = [-0.5, 0.5]
+            elif obvs == 'gmf': hrange = [-0.1, 0.25]
+            nbins = 40
+            y_max = 0. 
+            sub = fig.add_subplot(2,2,2*i_obv+i_div+1)
+            for div, lbl in zip(divs, lbls): 
+                hh = np.histogram(div, normed=True, range=hrange, bins=nbins)
+                bp = UT.bar_plot(*hh) 
+                sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', label=lbl) 
+                y_max = max(y_max, bp[1].max()) 
+            sub.set_xlim(hrange) 
+            sub.set_ylim([0., y_max*1.4]) 
+            if i_obv == 0: 
+                if i_div == 1: sub.legend(loc='upper right', prop={'size': 15})
+                else: 
+                    sub.text(0.075, 0.85, r'$P_\ell(k)$', ha='left', va='top', 
+                        transform=sub.transAxes, fontsize=20)
+            elif i_obv == 1: 
+                if div_func == 'kl': sub.set_xlabel(r'KL divergence', fontsize=20)
+                elif div_func == 'renyi0.5': 
+                    sub.set_xlabel(r'R\'enyi-$\alpha$ divergence', 
+                        fontsize=20)
+                    sub.text(0.075, 0.85, r'$\zeta(N)$', ha='left', va='top', 
+                            transform=sub.transAxes, fontsize=20)
+    fig.subplots_adjust(wspace=.15)
+    f_fig = ''.join([UT.tex_dir(), 'figs/', '_kNNdiverg_Gauss_hartlap.pdf'])
+    fig.savefig(f_fig, bbox_inches='tight') 
+    return None
+
+
 def div_Gauss(K=10):
     ''' compare the renyi-alpha and KL divergence for the following  
     - D( gauss(C_X) || gauss(C_X) ) 
@@ -391,7 +446,6 @@ def Like_RSD():
     # importance weight derived from p_KDE(X_i ICA)
     f_pXiICA = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
         'Beutler_et_al_full_shape_analysis_z1_chain0.RSD_pXiICA_gauss_weights.defICA.kde.dat']) 
-    #    'Beutler_et_al_full_shape_analysis_z1_chain0.RSD_pXiICA_gauss_weights.parICA.kde.dat']) 
     wimp = np.loadtxt(f_pXiICA, skiprows=1, unpack=True, usecols=[2]) 
     like_lbl = r'$\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$'
     
@@ -497,7 +551,6 @@ def RSD_contours():
     # importance weight derived from p_KDE(X_i ICA)
     f_pXiICA = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
         'Beutler_et_al_full_shape_analysis_z1_chain0.RSD_pXiICA_gauss_weights.defICA.kde.dat']) 
-    #    'Beutler_et_al_full_shape_analysis_z1_chain0.RSD_pXiICA_gauss_weights.parICA.kde.dat']) 
     wimp = np.loadtxt(f_pXiICA, skiprows=1, unpack=True, usecols=[2]) 
     like_lbl = r'$\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$'
     
@@ -772,14 +825,128 @@ def GMF_contours(tag_mcmc='manodeep'):
     return None
 
 
+def _Like_RSD(): 
+    ''' Compare importance sampled P_l likelihoods to original 
+    Beuter+(2017) likelihood 
+    '''
+    # import MCMC chain 
+    chain = Inf.mcmc_chains('beutler_z1', ichain=0)
+    # remove burnin?  
+    burnin = np.ones(chain['chi2'].shape, dtype=bool) 
+    burnin[:int(chain['chi2'].shape[0]/4)] = False 
+
+    # importance weight derived from p_KDE(X_i ICA)
+    f_pXiICA = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
+        'Beutler_et_al_full_shape_analysis_z1_chain0.RSD_pXiICA_gauss_weights.defICA.kde.dat']) 
+    lnP_denom, lnP_numer, _wimp = np.loadtxt(f_pXiICA, skiprows=1, unpack=True, usecols=[0,1,2]) 
+    
+    f_hartlap = (2048.-37.-2)/2047.
+    print f_hartlap
+    wimp = np.exp(lnP_numer - f_hartlap * lnP_denom)
+    #print wimp/_wimp
+
+    like_lbl = r'$\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$'
+    
+    # ignoring some of the nuissance parameters
+    labels = ['b1sig8_NGC', 'b1sig8_SGC', 'b2sig8_NGC', 'b2sig8_SGC', 
+            'alpha_perp', 'alpha_para', 'fsig8'] 
+    lbltex = [r'$b^{NGC}_1\sigma_8$', r'$b^{SGC}_1\sigma_8$', r'$b^{NGC}_2\sigma_8$', r'$b^{SGC}_2\sigma_8$', 
+            r'$\alpha_\perp$', r'$\alpha_\parallel$', r'$f \sigma_8$'] 
+    prior_min = [1., 1., -3., -3., 0.8, 0.8, 0.2]#, -10000., -10000., 0.5, 0.5]
+    prior_max = [1.8, 1.8, 5., 5., 1.2, 1.2, 0.8]#, 10000., 10000., 15., 15.]
+    yrange = [[0., 10.], [0., 10.], [0., 0.7], [0., 0.7], [0.0, 18.], [0., 18.], [0., 10.]]
+    yticks = [[0., 4., 8.], [0., 4., 8.], [0., 0.2, 0.4, 0.6], [0., 0.2, 0.4, 0.6],
+            [0., 5., 10., 15.], [0., 5., 10., 15.], [0., 4., 8.]] 
+    nbin = 30 
+    
+    f_out = open(''.join([UT.tex_dir(), 'dat/_pk_likelihood.dat']), 'w') 
+
+    pretty_colors = prettycolors() 
+    fig = plt.figure(figsize=(15, 9)) 
+    gs = gridspec.GridSpec(5, 4, height_ratios=[3, 0.75, 1.1, 3, 0.75]) 
+
+    for i in range(len(labels)): 
+        if i < 4: 
+            sub = plt.subplot(gs[i]) 
+            sub_box = plt.subplot(gs[i+4])
+        else: 
+            sub = plt.subplot(gs[i+8]) 
+            sub_box = plt.subplot(gs[i+12]) 
+
+        bplots1 = [] 
+        # original Beutler et al.(2017) constraints
+        hh = np.histogram(chain[labels[i]][burnin], normed=True, bins=nbin, range=[prior_min[i], prior_max[i]])
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none')
+        lowlow, low, med, high, highhigh = np.percentile(chain[labels[i]][burnin], [2.5, 16, 50, 84, 97.5])
+        bplots1.append({'med': med, 'q1': low, 'q3': high, 'whislo': lowlow, 'whishi': highhigh, 'fliers': []})
+
+        f_out.write(''.join(['# ', labels[i], ' Beutler et al. (2017)', '\n']))
+        f_out.write('\t'.join([str(round(low,5)), str(round(med,5)), str(round(high,5)), '\n']))
+
+        wlim = np.percentile(wimp[burnin], 99.9)
+        lims = np.where(burnin & (wimp < wlim)) #lims = np.where(wimp < 1e3)
+        # importance weighted constraints
+        hh = np.histogram(chain[labels[i]][lims], weights=wimp[lims],normed=True, bins=nbin, 
+                range=[prior_min[i], prior_max[i]])
+        bp = UT.bar_plot(*hh) 
+        sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], alpha=0.75, edgecolor='none') 
+        lowlow_w, low_w, med_w, high_w, highhigh_w = [wq.quantile_1D(chain[labels[i]][lims], wimp[lims], qq) for qq in 
+                [0.025, 0.16, 0.50, 0.84, 0.975]]
+        # stats dict for each box
+        bplots1.append({'med': med_w, 'q1': low_w, 'q3': high_w, 'whislo': lowlow_w, 'whishi': highhigh_w, 'fliers': []})
+
+        f_out.write(''.join(['# ', labels[i], ' ', like_lbl, '\n']))
+        f_out.write('\t'.join([str(round(low_w,5)), str(round(med_w,5)), str(round(high_w,5)), '\n']))
+        f_out.write('\n') 
+
+        medianprops = {'alpha': 0.}
+        whiskprop = dict(linestyle='-', linewidth=1, color='k') 
+        boxprops = dict(linestyle='-', linewidth=1, color='k')
+        bxp1 = sub_box.bxp(bplots1, positions=[1,2], vert=False, patch_artist=True, 
+                      showfliers=False, boxprops=boxprops, medianprops=medianprops, whiskerprops=whiskprop)
+
+        for ibox, box in enumerate(bxp1['boxes']):
+            if ibox == 0:
+                box.set(facecolor=pretty_colors[1], alpha=0.75)
+            elif ibox == 1:
+                box.set(facecolor=pretty_colors[3], alpha=0.75)
+        # x-axis 
+        sub.set_xlim([prior_min[i], prior_max[i]]) 
+        sub.set_xticklabels([]) 
+        sub_box.set_xlim([prior_min[i], prior_max[i]]) 
+        if i < 4: sub_box.set_xlabel(lbltex[i], labelpad=10, fontsize=22)
+        else: sub_box.set_xlabel(lbltex[i], labelpad=10, fontsize=25)
+        # y-axis
+        sub.set_ylim(yrange[i]) 
+        sub.set_yticks(yticks[i]) 
+        sub_box.set_yticklabels([]) 
+    f_out.close() 
+
+    sub = fig.add_subplot(1,1,1, frameon=False) 
+    sub.fill_between(bp[0], np.zeros(len(bp[0])), np.zeros(len(bp[0])), 
+            alpha=0.75, edgecolor='none', label=r'Beutler et al. (2017)')
+    sub.fill_between(bp[0], np.zeros(len(bp[0])), np.zeros(len(bp[0])), 
+            alpha=0.75, edgecolor='none', label='Hahn et al. (2018) \n $\mathcal{L}^\mathrm{ICA}$' ) 
+    sub.set_xticks([])
+    sub.set_yticks([])
+    sub.legend(bbox_to_anchor=(1.01, 0.4), prop={'size': 17})  # legend
+
+    fig.subplots_adjust(wspace=.2, hspace=0)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/', '_Like_Pk_comparison.pdf']), bbox_inches='tight') 
+    return None
+
+
 if __name__=="__main__": 
     #GMM_pedagog()
     #_div_Gauss_gmf(K=10)
+    #_div_Gauss_Pk_hartlap(K=10)
     #div_Gauss(K=10)
     #div_GMM()
     div_ICA()
     #GMF_contours()
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
+    #_Like_RSD()
     #Like_RSD()
     #RSD_contours()
     #Like_GMF()

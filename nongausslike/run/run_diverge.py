@@ -41,7 +41,7 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
     - D( mock X || PI p(X^i_ICA) GMM)
     '''
     if isinstance(Nref, float): Nref = int(Nref)
-    if diver not in ['ref', 'pX_gauss', 
+    if diver not in ['ref', 'pX_gauss', 'pX_gauss_hartlap', 
             'pX_GMM', 'pX_GMM_ref', 
             'pX_KDE', 'pX_KDE_ref', 
             'pX_scottKDE', 'pX_scottKDE_ref', 
@@ -96,6 +96,11 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
 
     if diver in ['pX_gauss', 'ref']: 
         C_X = np.cov(X_w.T) # covariance matrix
+    elif diver in ['pX_gauss_hartlap']: 
+        C_X = np.cov(X_w.T) # covariance matrix
+        f_hartlap = (n_mock - float(X_mock.shape[1]) - 2.)/(n_mock - 1.) 
+        print("hartlap factor = %f" % f_hartlap) 
+        C_X = C_X / f_hartlap # scale covariance matrix by hartlap factor
     elif diver in ['pX_GMM', 'pX_GMM_ref']: # p(mock X) GMM
         gmms, bics = [], [] 
         for i_comp in range(1,n_comp_max+1):
@@ -158,7 +163,7 @@ def diverge(obvs, diver, div_func='kl', Nref=1000, K=5, n_mc=10, n_comp_max=10, 
     for i in range(n_mc): 
         print('%i montecarlo' % i)
         t0 = time.time() 
-        if diver == 'pX_gauss': 
+        if diver in ['pX_gauss', 'pX_gauss_hartlap']: 
             # estimate divergence between gmfs_white and a 
             # Gaussian distribution described by C_gmf
             div_i = NG.kNNdiv_gauss(X_w, C_X, Knn=K, div_func=div_func, Nref=Nref, njobs=njobs)

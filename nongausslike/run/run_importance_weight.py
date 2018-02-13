@@ -70,7 +70,7 @@ if __name__=='__main__':
     tag_like = Sys.argv[2]
     print('--- %s, %s ---' % (analysis, tag_like))
     i = 3 
-    if 'ICA' in tag_like: 
+    if 'ica' in tag_like.lower(): 
         tag_ica = Sys.argv[i]
         i += 1 
     else: 
