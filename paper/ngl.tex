@@ -33,7 +33,7 @@
 \newcommand{\given}{\,|\,}
 \newcommand{\pseudo}{{\mathrm{pseudo}}}
 \newcommand{\Var}{\mathrm{Var}}
-\newcommand{\Nd}{100}
+\newcommand{\Nd}{{100}\xspace}
 
 \newcommand{\specialcell}[2][c]{%
   \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
@@ -473,15 +473,16 @@ One way to derive the linear transformation is through the eigen-decomposition
 of the covariance matrix~\citep[\emph{e.g.}][]{hartlap2009, sellentin2017}. We, alternatively, 
 derive the linear transformation ${\bf L}$ using Cholesky decomposition of the 
 inverse covariance matrix~\citep{Press:1992:NRC:148286}: 
-$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. We have checked \ms{is this true?} that a different methods for whitening 
+$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. We have checked \ms{I added `checked'
+  but don't know if that is true?} that a different methods for whitening 
 do not impact the results of the paper. With this pre-processed 
 mock observable data, we proceed to quantifying 
 the non-Gaussianity of the $P_\ell$ and $\zeta$ likelihoods in the next section. 
 
 
 \section{Quantifying the Likelihood non-Gaussianity} \label{sec:div}
-The standard approach to parameter inference in \lss studies neglects
-to account for likelihood non-Gaussianity. 
+The standard approach to parameter inference in \lss studies does not 
+account for likelihood non-Gaussianity. 
 However, we are not the first to investigate likelihood non-Gaussianity 
 in \lss analyses. Nearly two decades ago, \cite{scoccimarro2000} examined 
 the likelihood non-Gaussianity for the power spectrum and reduced bispectrum 
@@ -500,7 +501,7 @@ Integrated Squared Error (MISE) as a distance metric between
 Gaussian random variables and the whitened mock observable 
 data vector to characterize non-Gaussian correlations between elements 
 of the data vector. These indirect measures of non-Gaussianity 
-are challenging to interpret and extend more generally to \lss studies. 
+are challenging to interpret or apply more generally to \lss studies. 
 %Sellentin & Heavens (2018) presented stringent tests that characterize non-Gaussian statistical behaviour, and any sound weak lensing likelihood should hence pass these tests.  The methods derived in Sellentin & Heavens (2018) test whether all pairwise combinations of data elements display the correct statistical behaviour under addition, division and multiplication, and whether the correct marginal distribution ensues for each data point. 
 
 A more direct approach can be taken to quantify the 
@@ -516,6 +517,7 @@ and the R\'enyi-$\alpha$ divergence
 \beq \label{eq:renyi}
 D_{R-\alpha} ( p \parallel q ) = \frac{1}{\alpha -1} \log \int p^\alpha(x)\, q^{1 -\alpha}(x)\,{\rm d}x. 
 \eeq
+\ms{Is it fine to re-write $D_{R-\alpha}$ as $\dfrac{p^\alpha(x)}{q^{\alpha - 1}(x)}$ to highlight the connection with $D_{KL}$?}
 In the limit as $\alpha$ approaches 1, the R\'enyi-$\alpha$ divergence is
 equivalent to the KL divergence.
 %To evaluate the R\'enyi-$\alpha$ divergence, we need to evaluate the following
@@ -524,13 +526,13 @@ equivalent to the KL divergence.
 %D_{\alpha} ( p \parallel q ) = \int p^\alpha(x) q^{1-\alpha}(x)\,{\rm d}x. 
 %\eeq
 
-Of course, in our case, we don't know $p(x)$ --- \emph{i.e.} the probability 
-distribution function of our observable. If we did, we would simply use that 
-instead of bothering with the covariance matrix or this paper. We can, however, 
+Unfortunately the key unknown in parameter inference is $p(x)$ --- \emph{i.e.} the probability 
+distribution function of the observable.  Without knowing $p(x)$, we can not
+evaluate Eq.~\ref{eq:kl} or Eq.~\ref{eq:renyi}. We can, however, 
 still estimate the divergence using nonparametric divergence estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
-These estimators allow us to estimate the divergence directly from 
+These estimators allow us to estimate the divergence, $\hat{D}(X_{1:n} \parallel Y_{1:m})$, directly from 
 samples $X_{1:n} = \{ X_1, ... X_n \}$ and $Y_{1:m} = \{ Y_1, ... Y_m \}$ 
-drawn from $p$ and $q$ respectively: $\hat{D}(X_{1:n} \parallel Y_{1:m})$. 
+drawn from $p$ and $q$ respectively.
 For instance, the estimator presented in \cite{poczos2012} allows us to estimate 
 the kernel function of the R\'enyi-$\alpha$ divergence,
 \beq \label{eq:d_alpha}
@@ -544,8 +546,10 @@ of the $k^\mathrm{th}$ nearest neighbor of $x$ in the sample $Y_{1:m}$. Then
 D_{\alpha}(p \parallel q) \approx \hat{D}_{\alpha}(X_{1:n} \parallel Y_{1:m}) = \frac{B_{k,\alpha}}{n} \left(\frac{n-1}{m}\right)^{1-\alpha}
 \sum\limits_{i=1}^{n} \left(\frac{\rho_k^{d}(X_i)}{\nu_k^{d}(X_i)} \right)^{1-\alpha},
 \eeq
-where $B_{k, \alpha} = \frac{\Gamma(k)^2}{\Gamma(k-\alpha+1)\Gamma(k+\alpha-1)}$. 
-This estimator, as \cite{poczos2012} proves, is asymptotically unbias,
+where $B_{k, \alpha} = \dfrac{(\Gamma(k))^2}{\Gamma(k-\alpha+1)\Gamma(k+\alpha-1)}$. \ms{I added
+brackets for the numerator to clarify the exact meaning. Please confirm that that
+is what is meant in the \cite{poczos2012}, because I could not tell}
+\cite{poczos2012} proves that this estimator is asymptotically unbiased: 
 \beq
 \lim_{n, m \rightarrow \infty} \mathbb{E} \big[ \hat{D}_{\alpha} (X_{1:n} \parallel Y_{1:m}) \big] = D_{\alpha} (p \parallel q).
 \eeq
@@ -563,13 +567,13 @@ With these estimators, we can now explicitly quantify the
 non-Gaussianity of the likelihood by computing the divergence 
 between the likelihood distribution and the Gaussian 
 pseudo-likelihood distribution, $\mathcal{L}^\mathrm{pseudo}$.
-We draw a reference sample ${\bf Y}^\mathrm{ref}$ from 
-$\mathcal{L}^\mathrm{pseudo}$ then %\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$ 
-since $\Xmock$ is in principle sampled from $p(x)$, we can use the 
+Since $\Xmock$ is in principle sampled from $p(x)$, we can use the 
 estimators to compute 
 $D(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo}) \approx \hat{D}(\Xmock \parallel \mathcal{L}^\mathrm{pseudo})$. %\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C}\,))$.
-Similar to the experiments detailed in \cite{poczos2012}, 
-we construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as $\Xmock$: 
+Similar to the experiments detailed in \cite{poczos2012},
+we draw a reference sample ${\bf Y}^\mathrm{ref}$ from 
+$\mathcal{L}^\mathrm{pseudo}$ then %\mathcal{N}(\overline{\bf X}^\mathrm{mock}, \mathbb{C})$ 
+We construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as $\Xmock$: 
 $2000$ and $10,000$ for the $P_\ell$ and $\zeta$ analyses respectively. 
 Based on the sample size of $\Xmock$ we calculate the divergences using 
 the $k=10$ nearest neighbors. 
@@ -587,8 +591,10 @@ In Figure~\ref{fig:div_gauss}, we present the resulting distributions of $\hat{D
 which illustrate the uncertainty of $\hat{D}$. The discrepancy between 
 the $\hat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$
 distributions and the reference $\hat{D}(\Xref \parallel \Yref)$ distributions 
-($\Delta \hat{D}$) quantify the discrepancy between the pseudo-likelihood
-and the likelihood. Each panel of Figure~\ref{fig:div_gauss} shows significant 
+($\Delta \hat{D}$) quantify the discrepancy between the likelihood
+and the pseudo-likelihood\ms{I altered the ordering of `likelihood' and `pseudo-l' to
+  correspond to the ordering of the estimators. Also, should the likelihood
+  estimator involve $\Xmock$ rather than $p(x)$?}. Each panel of Figure~\ref{fig:div_gauss} shows significant 
 discrepancy between the two distributions --- \emph{both 
 the $P_\ell(k)$ and $\zeta(N)$ likelihoods are significantly non-Gaussian}. 
 
@@ -1482,9 +1488,12 @@ This project used resources of the National Energy Research
 Scientific Computing Center, a DOE Office of Science User 
 Facility supported by the Office of Science of the U.S. 
 Department of Energy under Contract No. DE-AC02-05CH11231.
+Parts of this research were conducted by the Australian Research Council
+Centre of Excellence for All Sky Astrophysics in 3 Dimensions (ASTRO 3D),
+through project number CE170100013.
 This project also made use of the NASA Astrophysics Data 
 System and open-source software Python, numpy, SciPy, matplotlib, 
-and Scikit-learn.
+and Scikit-learn. 
 
 \bibliographystyle{yahapj}
 \bibliography{nongausslike}
