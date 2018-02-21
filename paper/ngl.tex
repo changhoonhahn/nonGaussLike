@@ -5,6 +5,8 @@
 \usepackage{natbib}
 \usepackage{ctable}
 \usepackage{bm}
+\usepackage[normalem]{ulem} % Added by MS for \sout -> not required for final version
+\usepackage{xspace}
 \input{vc}
 
 % typesetting shih
@@ -45,7 +47,7 @@
 \newcommand{\eitem}{\end{itemize}}
 \newcommand{\beq}{\begin{equation}}
 \newcommand{\eeq}{\end{equation}}
-\newcommand{\todo}[1]{{\bf \textcolor{red}{#1}}}
+%% \newcommand{\todo}[1]{{\bf \textcolor{red}{#1}}}
 \newcommand{\Dmock}{\mathbf{D}^\mathrm{mock}}
 \newcommand{\Xmock}{{\bf X}^\mathrm{mock}}
 \newcommand{\Xref}{{\bf X}^\mathrm{ref}}
@@ -53,6 +55,21 @@
 \newcommand{\Ralpha}{R\'enyi-$\alpha$}
 \newcommand{\Beut}{\citetalias{beutler2017}}
 \newcommand{\Sinh}{\citetalias{sinha2017}}
+
+%% MS: To make collaborating easier
+\definecolor{orange}{rgb}{1,0.5,0}
+\setlength{\marginparwidth}{1.2in}
+\let\oldmarginpar\marginpar
+\renewcommand\marginpar[1]{\-\oldmarginpar[\raggedleft\footnotesize #1]%
+  {\raggedright\footnotesize #1}}
+
+%%% Here are the things that make collaborative effort easier
+\newcommand{\todo}[1]{\marginpar{\color{red}TODO}{\color{red}#1}}
+\newcommand{\ab}[1]{{\color{blue}{\bf AB:} #1}}
+\newcommand{\ms}[1]{{\color{orange}{\bf MS:}} {\em #1}}
+
+%% MS: Latex shortcuts
+\newcommand{\lss}{{\small{LSS}}\xspace}
 
 \newcommand{\patchy}{{\fontshape\scdefault\selectfont patchy}}
 
@@ -77,6 +94,9 @@
 \edef \swin {\arabic{affilcounter}}\stepcounter{affilcounter}
 \altaffiltext{\swin}{Centre for Astrophysics \& Supercomputing, Swinburne University of Technology, 1 Alfred St., Hawthorn, VIC 3122, Australia}
 
+\edef \astrothreed {\arabic{affilcounter}}\stepcounter{affilcounter}
+\altaffiltext{\swin}{ARC Centre of Excellence for All Sky Astrophysics in 3 Dimensions (ASTRO 3D)}
+
 \edef \vand {\arabic{affilcounter}}\stepcounter{affilcounter}
 \altaffiltext{\vand}{Department of Physics and Astronomy, Vanderbilt University, Nashville, TN 37235, USA}
 
@@ -92,7 +112,7 @@
 \author{
     ChangHoon~Hahn\altaffilmark{\lbl},
     Florian~Beutler\altaffilmark{\icg},
-    Manodeep~Sinha\altaffilmark{\swin}, 
+    Manodeep~Sinha\altaffilmark{\swin, \astrothreed, \vand}, 
     Andreas~Berlind\altaffilmark{\vand}, 
     Shirley~Ho\altaffilmark{\lbl,\carn}, 
     David~W.~Hogg\altaffilmark{\ccpp, \cca}
@@ -139,55 +159,61 @@ large-scale structure of universe
 
 \section{Introduction}
 Bayesian parameter inference provides the standard framework for 
-deriving cosmological parameters from observation in large scale 
-structure (LSS) studies and cosmology in general. 
-%observed measurements such as the galaxy power spectrum or two-point correlation function in large scale scturture (LSS) studies and cosmology analyses in general. 
+deriving cosmological parameters from observation of large scale 
+structure (\lss) studies. {\sout{and cosmology in general}}. 
+%observed measurements such as the galaxy power spectrum or two-point correlation function in large scale scturture (\lss) studies and cosmology analyses in general. 
 Using Bayes' rule, 
 \beq
 p( \theta\,|\,x) \propto p( x\,|\,\theta) \, p(\theta)
 \eeq
-the posterior probabilisty distributions of cosmological parameters
+the posterior probability distributions of cosmological parameters
 can be derived from observed measurements such as the galaxy 
-power spectrum. All that's required is the prior distribution of the 
+power spectrum. All that is required are the prior distribution of the 
 parameters, $p(\theta)$, and the likelihood, $p( x\,|\,\theta)$ --- 
-probability of the data (obsevation) given the theoretical model.
+probability of the data (observation) given the theoretical model.
 Priors are selected in analyses; so parameter inference ultimately 
-boils down to evaluating the likelihood. It consequently goes without 
-say that our analyses can only lead to unbiased constraints if the our 
-likelihood is correct. 
+reduces to evaluating the likelihood. Consequently,   
+analyses can yield unbiased constraints {\em only} if the likelihood
+evaluation is correct. 
 
-In present day LSS analyses, two major assumptions go into evaluating the 
+In present day \lss analyses, two major assumptions go into evaluating the 
 likelihood. First, the likelihood is assumed to have a Gaussian functional 
 form: 
 \beq \label{eq:gausslike}
-p(x\,|\,\theta) = \frac{1}{(2\pi)^{d/2} \sqrt{\mathrm{det}(C(\theta))}}\,\,\mathrm{exp}\bigg[\frac{1}{2}(x - m(\theta))^{t} C(\theta)^{-1} (x - m(\theta))\bigg]
+%% p(x\,|\,\theta) = \frac{1}{(2\pi)^{d/2}
+%%   \sqrt{\mathrm{det}(C(\theta))}}\,\,\mathrm{exp}\bigg[\frac{1}{2}(x -
+%%   m(\theta))^{t} C(\theta)^{-1} (x - m(\theta))\bigg]
+p(x\,|\,\theta) = \frac{1}{(2\pi)^{d/2} \sqrt{\mathrm{det}(C)}}\,\,\mathrm{exp}\bigg[\frac{1}{2}(x - m(\theta))^{t} C^{-1} (x - m(\theta))\bigg]
 \eeq
-where $d$ is the dimension of the data vector $x$, $m(\theta)$ is the theoretical model, and $C$ 
+where $d$ is the dimension of the data vector $x$, $m(\theta)$ are the
+theoretical predictions given the model parameters $\theta$, and $C$ 
 is the covariance matrix. Second, the covariance matrix used in evaluating the Gaussian pseudo-likelihood
-is assumed to be independent of cosmology. The covariance matrix is 
-evaluated only at a selected fiducial cosmology and used throughout 
+is assumed to be independent of cosmology or the model parameters.
+The covariance matrix is evaluated only at a selected fiducial cosmology with  
+fiducial model parameters and is assumed to be fixed throughout  
 the analysis. In principle, the covariance matrix depends on $\theta$, 
 and the dependence has been shown to have a significant effect 
 on parameter constraints~\citep[\emph{e.g.}][]{eifler2009, morrison2013, white2015}. 
-In this paper, we focus on the, first, Gaussian pseudo-likelihood assumption. 
-Even if analyses use covariance matrices that account for non-Gaussiance 
+In this paper, we focus on the first assumption of Gaussian pseudo-likelihood. 
+Even when the analyses uses covariance matrices that account for non-Gaussian 
 covariance~\citep[\emph{e.g.}][]{scoccimarro1999, hu2001, oconnell2016}, 
-they still use a Gaussian functional form (Eq.~\ref{eq:gausslike}) for 
-the likelihood. They therefore still employ a Gaussian \emph{pseudo}-likelihood. 
-We will test the assumption and quantify the impact of it on cosmological 
-parameter constraints. 
+the likelihood is still assumed to have a Gaussian functional form
+(Eq.~\ref{eq:gausslike}). The net effect is still equivalent to a Gaussian \emph{pseudo}-likelihood. 
+We will test the assumption and quantify the impact of this Gaussian
+\emph{pseudo}-likelihood assumption on cosmological parameter constraints. 
 
 The motivation for the Gaussian pseudo-likelihood ultimately stems 
-from the Central Limit Theorem. Take the power spectrum of the density 
+from the `Central Limit Theorem'. For instance, consider the power spectrum of the density 
 field for example. On large scales, the density field is approximately a 
-Gaussian random field. Then the power spectrum of a specific Fourier 
+Gaussian random field and the power spectrum of a specific Fourier 
 mode would follow a chi-squared distribution, \emph{not} a Gaussian. 
-However, with sufficiently many independent modes contributing, by the Central 
-Limit Theorem the likelihood of the power spectrum would \emph{approach} a 
-Gaussian distribution. In practice, we expect the Gaussian assumption 
-to fail in low signal-to-noise regimes. The assumption is also further invalidated 
-by finite survey volume, shot noise, and systematic effects, which correlate
-different modes. The breakdown of Gaussianity is clearly illustrated in earlier 
+However, with sufficiently many independent modes contributing, the likelihood
+of the power spectrum would \emph{approach} a Gaussian distribution by the Central 
+Limit Theorem. In practice, we expect the Gaussian assumption 
+to fail in low signal-to-noise regimes. The assumption is also further
+invalidated by correlations among different modes caused by 
+by finite survey volume, shot noise, and systematic effects.
+The breakdown of Gaussianity is clearly illustrated in earlier 
 surveys such as IRAS where limited survey volume and sparse sampling cause the 
 probability distribution function of the galaxy power spectrum to deviate 
 significantly from Gaussian~\citep[see Figure 9 in][]{scoccimarro2000}. 
@@ -198,33 +224,33 @@ likelihood.
 
 Even if the likelihood is Gaussian, \cite{sellentin2016} argue that 
 since an estimate of the covariance matrix is used for the likelihood, 
-the true covariance matrix must be marginalized for accurate parameter 
-inference. This leads to a likelihood that is no longer Gaussian, but rather a 
+for accurate parameter inference the true covariance matrix must be marginalized over. 
+This marginalization leads to a likelihood that is no longer Gaussian, but rather a 
 multivariate $t$-distribution. Fortunately, the Gaussian pseudo-likelihood 
-assumption is not necessary for parameter inference. Outside of LSS, in CMB 
-powerspecturm analyses for instance, the Planck collaboration 
+assumption is not necessary for parameter inference. Outside of \lss, in CMB 
+power-specturm analyses for instance, the Planck collaboration 
 uses a hybrid likelihood, which only assumes a Gaussian pseudo-likelihood 
 for $C_\ell$ on small scales~(\citealt{ade2014,aghanim2016}; see 
 also~\citealt{efstathiou2004, efstathiou2006}). On large scales (low-$\ell$), 
 the likelihood is instead computed directly in pixel-space and extensively 
 validated. Testing for likelihood non-Gaussianity and non-Gaussian likelihoods 
-in general are not currently part of standard practice in LSS studies. For 
-more precise parameter constraints from LSS, however, analyses must go beyond the 
+in general are not currently part of standard practice in \lss studies. However
+to obtain more accurate parameter constraints from \lss, analyses need to go beyond the 
 Gaussian pseudo-likelihood.
-%Hence for precise parameter constraints, LSS analyses using the Gaussian pseudo-likelihood must insure that their analysis is conducted in sufficiently high signal-to-noise regimes and test the impact of likelihood non-Gaussianity.  This is unfortunately not a part of the standard practice in LSS studies. 
+%Hence for precise parameter constraints, \lss analyses using the Gaussian pseudo-likelihood must insure that their analysis is conducted in sufficiently high signal-to-noise regimes and test the impact of likelihood non-Gaussianity.  This is unfortunately not a part of the standard practice in \lss studies. 
 
 In this paper we investigate the impact of the likelihood Gaussianity
-assumption on the two recent LSS analyses of \cite{beutler2017} (hereafter~\Beut)
+assumption on the two recent \lss analyses of \cite{beutler2017} (hereafter~\Beut)
 and \cite{sinha2017} (hereafter~\Sinh). \Beut~analyzes the power spectrum 
 multipoles ($P_\ell$; monopole, quadrupole, and hexadecapole) to measure
 redshift-space distortions along with the Alcock-Paczynski effect and baryon 
-acoustic oscillation scale. Meanwhile \Sinh~analyzes the group multiplicity 
+acoustic oscillation scale. Meanwhile \Sinh~fits to the observed SDSS group multiplicity 
 function ($\zeta$) in order to constrain parameters of the halo model.
 Using the~\Beut~and~\Sinh~analyses, we show in this paper that the assumption 
-of likelihood Gaussianity in LSS is not necessary. We will also show that 
-the mock catalogs used in standard LSS analyses for covariance matrix estimation 
-can be used to quantify the non-Gaussianity. More importantly we will use the 
-mocks to estimate the ``true'' non-Gaussian likelihood. 
+of likelihood Gaussianity in \lss is not necessary. We will also show that 
+the mock catalogs used in standard \lss analyses for covariance matrix estimation 
+can be used to quantify the non-Gaussianity. More importantly, we will directly
+use the mocks to estimate the ``true'' non-Gaussian likelihood. 
 
 We begin in Section~\ref{sec:mocks} by describing the mock catalogs that
 we use throughout the paper, constructed originally for covariance 
@@ -238,15 +264,15 @@ of~\Beut~and~\Sinh in Section~\ref{sec:parinf}. We discuss and conclude
 the paper in Section~\ref{sec:summary}.  
 
 \section{Mock Catalogs} \label{sec:mocks}
-Mock catalogs play an indispensable role in standard cosmological 
-anslyses of LSS studies. They're used for testing analysis 
+Mock catalogs are indispensable for standard cosmological 
+analyses of \lss studies. Mocks are used for testing analysis 
 pipelines~\citep[][]{beutler2017, grieb2017, tinkerinpreparation}, 
 testing the effect of systematics~\citep{guo2012, vargas-magana2014, hahn2017c, pinol2017, ross2017}, 
 and, most relevantly for this paper, estimating the covariance 
 matrix~\citep[][]{parkinson2012, kazin2014, grieb2017, alam2017, beutler2017, sinha2017}. 
-In fact, nearly all current state-of-the-art LSS analyses use
-covariance matrices estimated from mocks to evaluate the likelihood 
-for parameter inference. 
+In fact, nearly all current state-of-the-art \lss analyses use
+covariance matrices estimated from mocks to evaluate the likelihood.
+
 
 While some argue for analytic estimates of the covariance 
 matrix~\citep[e.g.][]{mohammed2017} or estimates directly from data
@@ -260,7 +286,7 @@ additional advantage: they allow us to
 quantify the non-Gaussianity of the likelihood and more accurately 
 estimate the true likelihood distribution. 
 
-In this paper, we focus on two LSS analyses: the power spectrum 
+In this paper, we focus on two \lss analyses: the power spectrum 
 multipole ($P_\ell$) analysis of \Beut~and group multiplicity 
 function ($\zeta$) analysis of \Sinh. Throughout the paper we will 
 make extensive use of the mock catalogs used in these analyses. 
@@ -451,10 +477,10 @@ the non-Gaussianity of the $P_\ell$ and $\zeta$ likelihoods.
 
 
 \section{Quantifying the Likelihood non-Gaussianity} \label{sec:div}
-The standard approach to parameter inference in LSS studies neglects
+The standard approach to parameter inference in \lss studies neglects
 to account for likelihood non-Gaussianity. 
 However, we are not the first to investigate likelihood non-Gaussianity 
-in LSS analyses. Nearly two decades ago, \cite{scoccimarro2000} examined 
+in \lss analyses. Nearly two decades ago, \cite{scoccimarro2000} examined 
 the likelihood non-Gaussianity for the power spectrum and reduced bispectrum 
 using mock catalogs of the IRAS redshift catalogs. More recently, 
 \cite{hartlap2009} and \cite{sellentin2017} examined the non-Gaussianity 
@@ -471,7 +497,7 @@ Integrated Squared Error (MISE) as a distance metric between
 Gaussian random variables and the whitened mock observable 
 data vector to characterize non-Gaussian correlations between elements 
 of the data vector. These indirect measures of non-Gaussianity 
-are challenging to interpret and extend more generally to LSS studies. 
+are challenging to interpret and extend more generally to \lss studies. 
 %Sellentin & Heavens (2018) presented stringent tests that characterize non-Gaussian statistical behaviour, and any sound weak lensing likelihood should hence pass these tests.  The methods derived in Sellentin & Heavens (2018) test whether all pairwise combinations of data elements display the correct statistical behaviour under addition, division and multiplication, and whether the correct marginal distribution ensues for each data point. 
 
 A more direct approach can be taken to quantify the 
@@ -632,10 +658,10 @@ signal-to-noise regime.
 In the previous section, we estimate the divergence between the 
 $P_\ell$ and $\zeta$ likelihoods and their respective Gaussian 
 pseudo-likelihoods. These divergences identify and quantify 
-the significant non-Gaussianity in the likelihoods of LSS studies.   
+the significant non-Gaussianity in the likelihoods of \lss studies.   
 Our ultimate goal, however, is to quantify the impact of likelihood 
 non-Gaussianity on the final cosmological parameter constrains and
-to develop more accurate methods for parameter inference in LSS. 
+to develop more accurate methods for parameter inference in \lss. 
 From the divergence estimates alone, it's not obvious how they propagate 
 onto the final parameter constraints. Therefore in this section, 
 we present two methods for more accurately estimating the true non-Gaussian 
@@ -646,7 +672,7 @@ quantify the impact of likelihood non-Gaussianity on the
 \Beut~and \Sinh~parameter constraints. 
 
 \subsection{Gaussian Mixture Likelihood Estimation} \label{sec:gmm}
-When mock catalogs are used for parameter inference in LSS analyses, 
+When mock catalogs are used for parameter inference in \lss analyses, 
 they essentially serve as data points sampling the likelihood distribution. 
 For the pseudo-likelihood, this distribution is assumed to have a 
 Gaussian functional form, which is why we estimate the covariance matrix 
@@ -962,7 +988,7 @@ more accurate likelihood estimate. This demonstrates that the ICA
 method is an effective alterative to the more direct Gaussian mixture method. 
 Furthermore, the effectiveness of the ICA method in estimating
 higher dimensional likelihoods with fewer samples (mocks) is  
-particularly appealing for LSS, since analyses continue to 
+particularly appealing for \lss, since analyses continue to 
 increase the size of their observable data vector. As 
 the divergence estimation framework we present makes it easy to test the accuracy of different methods, a hard 
 choice is not necessary and multiple methods can easily be tested to construct 
@@ -1169,7 +1195,7 @@ present provides an accurate estimate of the non-Gaussian likelihood.
 
 The posteriors of the \Sinh~$\zeta$ analysis highlight the importance of 
 accounting for likelihood non-Gaussianity in parameter inference of 
-LSS studies. One of the main results of the \Sinh~HOD analysis 
+\lss studies. One of the main results of the \Sinh~HOD analysis 
 is that the $\Lambda$CDM + HOD model can successful 
 fit either $\zeta(N)$ or the project two-point correlation function 
 $w_p(r_p)$, separately but struggles to jointly fit both (see Figure~10). 
@@ -1201,7 +1227,7 @@ For higher order statistics, likelihood non-Gaussianity will likely
 have a more significant effect. After all, for a given survey, \cite{scoccimarro2000} 
 found that the reduced bispectrum likelihood is significantly more 
 non-Gaussian than the power spectrum likelihood. Constraints on primordial 
-non-Gaussianity ($f_\mathrm{NL}$) from LSS~\citep[\emph{e.g.}][]{dalal2008, slosar2008, ross2013, giannantonio2014}, 
+non-Gaussianity ($f_\mathrm{NL}$) from \lss~\citep[\emph{e.g.}][]{dalal2008, slosar2008, ross2013, giannantonio2014}, 
 will also be significantly impacted by likelihood non-Gaussianity. 
 In fact, the constraining power for $f_\mathrm{NL}$ comes from the 
 largest scales, which we find contribute most to the non-Gaussianity. 
@@ -1343,12 +1369,12 @@ in this paper can easily be extended to other observables and analyses.
 
 
 \section{Summary and Discussion} \label{sec:summary}
-Current standard LSS analyses makes a major assumption in their 
+Current standard \lss analyses makes a major assumption in their 
 parameter inference --- the likelihood has a Gaussian functional-form. 
 Although this assumption is motivated by the Central Limit Theorem, 
 in detail the assumption cannot be true. 
 In this paper, we investigate the impact of this assumption on two recent 
-LSS analyses: the \Beut~power spectrum multipole ($\ell = 0, 2$, and $4$) 
+\lss analyses: the \Beut~power spectrum multipole ($\ell = 0, 2$, and $4$) 
 analysis and the \Sinh~group multiplicity function analysis. We combine 
 mock catalogs, originally constructed 
 for covariance matrix estimation in these analyses, with non-parametric 
@@ -1395,7 +1421,7 @@ are broadened by $42\%$ and $66\%$ and shifted by $+0.43\sigma$ and $-0.51\sigma
 respectively. Accounting for likelihood non-Gaussianity, significantly 
 eases the tension between the $\zeta$ and $w_p(r_p)$ constraints found 
 in \Sinh. Our comparisons of the posteriors highlight the importance of 
-incorporating likelihood non-Gaussianity in parameter inference of LSS studies. 
+incorporating likelihood non-Gaussianity in parameter inference of \lss studies. 
 
 Based on our results, it's unclear whether $P_\ell$ analyses using future 
 surveys (\emph{e.g.} DESI, Euclid) will be significantly impacted by 
@@ -1410,7 +1436,7 @@ non-Gaussianity may still be a significant effect. For higher order statistics
 such as the galaxy bispectrum or three-point function, even for future surveys, 
 likelihood non-Gaussianity will likely be a significant effect to consider for 
 parameter inference. We also expect it to significantly impact primordial non-Gaussianity 
-($f_\mathrm{NL}$) constraints from LSS, which derive most of their constraining 
+($f_\mathrm{NL}$) constraints from \lss, which derive most of their constraining 
 power from the largest, most non-Gaussian, scales. Regardless of our expectation, 
 for ever more accurate parameter inference the Gaussian likelihood assumption must 
 be extensively tested. The divergence and likelihood estimations we introduce in 
@@ -1422,7 +1448,7 @@ and derive more accurate estimates of the likelihood. With a similar
 motivation at addressing likelihoods that are non-Gaussian or difficult to 
 write down, methods for likelihood-free inference such as Approximate Bayesian 
 Computation~\citep[ABC;][]{hahn2017b,kacprzak2017,alsing2018} have recently 
-been introduced to LSS studies. 
+been introduced to \lss studies. 
 Although as a likelihood-free inference method, ABC has the advantage 
 of relaxing \emph{any} assumption on the likelihood, even with smart sampling methods 
 like Population Monte Carlo, it requires an expensive generative forward 
@@ -1431,7 +1457,7 @@ covariance matrix estimation. Our methods (especially the ICA method)
 do not require any more mocks than those already constructed for accurate covariance 
 matrix estimation. Therefore, the methods for likelihood estimation we present
 in this paper provide both accurate and practical methods for Bayesian 
-parameter inference in LSS. 
+parameter inference in \lss. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Acknowledgements
