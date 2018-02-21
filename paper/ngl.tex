@@ -279,7 +279,7 @@ matrix~\citep[e.g.][]{mohammed2017} or estimates directly from data
 by subsampling~\citep[e.g.][]{norberg2009}, covariance matrices 
 from mocks have a number of advantages. Mocks allow us 
 to incorporate detailed systematic errors present in the 
-data and also variance beyond the volume of the data. Even for analytic 
+data as well as variance beyond the survey volume. Even for analytic 
 estimates, a large ensemble of mocks are crucial for validation~\citep[\emph{e.g.}][]{slepian2017}. 
 Moreover, as we show later in this paper, mocks present an
 additional advantage: they allow us to 
@@ -299,17 +299,17 @@ data.
 \subsection{MultiDark-PATCHY~Mock Catalog} \label{sec:patchy}
 \Beut~use the MultiDark-\patchy~mock catalogs from \cite{kitaura2016}  mocks
 generated using the \patchy~code \citep{kitaura2014,kitaura2015}. 
-They rely on large-scale density fields generated using augmented
+These mocks rely on large-scale density fields generated using augmented
 Lagrangian Perturbation Theory~\citep[ALPT;][]{kitaura2013} on a mesh,
-which they then populate with galaxies based on a combined non-linear
+which are then populated with galaxies based on a combined non-linear
 deterministic and stochastic biases. The mocks from the \patchy~code 
-are then calibrated to reproduce the galaxy clustering in the 
+are calibrated to reproduce the galaxy clustering in the 
 high-fidelity BigMultiDark $N$-body simulation~\citep{rodriguez-torres2016, klypin2016}. 
-Afterwards, the galaxies are assigned stellar masses using the 
+Afterwards, stellar masses are assigned to galaxies using the 
 {\fontshape\scdefault\selectfont hadron}~code~\citep{zhao2015}.
-and the {\fontshape\scdefault\selectfont sugar}~code~\citep{rodriguez-torres2016} 
-is applied to combine different boxes, incorporate selection
-effects and masking to produce mock light-cone galaxy catalogs. 
+Finally, the {\fontshape\scdefault\selectfont sugar}~code~\citep{rodriguez-torres2016} 
+combines different boxes, incorporates selection
+effects and masks to produce mock light-cone galaxy catalogs. 
 The statistics of the resulting mocks are then compared to 
 observations and the process is iterated to reach desired 
 accuracy. We refer readers to~\cite{kitaura2016} for further 
@@ -333,26 +333,25 @@ quadrupole, and hexadecapole for the $0.2 < z < 0.5$ bin.
 \subsection{\cite{sinha2017} Mocks} \label{sec:gmf} 
 The simulations used in the \cite{sinha2017} analysis are from the
 Large Suite of Dark Matter Simulations project~\citep[LasDamas;][]{mcbride2009}, 
-which were designed to model galaxy samples from SDSS DR7. They use 
-initial conditions derived from second order Lagrangian Perturbation 
-Theory using the 2LTPIC code~\citep{scoccimarro1998, crocce2006}, 
-which are then evolved using the $N$-body $\mathtt{GADGET}$-$2$ code~\citep{springel2005}.
-Halos are then identified from the dark matter distribution outputs using 
+which were designed to model galaxy samples from SDSS DR7. The 
+initial conditions are generated with the {\fontshape\scdefault\selectfont 2LTPIC} code~\citep{scoccimarro1998, crocce2006}, 
+and evolved using the $N$-body $\mathtt{GADGET}$-$2$ code~\citep{springel2005}.
+Halos are identified from the dark matter distribution outputs using 
 the $\mathtt{ntropy-fofsv}$ code~\citep{gardner2007}, which uses a 
 friend-of-friends algorithm~\citep[FoF;][]{davis1985} with a linking length of $0.2$
 times the mean inter-particle separation. %The FoF halo masses are then adjusted using the \cite{warren2006} correction. 
 \Sinh~uses two configurations of the LasDamas simulations for the 
 SDSS DR7 samples with absolute magnitude limits $M_r < -19$ and $M_r < -21$.
-The Consuelo simulation contains $1400^3$ dark matter particles with 
+The `Consuelo' simulation contains $1400^3$ dark matter particles with 
 mass of $1.87 \times 10^9\,h^{-1} M_\odot$ in a cubic volume of 
 $420\,h^{-1} Mpc$ per side evolved from $z_\mathrm{init} = 99$. 
-The Carmen simulation contains $1120^3$ dark matter particles with mass 
+The `Carmen' simulation contains $1120^3$ dark matter particles with mass 
 of $4.938 \times 10^{10}\,h^{-1} M_\odot$ in a cubic volume of 
 $1000\,h^{-1} Mpc$ per side evolved from $z_\mathrm{init} = 49$. 
 %They use the following cosmological parameters, which are motivated by the WMAP3 constraints \citep{spergel2007}: $\Omega_m = 0.25, \Omega_\Lambda = 0.75, \Omega_b = 0.04, h = 0.7, \sigma_8 = 0.8,\;\mathrm{and}\;n_s = 1.0.$
 
 The FoF halo catalogs are populated with galaxies using the 
-`Halo Occupation Distribution` (HOD) framework. The 
+`Halo Occupation Distribution' (HOD) framework. The 
 number, positions, and velocities of galaxies are described statistically 
 by an HOD model. \Sinh~adopts the `vanilla' HOD model of \cite{zheng2007}, 
 where the mean number of central and satellite galaxies are described by 
@@ -366,21 +365,23 @@ details regarding the mocks, we refer readers to \Sinh.
 
 To calculate their covariance matrix, \Sinh~produced 200 
 independent mock catalogs from 50 simulations using a single set of 
-HOD model parameters. To take advantage of the methods we later 
-present, we use a large 
-number of mocks. Our methods rely on using the mocks to sample high 
-dimensional distributions, so incorporating more mocks improves their 
-accuracy. We utilize an addition $99$ sets of HOD parameters of $200$
-mocks each. The HOD parameters are sampled from the MCMC chain used to 
-produce the posterior in~\Sinh. In total we use $20,000$ mocks. 
-Among the multiple analyses in \Sinh, in this paper we focus on the 
-GMF analysis of the SDSS DR7 $M_r < -19$ sample. 
+HOD model parameters. The methods we propose in this paper rely on a large
+number of mocks to accurately sample high dimensional distributions. 
+%% To take advantage of the methods we later 
+%% present, we use a large number of mocks.
+We utilize an additional $99$ sets of HOD parameters, sampled from
+the MCMC chain in~\Sinh, with $200$ mocks each. Thus, we
+have a total of for a total of $20,000$ mocks for our current work.
+%% The HOD parameters are sampled from the MCMC chain used to 
+%% produce the posterior in~\Sinh. In total we use $20,000$ mocks. 
+In this paper we focus on the GMF analysis of the SDSS DR7 $M_r < -19$ sample
+of presented in \Sinh.
 
 \subsection{Mock Observable ${\bf X}^\mathrm{mock}$ and Covariance Matrix $\mathbb{C}$} \label{sec:xmock}
-To get from the mock catalogs described above to the covariance matrices 
-used in~\Beut~and~\Sinh, the observables are measured for each mock in 
+In order to correctly estimate the covariance matrices 
+used in~\Beut~and~\Sinh, the observables were measured for each mock in 
 the \emph{same} way as the observations. We briefly describe how $P_\ell(k)$ and $\zeta(N)$ 
-and their covariance matrices are measured in \Beut~and \Sinh. We then 
+and the corresponding covariance matrices are measured in \Beut~and \Sinh. We then 
 describe how we pre-process the mock observables for the methods we describe 
 in the next sections.
 
@@ -415,15 +416,15 @@ package\footnote{http://nbodykit.readthedocs.io/en/latest/index.html}~\citep{han
 We confirm that the resulting $P_\ell(k)s$ and covariance matrices from 
 the \cite{hand2017a} and \Beut~estimators are consistent with one another. 
 
-Next, for the \Sinh~group multiplicity function analysis, they start 
+Next, the \Sinh~group multiplicity function analysis starts 
 with the \cite{berlind2006} FoF algorithm to identify groups in the 
 SDSS and mock data. \Sinh~adopts the \cite{berlind2006} linking lengths
 in units of mean inter-galaxy separation: $b_\perp = 0.14$ and $b_\parallel = 0.75$.
 In comoving lengths, the linking lengths for the SDSS DR7 $M_r < -19$ 
 sample correspond to $(r_\perp, r_\parallel) = (0.57, 3.05)h^{-1}\,\mathrm{Mpc}$. 
-Once the groups are identified in the SDSS and mock data, $\zeta(N)$
+Once both the SDSS galaxy and mock galaxy groups are identified, $\zeta(N)$
 is derived by calculating the comoving number density of groups 
-in bins of richness $N$ --- the number of galaxies in the group. 
+in bins of richness $N$ --- the number of galaxies in a galaxy group. 
 For the $M_r < −19$ sample, \Sinh~uses eight $N$ bins: 
 $(5 - 6), (7 - 9), (10 - 13), (14 - 19), (20 - 32), (33 - 52), (53 - 84), (85 - 220)$.
 For further details on the GMF calculation, we refer readers to 
@@ -439,7 +440,9 @@ generated using a single fiducial set of HOD parameters. As we
 describe in Section~\ref{sec:gmf}, in this paper we use $20,000$ mocks from 
 $100$ different set of HOD parameters sampled from the MCMC chain. 
 The GMF covariance matrix we use in this paper is computed with 
-$N_\mathrm{mock} = 20,000$ mocks. 
+$N_\mathrm{mock} = 20,000$ mocks. \ms{Since the covmat `C` depends on $\theta$,
+  how does averaging over 20000 mocks with different HOD parameters differ
+  from 20000 mocks from the same HOD parameter?}
 
 For the rest of the paper, in order to discuss the two separate 
 analyses of~\Beut~and~\Sinh~in a consistent manner, we define the matrix 
@@ -463,17 +466,17 @@ to remove the Gaussian correlation between the bins of $\Dmock$:
 \beq
 \Xmock = L\,(\Dmock - \bar{\bf D}^\mathrm{mock}). 
 \eeq
-The linear transformation is derived so that covariance matrix of the whitened 
+This linear transformation is derived such that the covariance matrix of the whitened 
 data, $\Xmock$, is the identity matrix $\mathbb{I}$. Such a whitening linear 
 transformation can be derived in infinite ways. 
 One way to derive the linear transformation is through the eigen-decomposition
 of the covariance matrix~\citep[\emph{e.g.}][]{hartlap2009, sellentin2017}. We, alternatively, 
-derive the linear transformation ${\bf L}$ using Choletsky decomposition of the 
+derive the linear transformation ${\bf L}$ using Cholesky decomposition of the 
 inverse covariance matrix~\citep{Press:1992:NRC:148286}: 
-$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. The different methods for whitening 
-do not impact the results of the paper. Now that we have the pre-processed 
-data of the mock observables, we proceed in the next section to quantifying 
-the non-Gaussianity of the $P_\ell$ and $\zeta$ likelihoods. 
+$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. We have checked \ms{is this true?} that a different methods for whitening 
+do not impact the results of the paper. With this pre-processed 
+mock observable data, we proceed to quantifying 
+the non-Gaussianity of the $P_\ell$ and $\zeta$ likelihoods in the next section. 
 
 
 \section{Quantifying the Likelihood non-Gaussianity} \label{sec:div}
