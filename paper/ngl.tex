@@ -1057,22 +1057,22 @@ while the \Sinh~analysis includes $5$ parameters,
 \Big\{ \log\,M_\mathrm{min},~\sigma_{\log\,M},~\log\,M_0,~\log\,M_1,~\mathrm{and}~\alpha \Big\}. 
 \eeq
 Using the improved likelihood estimates of Sections~\ref{sec:gmm} 
-and~\ref{sec:ica}, we can now better estimate the true posterior distributions
-of these parameters and quantify the impact of likelihood non-Gaussianity 
-on parameter constraints. The most straightforward 
-approach to do this would be to use the likelihood estimates to compute 
-MCMC samples from scratch. While this is relatively tractable for the~\Beut~analysis, 
+and~\ref{sec:ica}, we can now better estimate the true posteriors for the parameters
+and quantify the impact of likelihood non-Gaussianity 
+on parameter constraints. The ideal method to determine the true
+posterior distributions would be to run new MCMC chains with non-Gaussian likelihood
+estimators. While re-running MCMC chains is relatively tractable for the~\Beut~analysis, 
 for~\Sinh~this is \emph{significantly} more involved. Rather than a perturbation 
-theory based model from~\Beut, the \Sinh~model is a forward model, same as 
-their mocks (Section~\ref{sec:gmf}). Rerunning the MCMC samples would involve
-evaluating their computationally costly forward model $> 10^5$ times. 
-
-Without having to re-run the MCMC chains, we instead use importance sampling 
-to derive the new posteriors from the original chains~\citep[see][for details on importance sampling]{wasserman2004}. 
+theory based model from~\Beut, the \Sinh~model is a forward model, identical to
+their mocks (Section~\ref{sec:gmf}). Re-running the MCMC samples would involve
+evaluating the computationally costly forward model of~\Sinh~$\sim 10^6$ times
+and is prohibitively expensive. 
+Therefore, we use importance sampling to derive the new posteriors
+from the original chains~\citep[see][for details on importance sampling]{wasserman2004}. 
 The \emph{target} distribution we want is the new posterior. To sample this 
-distribution, we sample the original posterior as the \emph{proposal} 
-distribution with importance weights, which in our case is the ratio 
-of our likelihood estimates over the pseudo-likelihood. If we let 
+distribution, we re-weight the original posterior as the \emph{proposal} 
+distribution with importance weights. In our case, the importance weights are the ratio 
+of the (non-Gaussian) likelihood estimates over the (Gaussian) pseudo-likelihood. If we let 
 $\mathrm{P}({\bf x} | \bm{\theta})$ be the original pseudo-likelihood and 
 $\mathrm{P}'({\bf x} | \bm{\theta})$ be our ``new'' likelihood, then the new 
 marginal likelihood can be calculated through importance sampling:   
@@ -1083,15 +1083,17 @@ Then through Monte Carlo integration,
 \beq
 \mathrm{P}'({\bf x} | \theta_1) \approx \sum\limits_{\bm{\theta}^{(i)} \in S} \frac{\mathrm{P}'({\bf x} | \bm{\theta}^{(i)})}{\mathrm{P}({\bf x} | \bm{\theta}^{(i)})}. \label{eq:impsamp}
 \eeq
-where $S$ is the sample drawn from $\mathrm{P}({\bf x} | \bm{\theta})$. In our 
-case $S$ is just the original MCMC chain. The only calculation required 
+where $S$ is the sample drawn from $\mathrm{P}({\bf x} | \bm{\theta})$. $S$ 
+is simply the original MCMC chain in our case. The only calculation required 
 is the importance weights in Eq.~\ref{eq:impsamp}, 
 ${\mathrm{P}'({\bf x} | \bm{\theta}^{(i)})}/{\mathrm{P}({\bf x} | \bm{\theta}^{(i)})}$ for 
 each sample $\bm{\theta}^{(i)}$ of the original MCMC chain. 
 For \Beut, $\mathrm{P}({\bf x} | \bm{\theta}^{(i)})$ is the \ica likelihood;  
-for \Sinh, $\mathrm{P}({\bf x} | \bm{\theta}^{(i)})$ is the GMM likelihood.
+for \Sinh, $\mathrm{P}({\bf x} | \bm{\theta}^{(i)})$ is the \gmm
+likelihood. \ms{What does the \ica estimator look like for \Sinh? Or the \gmm
+  estimator for \Beut?}
 
-We present in Figure~\ref{fig:pk_like} the resulting posterior 
+In Figure~\ref{fig:pk_like} we present the resulting posterior 
 distributions using the non-Gaussian \ica likelihood for the 
 $\big \{f \sigma_8$, $\alpha_\parallel$, $\alpha_\perp$, 
 $b_1^\mathrm{NGC} \sigma_8$, $b_1^\mathrm{SGC} \sigma_8$, 
@@ -1104,9 +1106,10 @@ The boxes and ``whiskers'' repesent the $68\%$ and $95\%$
 confidence intervals, respectively. The median and $68\%$ 
 confidence intervals of the posteriors are also listed in Table~\ref{tab:posterior}.
 $f \sigma_8$ and $b_2^\mathrm{SGC} \sigma_8$ are the main parameters with 
-noticeable change in their posteriors. The posterior of $b_2^\mathrm{SGC} \sigma_8$
-broadens from $0.476^{+1.262}_{-1.175}$ to $0.422^{+1.517}_{-1.377}$ once likelihood 
-non-Gaussianity is incorporated. More importantly, the $f \sigma_8$ posterior
+noticeable changes in their posteriors. After accounting for the 
+non-Gaussian likelihood, the posterior of $b_2^\mathrm{SGC} \sigma_8$
+broadens from $0.476^{+1.262}_{-1.175}$ to $0.422^{+1.517}_{-1.377}$.
+More importantly, the $f \sigma_8$ posterior
 shifts from $0.478^{+0.053}_{-0.049}$ to $0.456^{+0.059}_{-0.049}$, which 
 corresponds to a shift of $-0.44 \sigma$. The other parameter constraints, 
 however, remain largely unaffected by likelihood non-Gaussianity. 
@@ -1122,15 +1125,17 @@ contours (left and middle panels respectively). The
 $(\alpha_\parallel, \alpha_\perp)$ distribution (right), however, show nearly 
 no change from the non-Gaussian likelihood. %These joint posteriors corroborate our conclusion from Figure~\ref{fig:pk_like}.
 Despite its impact on $f \sigma_8$ and $b_2^\mathrm{SGC} \sigma_8$, 
-overall, likelihood non-Gaussianity does \emph{not}
-significantly impact the parameter constraints of the $P_\ell$ 
+likelihood non-Gaussianity does \emph{not}
+significantly impact the overall parameter constraints of the $P_\ell$ 
 analysis. $b_2^\mathrm{SGC} \sigma_8$ is a poorly constrained nuisance 
 parameter and although using the pseudo-likelihood biases $f \sigma_8$, 
 the impact relative to its uncertainty is small --- less than $0.5 \sigma$. 
 The fact that the $P_\ell$ analysis is largely unaffected by likelihood 
-non-Gaussianity is consistent with the divergences in 
-Figure~\ref{fig:div_gauss}, which found relatively small discrepancies 
-between the likelihood and pseudo-likelihood. It also illustrates
+non-Gaussianity is consistent with the relatively small divergences found 
+in Figure~\ref{fig:div_gauss}.
+%, which found relatively small discrepancies 
+%between the likelihood and pseudo-likelihood.
+It also illustrates
 the remarkable effectiveness of the Central Limit Theorem. %for the power spectrum multipole over the \Beut~$k$ range. 
 
 %Furthermore, the Gaussian pseudo-likelihood assumption for $P_\ell$ 
@@ -1162,8 +1167,8 @@ the remarkable effectiveness of the Central Limit Theorem. %for the power spectr
     The $f\sigma_8$ constraint shifts by $-0.44\sigma$. 
     Hence, using the pseudo-likelihood in the $P_\ell$ analysis 
     biases the posteriors of these parameters. 
-    Overall, however, likelihood non-Gaussianity does \emph{not} 
-    have a siginificant impact on the parameter constraints of 
+    However, likelihood non-Gaussianity does \emph{not} 
+    have a siginificant impact on the overall parameter constraints of 
     the $P_\ell$ analysis.} 
 \label{fig:pk_like}
 \end{center}
@@ -1192,7 +1197,7 @@ the remarkable effectiveness of the Central Limit Theorem. %for the power spectr
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Next in Figure~\ref{fig:gmf_like}, we present the posterior 
-distributions calculated using the non-Gaussian GMM likelihood for 
+distributions calculated using the non-Gaussian \gmm likelihood for 
 the HOD parameters in the \Sinh~$\zeta$ analysis (orange).  
 We include the posteriors calculated using the pseudo-likelihood 
 for comparison in blue. The box plots on the bottom of each plot 
