@@ -1039,7 +1039,7 @@ estimator -- the divergence estimation framework makes it
 straight-forward to test the accuracy of different methods. Multiple methods can easily be tested to construct 
 the best estimate of the likelihood distribution for {\em each }specific analysis. 
 Based on the performances of the \gmm and \ica 
-methods, in the following sections we use the \ica likelihood for the~\Beut~analysis 
+methods, we chose the \ica likelihood for the~\Beut~analysis 
 and the \gmm likelihood for the~\Sinh~analysis. 
 
 \section{Impact on Parameter Inference} \label{sec:parinf}
@@ -1236,16 +1236,16 @@ that the true $\zeta$ likelihood distribution is likely Poisson. Although
 we expect the likelihood to be similar to the observed cluster count likelihood, 
 the complicated connection between FoF groups and the underlying 
 matter overdensity makes writing down the exact $\zeta$ likelihood function 
-tremendously difficult. Nonetheless, the GMM likelihood estimation method we 
+tremendously difficult. Nonetheless, the \gmm likelihood estimation method we 
 present provides an accurate estimate of the non-Gaussian likelihood. 
 
-The posteriors of the \Sinh~$\zeta$ analysis highlight the importance of 
+The updated posteriors of the \Sinh~$\zeta$ analysis highlight the importance of 
 accounting for likelihood non-Gaussianity in parameter inference of 
 \lss studies. One of the main results of the \Sinh~HOD analysis 
-is that the $\Lambda$CDM + HOD model can successful 
-fit either $\zeta(N)$ or the project two-point correlation function 
-$w_p(r_p)$, separately but struggles to jointly fit both (see Figure~10). 
-This tension suggests that the `vanilla' HOD model is insufficiently 
+is that the $\Lambda$CDM + HOD model can successfully 
+fit either $\zeta(N)$ or the projected two-point correlation function 
+$w_p(r_p)$ separately, but struggles to jointly fit both (see Figure~10). 
+Such a tension suggests that the `vanilla' HOD model is not sufficiently 
 flexible in describing the galaxy-halo connection. Likelihood non-Gaussianity
 impacts this result. Once the non-Gaussianity is included in 
 the analysis, the posteriors are broadened and shifted towards 
@@ -1259,24 +1259,33 @@ pseudo-likelihood biases the $f\sigma_8$ constraints by $\sim 0.5\%$.
 Meanwhile, the Dark Energy Spectroscopic Instrument~\citep[DESI;][]{levi2013}, 
 for instance, seeks to constrain $f\sigma_8$ to within a 
 percent\footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}. 
-The future, however, may be encouraging in this regard. The next surveys 
-will expand the cosmic volumes probed by galaxies and therefore increase 
-the number of modes on all scales. Even as they seek to extend the $k$ 
-range of analyses, thanks to the Central Limit Theorm, we consequently expect 
-likelihood non-Gaussianity to have a smaller effect. However, without 
-precisely quantifying the impact, as we have done in this paper, it 
-remains to be determined whether likelihood non-Gaussianity will signficantly 
-impact future $P_\ell$ analyses.  
+%% The future, however, may be encouraging in this regard.
+One way to reduce the impact of likelihood non-Gaussianity is via the Central
+Limit Theorem, i.e., capture more modes on all scales by covering larger volumes. Thankfully, the future
+is more encouraging on this aspect. 
+The next generation galaxy surveys will probe larger cosmic volumes and
+therefore reduce the effect of likelihood non-Gaussianity.  
+%% increase 
+%% the number of modes on all scales. Even as they seek to extend the $k$ 
+%% range of analyses, thanks to the Central Limit Theorm, we consequently expect 
+%% likelihood non-Gaussianity to have a smaller effect.
+%% However, without precisely quantifying the impact, as we have done in this paper, it 
+%% remains to be determined whether likelihood non-Gaussianity will signficantly 
+%% impact future $P_\ell$ analyses.
+However, the effect of likelihood non-Gaussianity on future $P_\ell$
+analyses can be determined {\em  only after} precisely quantifying the impact
+with similar approaches to the work presented here.
+
 
 %non-Gaussianity bispectrum, which has lower signal-to-noise on large scales~\citep{sefusatti2005},
 For higher order statistics, likelihood non-Gaussianity will likely 
-have a more significant effect. After all, for a given survey, \cite{scoccimarro2000} 
+have a more significant effect. \cite{scoccimarro2000}   
 found that the reduced bispectrum likelihood is significantly more 
 non-Gaussian than the power spectrum likelihood. Constraints on primordial 
 non-Gaussianity ($f_\mathrm{NL}$) from \lss~\citep[\emph{e.g.}][]{dalal2008, slosar2008, ross2013, giannantonio2014}, 
 will also be significantly impacted by likelihood non-Gaussianity. 
 In fact, the constraining power for $f_\mathrm{NL}$ comes from the 
-largest scales, which we find contribute most to the non-Gaussianity. 
+largest scales -- the same scales that contribute most to the likelihood non-Gaussianity. 
 Future experiments such as Euclid~\citep{amendola2016}, which seek 
 to measure $\sigma(f_\mathrm{NL}) < 5$~\citep{giannantonio2012, amendola2016}, 
 will need to robustly account for likelihood non-Gaussianity for 
