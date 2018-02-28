@@ -20,6 +20,12 @@ ngl.pdf: *.tex vc.tex
 	( grep Rerun ngl.log && ${LATEX} ngl ) || echo "Done."
 	( grep Rerun ngl.log && ${LATEX} ngl ) || echo "Done."
 
+ngl_2col.pdf: *.tex 
+	${LATEX} ngl_2col
+	bibtex ngl_2col
+	${LATEX} ngl_2col  
+	( grep Rerun ngl_2col.log && ${LATEX} ngl_2col ) || echo "Done."
+	( grep Rerun ngl_2col.log && ${LATEX} ngl_2col ) || echo "Done."
 
 clean:
 	${RM} $(foreach suff, ${TMP_SUFFS}, ngl.${suff})
