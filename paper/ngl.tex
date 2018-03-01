@@ -101,7 +101,7 @@
 \altaffiltext{\bccp}{Berkeley Center for Cosmological Physics, University of California, Berkeley, CA 94720, USA}
 
 \edef \icg {\arabic{affilcounter}}\stepcounter{affilcounter}
-\altaffiltext{\icg}{Institute of Cosmology \& Gravitation, Dennis Sciama Building, University of Portsmouth, Portsmouth, PO1 3FX, UK}
+\altaffiltext{\icg}{Institute of Cosmology \& Gravitation, Dennis Sciama Building, University of Portsmouth, Portsmouth PO1 3FX, UK}
 
 \edef \swin {\arabic{affilcounter}}\stepcounter{affilcounter}
 \altaffiltext{\swin}{Centre for Astrophysics \& Supercomputing, Swinburne University of Technology, 1 Alfred St., Hawthorn, VIC 3122, Australia}
@@ -134,7 +134,7 @@
 \begin{abstract}
     Standard present day large-scale structure (LSS) analyses make a major 
     assumption in their Bayesian parameter inference --- the likelihood has 
-    a Gaussian functional-form. We investigate the impact of this assumption 
+    a Gaussian functional-form.\todo{hogg's comment} We investigate the impact of this assumption 
     on two recent LSS analyses: the \cite{beutler2017}~power spectrum multipole ($P_\ell$) analysis and 
     the \cite{sinha2017}~group multiplicity function ($\zeta$) analysis. Using
     non-parametric divergence estimators on mock catalogs originally constructed 
@@ -593,9 +593,7 @@ which illustrate the uncertainty of $\widehat{D}$. The discrepancy between
 the $\widehat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo})$
 distributions and the reference $\widehat{D}(\Xref \parallel \Yref)$ distributions 
 ($\Delta \widehat{D}$) quantify the discrepancy between the likelihood
-and the pseudo-likelihood\ms{I altered the ordering of `likelihood' and `pseudo-l' to
-  correspond to the ordering of the estimators. Also, should the likelihood
-  estimator involve $\Xmock$ rather than $p(x)$?}. Each panel of Figure~\ref{fig:div_gauss} shows significant 
+and the pseudo-likelihood. Each panel of Figure~\ref{fig:div_gauss} shows significant 
 discrepancy between the two distributions --- \emph{both 
 the $P_\ell(k)$ and $\zeta(N)$ likelihoods are significantly non-Gaussian}. 
 
@@ -634,8 +632,7 @@ when we exclude the highest $N$ bin, $\Delta \widehat{D}$ decreases significantl
 We therefore find that the high richness end of $\zeta$ contibute most to 
 the non-Gaussianity of the $\zeta$ likelihood. The contribution to the 
 non-Gaussianity, similar to the $P_\ell$ case, comes most from the low 
-signal-to-noise regime. \ms{Do we have the plots that show that the nG
-  come from low-k and high-N? If so, would be good to add with Fig~1.}
+signal-to-noise regime. %\ms{Do we have the plots that show that the nG come from low-k and high-N? If so, would be good to add with Fig~1.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 1 
@@ -1107,6 +1104,8 @@ significantly impact the overall parameter constraints of the $P_\ell$
 analysis. $b_2^\mathrm{SGC} \sigma_8$ is a poorly constrained nuisance 
 parameter and although using the pseudo-likelihood biases $f \sigma_8$, 
 the impact relative to its uncertainty is small --- less than $0.5 \sigma$. 
+\todo{add here how some of this discrepancy is not necessarily from non-Gaussianity
+but could also be from not enough mocks to constrain all the terms of the covariance matrix} 
 The fact that the $P_\ell$ analysis is largely unaffected by likelihood 
 non-Gaussianity is consistent with the relatively small divergences found 
 in Figure~\ref{fig:div_gauss}.
@@ -1184,6 +1183,7 @@ which differ slightly from the blue distribution.
 This discrepancy is caused by the difference in the covariance 
 matrix we use in the pseudo-likelihood~(see Section~\ref{sec:xmock}).  
 The difference, however, is negligible. 
+\todo{add here how this justifies our use of multiple theta mocks for estimating the covariance matrix and likelihood}  
 
 Besides the poorly constrained parameters $\sigma_{\log M}$ and $\log\, M_0$, 
 likelihood non-Gaussianity significantly impacts the posterior 
@@ -1199,7 +1199,9 @@ the joint posterior distributions in Figure~\ref{fig:gmf_contour}.
 The $\log\,M_\mathrm{min}$ versus $\sigma_{\log M}$ and 
 $\log\,M_\mathrm{min}$ versus $\alpha$ contours are both shifted 
 and broadened compared to the $\mathcal{L}^\mathrm{pseudo}$ 
-posterior. Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~reveal 
+posterior. \todo{add: With 20,000 mocks and only 8 dimensional data, 
+this discrepancy is certainly not from convergence issues.}
+Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~reveal 
 that \emph{using the Gaussian pseudo-likelihood significantly 
 underestimates the uncertainty and biases the HOD parameter constraints 
 of the \Sinh~$\zeta$ analysis.}
@@ -1233,6 +1235,9 @@ Even for the $P_\ell$ analysis, the impact of likelihood non-Gaussianity
 on the parameter constraints cannot be easily dismissed as we demand 
 increasingly more precise constraints from future experiments. Using the 
 pseudo-likelihood biases the $f\sigma_8$ constraints by $\sim 0.5\%$. 
+\todo{add: While some of this discrepancy might just be statistical 
+fluctuations, since the mocks are calibrated so that their mean powerspectrum 
+is consistent with the BOSS $P(k)$, this should not be a significant contribution}
 Meanwhile, the Dark Energy Spectroscopic Instrument~\citep[DESI;][]{levi2013}, 
 for instance, seeks to constrain $f\sigma_8$ to within a 
 percent\footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}. 
