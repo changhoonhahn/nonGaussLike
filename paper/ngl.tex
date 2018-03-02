@@ -85,7 +85,7 @@
 \begin{document}\sloppy\sloppypar\frenchspacing 
 
 %\title{How I Learned to Stop Worrying and Love The Central Limit Theorem}
-\title{Likelihood Non-Gaussianity in Large Scale Structure Analyses}
+\title{Likelihood Non-Gaussianity in Large-Scale Structure Analyses}
 \date{\texttt{DRAFT~---~\githash~---~\gitdate~---~NOT READY FOR DISTRIBUTION}}
 
 
@@ -633,6 +633,13 @@ We therefore find that the high richness end of $\zeta$ contibute most to
 the non-Gaussianity of the $\zeta$ likelihood. The contribution to the 
 non-Gaussianity, similar to the $P_\ell$ case, comes most from the low 
 signal-to-noise regime. %\ms{Do we have the plots that show that the nG come from low-k and high-N? If so, would be good to add with Fig~1.}
+Besides likelihood non-Gaussianity, biases that arise from estimating
+the covariance matrix from a limit number of mocks may also contribute 
+to $\Delta \widehat{D}$. With $ > 2000$ mocks, however, this bias is 
+likely unimportant for the $P_\ell$ analysis and even less so for the 
+$\zeta$ analysis where we use $20,000$ mocks~\citep{hartlap2009}. Nonetheless, 
+this underlines another limitation of using pseudo-likelihoods for 
+parameter inference in \lss studies. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 1 
@@ -1104,25 +1111,18 @@ significantly impact the overall parameter constraints of the $P_\ell$
 analysis. $b_2^\mathrm{SGC} \sigma_8$ is a poorly constrained nuisance 
 parameter and although using the pseudo-likelihood biases $f \sigma_8$, 
 the impact relative to its uncertainty is small --- less than $0.5 \sigma$. 
-\todo{add here how some of this discrepancy is not necessarily from non-Gaussianity
-but could also be from not enough mocks to constrain all the terms of the covariance matrix} 
+Some of this impact may be from statistical fluctuation. However, since 
+the \patchy mocks are calibrated so that their $\overline{P_\ell}$ is
+consistent with the BOSS $P_\ell$, this is likely not a significant contributor. 
+Furthermore, as mentioned in Section~\ref{sec:div}, some of the impact 
+may also come from biases in covariance matrix estimation. 
 The fact that the $P_\ell$ analysis is largely unaffected by likelihood 
 non-Gaussianity is consistent with the relatively small divergences found 
-in Figure~\ref{fig:div_gauss}.
-%, which found relatively small discrepancies 
-%between the likelihood and pseudo-likelihood.
-It also illustrates
-the remarkable effectiveness of the Central Limit Theorem. %for the power spectrum multipole over the \Beut~$k$ range. 
-
-%Furthermore, the Gaussian pseudo-likelihood assumption for $P_\ell$ 
-%is motivated by the Central Limit Theorem: if enough modes contribute  
-%to the power spectrum, then the likelihood approaches a Gaussian. In 
-%the restrictive $k$ range of the \Beut~analysis ($0.01 < k < 0.15$), 
-%one would expect this to be the case. 
-%\todo{When we repeat the comparison for the $P_\ell$ analysis without 
-%the hexadecapole, we see even less impact on the parameter constraints. 
-%This suggests that most of the non-Gaussianity in the likelihood comes 
-%from the hexadecapole which has the lowest signal to noise.} 
+in Figure~\ref{fig:div_gauss}. It also illustrates
+the remarkable effectiveness of the Central Limit Theorem. 
+%Some of the impact on $f \sigma_8$ may not entirely  result from biases 
+%Furthermore, the impact on the parameters may not entirely be caused by 
+%likelihood non-Gaussianity. \todo{add here how some of this discrepancy is not necessarily from non-Gaussianity but could also be from not enough mocks to constrain all the terms of the covariance matrix} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 5 
@@ -1182,8 +1182,10 @@ In the dotted lines, we plot the original \Sinh~posteriors,
 which differ slightly from the blue distribution.
 This discrepancy is caused by the difference in the covariance 
 matrix we use in the pseudo-likelihood~(see Section~\ref{sec:xmock}).  
-The difference, however, is negligible. 
-\todo{add here how this justifies our use of multiple theta mocks for estimating the covariance matrix and likelihood}  
+The difference, however, is negligible and illustrates that the 
+covariance matrix of $\zeta$ does not have a strong dependence on 
+HOD parameters.  
+%\todo{add here how this justifies our use of multiple theta mocks for estimating the covariance matrix and likelihood}  
 
 Besides the poorly constrained parameters $\sigma_{\log M}$ and $\log\, M_0$, 
 likelihood non-Gaussianity significantly impacts the posterior 
@@ -1199,9 +1201,7 @@ the joint posterior distributions in Figure~\ref{fig:gmf_contour}.
 The $\log\,M_\mathrm{min}$ versus $\sigma_{\log M}$ and 
 $\log\,M_\mathrm{min}$ versus $\alpha$ contours are both shifted 
 and broadened compared to the $\mathcal{L}^\mathrm{pseudo}$ 
-posterior. \todo{add: With 20,000 mocks and only 8 dimensional data, 
-this discrepancy is certainly not from convergence issues.}
-Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~reveal 
+posterior. Figures~\ref{fig:gmf_like}~and~\ref{fig:gmf_contour}~reveal 
 that \emph{using the Gaussian pseudo-likelihood significantly 
 underestimates the uncertainty and biases the HOD parameter constraints 
 of the \Sinh~$\zeta$ analysis.}
@@ -1235,9 +1235,6 @@ Even for the $P_\ell$ analysis, the impact of likelihood non-Gaussianity
 on the parameter constraints cannot be easily dismissed as we demand 
 increasingly more precise constraints from future experiments. Using the 
 pseudo-likelihood biases the $f\sigma_8$ constraints by $\sim 0.5\%$. 
-\todo{add: While some of this discrepancy might just be statistical 
-fluctuations, since the mocks are calibrated so that their mean powerspectrum 
-is consistent with the BOSS $P(k)$, this should not be a significant contribution}
 Meanwhile, the Dark Energy Spectroscopic Instrument~\citep[DESI;][]{levi2013}, 
 for instance, seeks to constrain $f\sigma_8$ to within a 
 percent\footnote{DESI Final Design Report: http://desi.lbl.gov/wp-content/uploads/2014/04/fdr-science-biblatex.pdf}. 
