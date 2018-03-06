@@ -813,7 +813,7 @@ def GMF_contours(tag_mcmc='manodeep'):
     sub.set_ylabel(r'$\alpha$', fontsize=25) 
     
     legs = []
-    legs.append(mlines.Line2D([], [], ls='--', c='k', linewidth=2, label='Sinha et al.(2017)'))
+    legs.append(mlines.Line2D([], [], ls=':', c='k', linewidth=2, label='Sinha et al.(2017)'))
     #imp_lbls = [r"$\mathcal{N} \left(\,\overline{\zeta}, \,{\bf C}^{'} \right)$", r'$p_\mathrm{GMM} \left(\{\zeta^\mathrm{mock}\} \right)$']
     imp_lbls = [r"$\mathcal{L}^\mathrm{pseudo}$", '$\mathcal{L}^\mathrm{GMM}$; Hahn et al. (2018)']
     for imp_lbl, imp_color in zip(imp_lbls, imp_colors): 
@@ -943,8 +943,8 @@ if __name__=="__main__":
     #_div_Gauss_Pk_hartlap(K=10)
     #div_Gauss(K=10)
     #div_GMM()
-    div_ICA()
-    #GMF_contours()
+    #div_ICA()
+    GMF_contours()
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #_Like_RSD()
     #Like_RSD()
