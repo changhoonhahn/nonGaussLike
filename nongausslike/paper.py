@@ -149,7 +149,7 @@ def _div_Gauss_Pk_hartlap(K=10):
     return None
 
 
-def div_Gauss(K=10):
+def div_Gauss(K=15):
     ''' compare the renyi-alpha and KL divergence for the following  
     - D( gauss(C_X) || gauss(C_X) ) 
     - D( mock X || gauss(C_X))
@@ -170,7 +170,10 @@ def div_Gauss(K=10):
                 elif obvs == 'gmf': 
                     f_div = ''.join([UT.dat_dir(), 
                         'diverg.gmf.', f, '.Nref10000.', div_func, '.dat']) 
-                div = np.loadtxt(f_div)
+                try: 
+                    div = np.loadtxt(f_div)
+                except IOError: 
+                    continue 
                 divs.append(div) 
             
             if obvs == 'pk': hrange = [-0.5, 0.5]
@@ -183,6 +186,7 @@ def div_Gauss(K=10):
                 bp = UT.bar_plot(*hh) 
                 sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', label=lbl) 
                 y_max = max(y_max, bp[1].max()) 
+                print lbl, np.mean(div)
             sub.set_xlim(hrange) 
             sub.set_ylim([0., y_max*1.4]) 
             if i_obv == 0: 
@@ -198,7 +202,7 @@ def div_Gauss(K=10):
                     sub.text(0.075, 0.85, r'$\zeta(N)$', ha='left', va='top', 
                             transform=sub.transAxes, fontsize=20)
     fig.subplots_adjust(wspace=.15)
-    f_fig = ''.join([UT.tex_dir(), 'figs/', 'kNNdiverg_Gauss.pdf'])
+    f_fig = ''.join([UT.tex_dir(), 'figs/', 'k_', str(K), 'NNdiverg_Gauss.pdf'])
     fig.savefig(f_fig, bbox_inches='tight') 
     return None
 
@@ -937,16 +941,68 @@ def _Like_RSD():
     return None
 
 
+def _Like_RSD_testMCMC(): 
+    ''' Estimate the uncertainty in the discrepancy between the pseudo-likelihood posterior
+    vs the ICA likelihood posterior *caused by MCMC sampling*
+    '''
+    # import MCMC chain 
+    chain = Inf.mcmc_chains('beutler_z1', ichain=0)
+    # remove burnin?  
+    burnin = np.ones(chain['chi2'].shape, dtype=bool) 
+    burnin[:int(chain['chi2'].shape[0]/4)] = False 
+
+    # thin it out 
+    thinfactor = 2**4
+    # importance weight derived from p_KDE(X_i ICA)
+    f_pXiICA = ''.join([UT.dat_dir(), 'Beutler/public_full_shape/', 
+        'Beutler_et_al_full_shape_analysis_z1_chain0.RSD_pXiICA_gauss_weights.defICA.kde.dat']) 
+    wimp = np.loadtxt(f_pXiICA, skiprows=1, unpack=True, usecols=[2]) 
+    like_lbl = r'$\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$'
+    
+    # ignoring some of the nuissance parameters
+    labels = ['b1sig8_NGC', 'b1sig8_SGC', 'b2sig8_NGC', 'b2sig8_SGC', 
+            'alpha_perp', 'alpha_para', 'fsig8'] 
+    lbltex = [r'$b^{NGC}_1\sigma_8$', r'$b^{SGC}_1\sigma_8$', r'$b^{NGC}_2\sigma_8$', r'$b^{SGC}_2\sigma_8$', 
+            r'$\alpha_\perp$', r'$\alpha_\parallel$', r'$f \sigma_8$'] 
+    prior_min = [1., 1., -3., -3., 0.8, 0.8, 0.2]#, -10000., -10000., 0.5, 0.5]
+    prior_max = [1.8, 1.8, 5., 5., 1.2, 1.2, 0.8]#, 10000., 10000., 15., 15.]
+    yrange = [[0., 10.], [0., 10.], [0., 0.7], [0., 0.7], [0.0, 18.], [0., 18.], [0., 10.]]
+    yticks = [[0., 4., 8.], [0., 4., 8.], [0., 0.2, 0.4, 0.6], [0., 0.2, 0.4, 0.6],
+            [0., 5., 10., 15.], [0., 5., 10., 15.], [0., 4., 8.]] 
+    nbin = 30 
+    
+    dmeds = [] 
+    for i_thin in range(thinfactor): 
+        thincut = burnin & (np.arange(len(burnin)) % thinfactor == i_thin)  
+        
+        # original Beutler et al.(2017) constraints
+        lowlow, low, med, high, highhigh = np.percentile(chain['fsig8'][thincut], [2.5, 16, 50, 84, 97.5])
+
+        wlim = np.percentile(wimp[burnin], 99.9)
+        lims = np.where(thincut & (wimp < wlim)) #lims = np.where(wimp < 1e3)
+        # importance weighted constraints
+        lowlow_w, low_w, med_w, high_w, highhigh_w = [wq.quantile_1D(chain['fsig8'][lims], wimp[lims], qq) for qq in 
+                [0.025, 0.16, 0.50, 0.84, 0.975]]
+        # stats dict for each box
+        print 'delta fsig8 = ', med - med_w 
+        dmeds.append(med - med_w) 
+    print np.mean(dmeds), np.std(dmeds)
+
+    return None
+
+
 if __name__=="__main__": 
     #GMM_pedagog()
     #_div_Gauss_gmf(K=10)
     #_div_Gauss_Pk_hartlap(K=10)
     #div_Gauss(K=10)
+    div_Gauss(K=15)
     #div_GMM()
     #div_ICA()
-    GMF_contours()
+    #GMF_contours()
     #Corner_updatedLike('beutler_z1', 'RSD_ica_gauss', 0)
     #_Like_RSD()
     #Like_RSD()
     #RSD_contours()
     #Like_GMF()
+    #_Like_RSD_testMCMC()

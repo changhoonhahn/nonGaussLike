@@ -86,7 +86,7 @@
 
 %\title{How I Learned to Stop Worrying and Love The Central Limit Theorem}
 \title{Likelihood Non-Gaussianity in Large-Scale Structure Analyses}
-\date{\texttt{DRAFT~---~\githash~---~\gitdate~---~NOT READY FOR DISTRIBUTION}}
+%\date{\texttt{DRAFT~---~\githash~---~\gitdate~---~NOT READY FOR DISTRIBUTION}}
 
 
 \newcounter{affilcounter}
@@ -116,17 +116,21 @@
 \altaffiltext{\carn}{Department of Physics, Carnegie Mellon University, 5000 Forbes Avenue, Pittsburgh, PA 15213, USA}
 
 \edef \ccpp {\arabic{affilcounter}}\stepcounter{affilcounter}
-\altaffiltext{\ccpp}{Center for Cosmology and Particle Physics, Department of Physics, New York University, 726 Broadway, New York, NY 10003, USA} 
+\altaffiltext{\ccpp}{Center for Cosmology and Particle Physics, New York University, New York, NY 10003, USA} 
 
 \edef \cca {\arabic{affilcounter}}\stepcounter{affilcounter}
 \altaffiltext{\cca}{Flatiron Institute, 162 Fifth Avenue, New York, NY 10010, USA} 
 
+\edef \berk {\arabic{affilcounter}}\stepcounter{affilcounter}
+\altaffiltext{\bccp}{Department of Physics, University of California, Berkeley, CA 94720, USA}
+
+
 \author{
     ChangHoon~Hahn\altaffilmark{\lbl, \bccp},
-    Florian~Beutler\altaffilmark{\icg},
+    Florian~Beutler\altaffilmark{\icg, \lbl},
     Manodeep~Sinha\altaffilmark{\swin, \astrothreed, \vand}, 
     Andreas~Berlind\altaffilmark{\vand}, 
-    Shirley~Ho\altaffilmark{\lbl,\carn}, 
+    Shirley~Ho\altaffilmark{\lbl, \bccp, \berk, \carn}, 
     David~W.~Hogg\altaffilmark{\ccpp, \cca}
 }
 \email{changhoon.hahn@lbl.gov}
@@ -134,15 +138,18 @@
 \begin{abstract}
     Standard present day large-scale structure (LSS) analyses make a major 
     assumption in their Bayesian parameter inference --- that the likelihood has 
-    a Gaussian form. We investigate the impact of this assumption on two recent 
-    LSS analyses: the \cite{beutler2017}~power spectrum multipole ($P_\ell$) analysis and 
+    a Gaussian form. This assumption, however, cannot be correct in detail, even 
+    if the underlying LSS density field is Gaussian. We investigate the impact 
+    of this assumption on two recent LSS analyses: the \cite{beutler2017}~power 
+    spectrum multipole ($P_\ell$) analysis and 
     the \cite{sinha2017}~group multiplicity function ($\zeta$) analysis. Using
     non-parametric divergence estimators on mock catalogs originally constructed 
     for covariance matrix estimation, we identify significant non-Gaussianity in 
     both the $P_\ell$ and $\zeta$ likelihoods. We then use Gaussian mixture 
-    density estimation and Independent Component Analysis to construct likelihood estimates that 
-    approximate the true likelihood better than the Gaussian \emph{pseudo}-likelihood. 
-    Using these likelihood estimates, we derive the true posterior probability 
+    density estimation and Independent Component Analysis on the same mocks to 
+    construct likelihood estimates that approximate the true likelihood better 
+    than the Gaussian \emph{pseudo}-likelihood. Using these likelihood estimates, 
+    we derive the true posterior probability 
     distribution of the \Beut~and~\Sinh~parameters. Likelihood non-Gaussianity 
     shifts the $f\sigma_8$ constraint by $-0.44\sigma$, but otherwise, does not 
     significantly impact the overall parameter constraints of~\Beut. For the 
@@ -183,9 +190,8 @@ power spectrum. All that is required are the prior distribution of the
 parameters, $p(\theta)$, and the likelihood, $p( x\,|\,\theta)$ --- 
 probability of the data (observation) given the theoretical model.
 Priors are selected in analyses; so parameter inference ultimately 
-reduces to evaluating the likelihood. It consequently goes without say,   
-that our analyses can {\em only} yield unbiased constraints if the likelihood
-evaluation is correct. 
+reduces to evaluating the likelihood. Analyses can {\em only} yield 
+unbiased constraints if the likelihood evaluation is correct. 
 
 In present day \lss analyses, two major assumptions go into evaluating the 
 likelihood. First, the likelihood is assumed to have a Gaussian functional 
@@ -273,7 +279,7 @@ the paper in Section~\ref{sec:summary}.
 
 \section{Mock Catalogs} \label{sec:mocks}
 Mock catalogs are indispensable for standard cosmological 
-analyses of \lss studies. They're used for testing analysis 
+analyses of \lss studies. They are used for testing analysis 
 pipelines~\citep[][]{beutler2017, grieb2017, tinkerinpreparation}, 
 testing the effect of systematics~\citep{guo2012, vargas-magana2014, hahn2017c, pinol2017, ross2017}, 
 and, most relevantly for this paper, estimating the covariance 
@@ -334,9 +340,9 @@ combined sample. In \Beut, they conduct multiple analyses,
 some using only the power spectrum monopole and quadrupole 
 and others using monopole, quadrupole, and hexadecapole. They 
 also separately analyze three redshift bins: $0.2 < z < 0.5$, 
-$0.4 < z < 0.6$, and $0.5 < z < 0.75$. In this paper we focus on 
-one of these analyses: the analysis of the power spectrum monopole, 
-quadrupole, and hexadecapole for the $0.2 < z < 0.5$ bin.  
+$0.4 < z < 0.6$, and $0.5 < z < 0.75$. In this paper, for simplicity, 
+we focus on one of these analyses: the analysis of the power spectrum 
+monopole, quadrupole, and hexadecapole for the $0.2 < z < 0.5$ bin.  
 
 \subsection{\cite{sinha2017} Mocks} \label{sec:gmf} 
 The simulations used in the \cite{sinha2017} analysis are from the
@@ -379,7 +385,7 @@ number of mocks to accurately sample high dimensional distributions.
 %% present, we use a large number of mocks.
 We utilize an additional $99$ sets of HOD parameters, sampled from
 the MCMC chain in~\Sinh, with $200$ mocks each. Thus, we
-have a total of for a total of $20,000$ mocks for our current work.
+have a total of $20,000$ mocks for our current work.
 %% The HOD parameters are sampled from the MCMC chain used to 
 %% produce the posterior in~\Sinh. In total we use $20,000$ mocks. 
 In this paper we focus on the GMF analysis of the SDSS DR7 $M_r < -19$ sample
@@ -446,7 +452,7 @@ the covariance matrix as
 In \Sinh, they compute the covariance matrix using $200$ mocks
 generated using a single fiducial set of HOD parameters. As we 
 describe in Section~\ref{sec:gmf}, in this paper we use $20,000$ mocks from 
-$100$ different set of HOD parameters sampled from the MCMC chain. 
+$100$ different sets of HOD parameters sampled from the MCMC chain. 
 The GMF covariance matrix we use in this paper is computed with 
 $N_\mathrm{mock} = 20,000$ mocks. %\ms{Since the covmat `C' depends on $\theta$, how does averaging over 20000 mocks with different HOD parameters differ from 20000 mocks from the same HOD parameter?}
 
@@ -479,8 +485,8 @@ One way to derive the linear transformation is through the eigen-decomposition
 of the covariance matrix~\citep[\emph{e.g.}][]{hartlap2009, sellentin2017}. We, alternatively, 
 derive the linear transformation ${\bf L}$ using Cholesky decomposition of the 
 inverse covariance matrix~\citep{Press:1992:NRC:148286}: 
-$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. We have checked that a different 
-methods for whitening do not impact the results of the paper. With this pre-processed 
+$\mathbb{C}^{-1} = {\bf L}\,{\bf L}^T$. We have checked that different methods 
+for whitening do not impact the results of the paper. With this pre-processed 
 mock observable data, we proceed to quantifying 
 the non-Gaussianity of the $P_\ell$ and $\zeta$ likelihoods in the next section. 
 
@@ -530,7 +536,7 @@ equivalent to the KL divergence.
 %D_{\alpha} ( p \parallel q ) = \int p^\alpha(x) q^{1-\alpha}(x)\,{\rm d}x. 
 %\eeq
 
-Of course, in our case, we don't know $p(x)$ --- \emph{i.e.} the probability 
+Of course, in our case, we do not know $p(x)$ --- \emph{i.e.} the probability 
 distribution function of our observable. If we did, we would simply use that 
 instead of bothering with the covariance matrix or this paper. We can, however, 
 still estimate the divergence using nonparametric divergence estimators~\citep{wang2009, poczos2012, krishnamurthy2014}. 
@@ -576,8 +582,10 @@ $D(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo}) \approx \widehat{D}(\Xmock \pa
 Similar to the experiments detailed in \cite{poczos2012},
 we construct ${\bf Y}^\mathrm{ref}$ with a comparable sample size as $\Xmock$:
 $2000$ and $10,000$ for the $P_\ell$ and $\zeta$ analyses respectively.
-Based on the sample size of $\Xmock$ we calculate the divergences using 
-the $k=10$ nearest neighbors. 
+For a sample size of $1000$, \cite{sutherland2012} use $k=5$. Based on the 
+larger sample size of $\Xmock$, we calculate the divergences using the $k=10$ 
+nearest neighbors. We note that the divergence estimates are not significantly 
+impacted by our choice of $k$ within the range $5 < k < 20$.
 
 In Figure~\ref{fig:div_gauss}, we present the resulting \Ralpha~(left) 
 and KL (right) divergences (orange) between the likelihood and the 
@@ -602,7 +610,7 @@ The Gaussian pseudo-likelihood assumption for $P_\ell$ is motivated
 by the Central Limit Theorem. If enough modes contribute to the 
 power spectrum, then the likelihood approaches a Gaussian. Given the 
 survey volume of BOSS DR12 and the restrictive $k$ range of the \Beut~analysis 
-($0.01 < k < 0.15$ for $\ell = 0$ and $2$; $0.01 < k < 0.15$ for $\ell = 4$), 
+($0.01 < k < 0.15$ for $\ell = 0$ and $2$; $0.01 < k < 0.10$ for $\ell = 4$), 
 one would expect this to be mostly true. Although relatively small, we
 find significant $\Delta \widehat{D}$ and therefore likelihood non-Gaussianity. 
 In order to better understand the source of this non-Gaussianity, 
@@ -616,8 +624,8 @@ Furthermore, when we compare the divergences for just the monopole and quadrupol
 $\Delta \widehat{D}$ decreases. Among the multipole, the hexadecapole 
 contributes most to the non-Gaussianity of the $P_\ell$ likelihood. 
 In both the low $k$ regimes and the hexadecapole, the contribution to 
-the non-Gaussianity is likely due to an insufficient number of modes 
-for satisfying the Central Limit Theorem.
+the non-Gaussianity is likely caused by low signal-to-noise and failure to 
+satisfy the Central Limit Theorem.
 
 For $\zeta$, the discrepancies between the $\widehat{D}$ distributions 
 are consistent with the fact that the true $\zeta$ likelihood 
@@ -677,7 +685,7 @@ the significant non-Gaussianity in the likelihoods of \lss studies.
 Our ultimate goals, however, are to quantify the impact of likelihood 
 non-Gaussianity on the final cosmological parameter constraints and 
 to develop more accurate methods for parameter inference in \lss. 
-From the divergence estimates alone, it's not obvious how they propagate
+From the divergence estimates alone, it is not obvious how they propagate
 onto the final parameter constraints. Therefore in this section,
 we present two methods for more accurately estimating the true non-Gaussian
 likelihoods of $P_\ell$ and $\zeta$ from their corresponding mocks.
@@ -1114,6 +1122,7 @@ the impact relative to its uncertainty is small --- less than $0.5 \sigma$.
 Furthermore, some of the impact may be from statistical fluctuation; although
 this is likely not an important contributor since the \patchy~mocks are 
 calibrated so that their $\overline{P_\ell}$ is consistent with the BOSS $P_\ell$. 
+Some uncertainty is also introduced by the finite sampling of the MCMC chains. 
 As mentioned in Section~\ref{sec:div}, some of the impact may also come 
 from biases in covariance matrix estimation. Nevertheless, the fact that 
 the $P_\ell$ analysis is largely unaffected by likelihood 
