@@ -17,4 +17,7 @@ run/*
 *.log
 *.out
 
+paper/arxiv
+paper/mnras
+
 _*
