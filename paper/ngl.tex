@@ -195,7 +195,7 @@ In present day \lss analyses, two major assumptions go into evaluating the
 likelihood. First, the likelihood is assumed to have a Gaussian functional 
 form: 
 \beq \label{eq:gausslike}
-p(x\,|\,\theta) = \frac{1}{(2\pi)^{d/2} \sqrt{\mathrm{det}(C)}}\,\,\mathrm{exp}\bigg[\frac{1}{2}(x - m(\theta))^{t} C^{-1} (x - m(\theta))\bigg]
+p(x\,|\,\theta) = \frac{1}{(2\pi)^{d/2} \sqrt{\mathrm{det}(C)}}\,\,\mathrm{exp}\bigg[-\frac{1}{2}(x - m(\theta))^{t} C^{-1} (x - m(\theta))\bigg]
 \eeq
 where $d$ is the dimension of the data vector $x$, $m(\theta)$ is the
 theoretical predictions given the model parameters $\theta$, and $C$ 
