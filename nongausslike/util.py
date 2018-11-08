@@ -10,6 +10,12 @@ from scipy import interpolate
 from scipy.stats import gaussian_kde as gKDE
 
 
+def check_env(): 
+    if os.environ.get('NONGAUSSLIKE_DIR') is None: 
+        raise ValueError("set $NONGAUSSLIKE_DIR in bashrc file!") 
+    return None
+
+
 class KayDE(gKDE): 
     def __init__(self, X): 
         ''' wrapper for gKDE to behave more like 
@@ -31,7 +37,7 @@ class KayDE(gKDE):
 def code_dir(): 
     ''' Directory where all the code is located (the directory that this file is in!)
     '''
-    return os.path.dirname(os.path.abspath(__file__))+'/'
+    return os.environ.get('NONGAUSSLIKE_CODEDIR') 
 
 
 def catalog_dir(name): 
@@ -42,29 +48,22 @@ def catalog_dir(name):
         name_dir = 'patchy'
     elif 'manodeep' in name: 
         name_dir = ''.join([name.split('.run')[0], '/run_', name.split('.run')[-1].zfill(4)])
-    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/dat/'+name_dir+'/'
+    #return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/dat/'+name_dir+'/'
+    return os.environ.get('NONGAUSSLIKE_DIR')+name_dir+'/'
 
 
 def dat_dir(): 
-    ''' dat directory is symlinked to a local path where the data files are located
+    ''' 
     '''
-    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/dat/'
+    return os.environ.get('NONGAUSSLIKE_DIR') 
 
 
 def fig_dir(): 
-    ''' 
-    '''
-    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/figs/'
+    return os.environ.get('NONGAUSSLIKE_CODEDIR')+'figs/'
 
 
 def tex_dir():
-    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/paper/'
-
-
-def run_dir(): 
-    ''' 
-    '''
-    return code_dir()+'run/'
+    return os.environ.get('NONGAUSSLIKE_CODEDIR')+'paper/'
 
 
 def bar_plot(values, bin_edges): 
