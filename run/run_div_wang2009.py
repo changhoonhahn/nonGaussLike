@@ -143,7 +143,6 @@ def KL_wang_YX(obvs, diver, Nref=1000, n_mc=10, n_comp_max=10, n_mocks=20000,
     return None
 
 
-
 if __name__=="__main__": 
     # e.g. python run_diverge.py gmf kl pX_GMM 1000 10 10 20 
     # e.g. python run_diverge.py pk kl pX_GMM 1000 10 10 20 
