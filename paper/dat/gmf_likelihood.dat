@@ -1,0 +1,35 @@
+# logMmin Sinha et al. (2017)
+11.55269	11.6802	11.82864	
+# logMmin $\mathcal{N}\left(\,\overline{\zeta},\,{\bf C}^{'} \right)$
+11.55133	11.68262	11.83446	
+# logMmin $p_\mathrm{GMM}\left(\{\zeta^\mathrm{mock}\}\right)$
+11.55905	11.69396	11.88235	
+
+# sig_logM Sinha et al. (2017)
+0.21753	0.58502	0.84029	
+# sig_logM $\mathcal{N}\left(\,\overline{\zeta},\,{\bf C}^{'} \right)$
+0.21806	0.58659	0.8507	
+# sig_logM $p_\mathrm{GMM}\left(\{\zeta^\mathrm{mock}\}\right)$
+0.17639	0.55441	0.871	
+
+# logM0 Sinha et al. (2017)
+6.99221	9.15408	11.228	
+# logM0 $\mathcal{N}\left(\,\overline{\zeta},\,{\bf C}^{'} \right)$
+7.01465	9.19502	11.28134	
+# logM0 $p_\mathrm{GMM}\left(\{\zeta^\mathrm{mock}\}\right)$
+6.96111	9.15889	11.33269	
+
+# logM1 Sinha et al. (2017)
+12.54069	12.61797	12.68187	
+# logM1 $\mathcal{N}\left(\,\overline{\zeta},\,{\bf C}^{'} \right)$
+12.5381	12.6123	12.68248	
+# logM1 $p_\mathrm{GMM}\left(\{\zeta^\mathrm{mock}\}\right)$
+12.52773	12.63719	12.73208	
+
+# alpha Sinha et al. (2017)
+0.87402	0.92783	0.96999	
+# alpha $\mathcal{N}\left(\,\overline{\zeta},\,{\bf C}^{'} \right)$
+0.88658	0.93578	0.97838	
+# alpha $p_\mathrm{GMM}\left(\{\zeta^\mathrm{mock}\}\right)$
+0.82352	0.90927	0.9762	
+

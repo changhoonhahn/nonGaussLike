@@ -1,0 +1,35 @@
+# b1sig8_NGC Beutler et al. (2017)
+1.29928	1.34106	1.38081	
+# b1sig8_NGC $\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$
+1.30251	1.35115	1.39084	
+
+# b1sig8_SGC Beutler et al. (2017)
+1.27095	1.33255	1.38844	
+# b1sig8_SGC $\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$
+1.26592	1.33533	1.39787	
+
+# b2sig8_NGC Beutler et al. (2017)
+0.54147	1.29315	1.99018	
+# b2sig8_NGC $\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$
+0.49702	1.29457	2.0407	
+
+# b2sig8_SGC Beutler et al. (2017)
+-0.69905	0.47629	1.7383	
+# b2sig8_SGC $\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$
+-0.955	0.42189	1.93911	
+
+# alpha_perp Beutler et al. (2017)
+0.98883	1.0143	1.03881	
+# alpha_perp $\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$
+0.98923	1.01442	1.0386	
+
+# alpha_para Beutler et al. (2017)
+0.97029	1.00272	1.04035	
+# alpha_para $\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$
+0.9657	1.00058	1.03946	
+
+# fsig8 Beutler et al. (2017)
+0.42867	0.47792	0.53089	
+# fsig8 $\prod p_\mathrm{KDE}\left(\textbf{X}_i^\mathrm{ICA}\right)$
+0.40708	0.45613	0.51515	
+
