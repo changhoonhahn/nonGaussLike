@@ -596,7 +596,7 @@ $\widehat{D}$s are \emph{estimates} of the true divergence, therefore we
 resample $\Yref$ and compute each $\widehat{D}$ estimate \Nd times. 
 In Figure~\ref{fig:div_gauss}, we present the resulting distributions of $\widehat{D}$,
 which illustrate the uncertainty of $\widehat{D}$. 
-We also note that 
+{\color{red} We also note that 
 for the \Beut~$P_\ell$ analysis, some of the $\widehat{D}_{KL}$ estimates are negative, 
 which violates Gibb's inequality. This is due to the limited number of $p(x)$ samples 
 (only $N_\mathrm{mock} = 2048$ samples of a $37$-dimensional distribution) that 
@@ -609,6 +609,7 @@ distributions and  %\widehat{D}(\, p(x) \parallel \mathcal{L}^\mathrm{pseudo}) \
 the reference $\widehat{D}(\Xref \parallel \Yref)$ distributions ($\Delta \widehat{D}$).
 Since $\Xref$ has the same dimensions as $\Xmock$, $\Delta \widehat{D}$ more accurately
 reflects the discrepancy between the likelihood and the pseudo-likelihood.
+} 
 Each panel of Figure~\ref{fig:div_gauss} shows significant discrepancy between 
 the two distributions --- \emph{both the $P_\ell(k)$ and $\zeta(N)$ likelihoods 
 are significantly non-Gaussian}. 
@@ -744,8 +745,9 @@ can also be updated by summing up the assignment weights and
 normalizing it by the total number of data points, $N$. This entire
 process is repeated until convergence --- \emph{i.e.} when the log-likelihood of the
 mixture model $\log\,p({\bf X}_N; \bm{\theta}^t)$ %= \sum\limits_{n=1}^{N} \log\,p({\bf x}_n; \bm{\theta}^t)
-converges. As demonstrated in \cite{wu1983}, the \EM algorithm is guaranteed 
-to converge to a local maximum of $\log\,p({\bf X}_N; \bm{\theta})$. 
+converges. 
+{\color{red} As demonstrated in \cite{wu1983}, the \EM algorithm is guaranteed 
+to converge to a local maximum of $\log\,p({\bf X}_N; \bm{\theta})$ .} 
 In practice, instead of arbitrarily assigning the initial condition, $\bm{\theta}^0_i$ 
 is derived from a $\texttt{k-means}$ clustering algorithm~\citep{lloyd1982}. The 
 $\texttt{k-means}$ algorithm clusters a dataset, ${\bf X}_N$, into $k$ 
@@ -805,8 +807,8 @@ $k\mathrm{s} < 30$ components to the whitened mock data $\Xmock$ using
 the \EM algorithm for each model. For each of the converged \gmms, we 
 calculate the \bic and then select the model with the lowest \bic as the
 best density estimate of the likelihood distribution: $\widehat{p}_\mathrm{\tiny GMM}(x)$. 
-For the~\Beut and~\Sinh analyses, we find \gmms with $k = 1$ 
-and $5$ components, respectively, have the lowest \bic.
+{\color{red} For the~\Beut and~\Sinh analyses, we find \gmms with $k = 1$ 
+and $5$ components, respectively, have the lowest \bic.} 
 These selected density estimate can then be used to calculate the likelihood 
 and quantify the impact of likelihood non-Gaussianity on the parameter 
 constraints of~\Beut~and~\Sinh. But first, we test whether $\widehat{p}_\mathrm{\tiny GMM}$ 
@@ -834,12 +836,13 @@ estimate significantly improves the divergence discrepancy compared to the
 pseudo-likelihood for the $\zeta(N)$ analysis of \Sinh. In other words, 
 \emph{our Gaussian mixture density estimate is a significant better estimate 
 of the $\zeta$ likelihood distribution than the pseudo-likelihood}.
-On the other hand, the Gaussian mixture density estimate for 
+{\color{red} On the other hand, the Gaussian mixture density estimate for 
 the $P_\ell(k)$ analysis of \Beut~does not improve the divergence discrepancy. 
 This is expected since the $P_\ell$ Gaussian mixture density estimate that
 we select based on \bic only has one component and therefore is equivalent
 to the pseudo-likelihood. % difference in the performance of Gaussian mixture density estimation is not surprising. 
-Also, one would expect a direct density estimation to be more effective 
+Also,} 
+one would expect a direct density estimation to be more effective 
 for the \Sinh~case, where we estimate an $8$-dimensional 
 distribution with $N_\mathrm{mock} = 20,000$ samples, compared to the \Beut~ 
 case where we estimate a $37$-dimensional distribution with 
@@ -1265,10 +1268,10 @@ impact future $P_\ell$ analyses.
 
 Constraints on primordial non-Gaussianity ($f_\mathrm{NL}$) from \lss~\citep[\emph{e.g.}][]{dalal2008, slosar2008, ross2013, giannantonio2014}, 
 will likely be significantly impacted by likelihood non-Gaussianity. 
-In fact, the constraining power for $f_\mathrm{NL}$ comes from the 
+{\color{red} In fact, the constraining power for $f_\mathrm{NL}$ comes from the 
 largest scales. These are the scales that we find contribute most to the 
 likelihood non-Gaussianity in Section~\ref{sec:div} due to the low signal-to-noise 
-and failure to satisfy the Central Limit Theorem.
+and failure to satisfy the Central Limit Theorem.}
 Future experiments such as Euclid~\citep{amendola2016}, which seek 
 to measure $\sigma(f_\mathrm{NL}) < 5$~\citep{giannantonio2012, amendola2016}, 
 will need to robustly account for likelihood non-Gaussianity for 
@@ -1276,6 +1279,7 @@ accurate parameter constraints. Fortunately, the methods we present
 in this paper can easily be extended to other observables and analyses. 
 
 %non-Gaussianity bispectrum, which has lower signal-to-noise on large scales~\citep{sefusatti2005},
+{\color{red}
 For higher order statistics, likelihood non-Gaussianity will also have a 
 more significant effect. \cite{scoccimarro2000} found that the reduced 
 bispectrum likelihood is significantly more non-Gaussian than the power spectrum likelihood. 
@@ -1295,6 +1299,7 @@ the dimensionality of data-space for likelihood-free inference~\citep{papamakari
 In a similar fashion, massive data compression can be combined with the methods 
 we present in this paper to robustly account for likelihood non-Gaussianity in 
 analyzing high dimensional data from future surveys.
+}
 
 %\todo{paragraph that restates what we did} 
 %make it straightforward to quantify likeilhood non-Gaussianity and examine the effect on parameter inference. 
@@ -1468,11 +1473,11 @@ calculate more accurate posterior parameter constraints for the \Beut~and~\Sinh
 analyses. %% Since our likelihood estimates are closer to the true likelihood, 
 %% they allow us to derive more accurate posterior probability distributions 
 %% than with Gaussian pseudo-likelihoods.
-By comparing our posteriors to the parameter constraints from 
+{\color{red} By comparing our posteriors to the parameter constraints from 
 \Beut~and~\Sinh, we find that likelihood non-Gaussianity significantly impacts 
 both analyses.  %does not significantly impact the $P_\ell$ analysis of \Beut. 
 Among the non-nuisance parameters in the $P_\ell$ analysis of \Beut, accounting 
-for likelihood non-Gaussianity shifts $f\sigma_8$ constraints by $-0.44\sigma$.
+for likelihood non-Gaussianity shifts $f\sigma_8$ constraints by $-0.44\sigma$.} 
 Meanwhile for the \Sinh~$\zeta$ analysis, likelihood non-Gaussianity 
 significant impacts the posterior distributions of the HOD parameter. 
 Using the pseudo-likelihood significantly underestimates the width of the 
@@ -1484,7 +1489,7 @@ the tension between the $\zeta$ and $w_p(r_p)$ constraints found
 in \Sinh. Our comparisons of the posteriors highlight the importance of 
 incorporating likelihood non-Gaussianity in parameter inference of \lss studies. 
 
-Based on our results, it is unclear whether future $P_\ell$ 
+{\color{red} Based on our results, it is unclear whether future $P_\ell$ 
 analyses will be significantly impacted by likelihood non-Gaussianity.
 Future surveys (\emph{e.g.} DESI, Euclid, WFIRST) will expand the cosmic 
 volumes probed by galaxies and therefore increase the number of modes 
@@ -1492,7 +1497,7 @@ included in $P_\ell$ analyses on all scales. Over the same $k$ range, this
 will reduce likelihood non-Gaussianity due to Central Limit Theorem and 
 therefore reduce the impact on parameter constraints. However, future 
 analyses seek to extend analyses to both higher and lower $k$, which will 
-introduce likelihood non-Gaussianity from these scales.
+introduce likelihood non-Gaussianity from these scales.}
 %While future surveys will expand the cosmic volumes probed by galaxies and increase the number of modes on all scales, future analyses also seek to extend the $k$ ranges probed and demand unprecedentedly precise constraints. 
 Meanwhile, for $\zeta$ analyses with
 the same multiplicity range, we expect future surveys to reduce the impact of
@@ -1522,9 +1527,11 @@ model to be computed far more times than the number of mocks required for
 covariance matrix estimation. Our methods (especially the \ica method)
 do not require any more mocks than those already constructed for accurate covariance
 matrix estimation. 
+{\color{red} 
 For future analyses that will analyze even higher dimensional data, our 
 method can easily be combined with optimal massive data 
 compression methods~\citep[e.g.][]{heavens2017, alsing2018}.
+}
 Therefore, the methods for likelihood estimation we present
 in this paper provide both accurate and practical methods for Bayesian 
 parameter inference in \lss. 

@@ -207,6 +207,69 @@ def div_Gauss(K=15):
     return None
 
 
+def div_Gauss_wang2009_redbias(K=15):
+    ''' compare the renyi-alpha and KL divergence for the following  
+    - D( gauss(C_X) || gauss(C_X) ) 
+    - D( mock X || gauss(C_X))
+    for both P(k) and GMF 
+    '''
+    # D( gauss(C_X) || gauss(C_X) ) vs D( mock X || gauss(C_X))
+    fs = ['ref.K'+str(K), 'pX_gauss.K'+str(K)] 
+    lbls = ['Ref.', r'$D(\textbf{X}^\mathrm{mock} \parallel \textbf{Y}^\mathrm{ref})$'] 
+    
+    fig = plt.figure(figsize=(12,5))
+    for i_obv, obvs in enumerate(['pk', 'gmf']): 
+        for i_div, div_func in enumerate(['renyi0.5', 'kl']): 
+            divs = []  
+            for f in fs: 
+                if obvs == 'pk': 
+                    if div_func == 'renyi0.5':
+                        f_div = ''.join([UT.dat_dir(), 
+                            'diverg.pk.ngc.', f, '.Nref2000.', div_func, '.dat']) 
+                    elif div_func == 'kl': 
+                        f_div = ''.join([UT.dat_dir(), 'diverg/',
+                            'diverg.pk.ngc.', f.split('.')[0], '.Nref1000.KLwang2009.dat']) 
+                elif obvs == 'gmf': 
+                    f_div = ''.join([UT.dat_dir(), 
+                        'diverg.gmf.', f, '.Nref10000.', div_func, '.dat']) 
+                try: 
+                    div = np.loadtxt(f_div)
+                except IOError: 
+                    print("error reading %s" % f_div)
+                    continue 
+                divs.append(div) 
+            
+            if obvs == 'pk': hrange = [-0.5, 0.5]
+            elif obvs == 'gmf': hrange = [-0.1, 0.25]
+            nbins = 40
+            y_max = 0. 
+            sub = fig.add_subplot(2,2,2*i_obv+i_div+1)
+            for div, lbl in zip(divs, lbls): 
+                hh = np.histogram(div, density=True, range=hrange, bins=nbins)
+                bp = UT.bar_plot(*hh) 
+                sub.fill_between(bp[0], np.zeros(len(bp[0])), bp[1], edgecolor='none', label=lbl) 
+                y_max = max(y_max, bp[1].max()) 
+                print lbl, np.mean(div)
+            sub.set_xlim(hrange) 
+            sub.set_ylim([0., y_max*1.4]) 
+            if i_obv == 0: 
+                if i_div == 1: sub.legend(loc='upper right', prop={'size': 15})
+                else: 
+                    sub.text(0.075, 0.85, r'$P_\ell(k)$', ha='left', va='top', 
+                        transform=sub.transAxes, fontsize=20)
+            elif i_obv == 1: 
+                if div_func == 'kl': sub.set_xlabel(r'KL divergence', fontsize=20)
+                elif div_func == 'renyi0.5': 
+                    sub.set_xlabel(r'R\'enyi-$\alpha$ divergence', 
+                        fontsize=20)
+                    sub.text(0.075, 0.85, r'$\zeta(N)$', ha='left', va='top', 
+                            transform=sub.transAxes, fontsize=20)
+    fig.subplots_adjust(wspace=.15)
+    f_fig = ''.join([UT.tex_dir(), 'figs/', 'k_', str(K), 'NNdiverg_Gauss_wang2009.pdf'])
+    fig.savefig(f_fig, bbox_inches='tight') 
+    return None
+
+
 def div_GMM(K=10):
     ''' compare the renyi-alpha and KL divergence for the following  
 
@@ -996,7 +1059,8 @@ if __name__=="__main__":
     #_div_Gauss_gmf(K=10)
     #_div_Gauss_Pk_hartlap(K=10)
     #div_Gauss(K=10)
-    div_Gauss(K=15)
+    #div_Gauss(K=15)
+    div_Gauss_wang2009_redbias(K=15)
     #div_GMM()
     #div_ICA()
     #GMF_contours()

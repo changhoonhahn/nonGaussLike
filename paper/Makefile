@@ -20,6 +20,13 @@ ngl.pdf: *.tex vc.tex
 	( grep Rerun ngl.log && ${LATEX} ngl ) || echo "Done."
 	( grep Rerun ngl.log && ${LATEX} ngl ) || echo "Done."
 
+ngl_marked.pdf: *.tex vc.tex
+	${LATEX} ngl_marked
+	bibtex ngl_marked 
+	${LATEX} ngl_marked
+	( grep Rerun ngl_marked.log && ${LATEX} ngl ) || echo "Done."
+	( grep Rerun ngl_marked.log && ${LATEX} ngl ) || echo "Done."
+
 ngl_2col.pdf: *.tex 
 	${LATEX} ngl_2col
 	bibtex ngl_2col

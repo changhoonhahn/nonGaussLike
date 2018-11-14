@@ -129,6 +129,11 @@ Alam, S., Ata, M., Bailey, S., {et~al.} 2017,
   \href{http://dx.doi.org/10.1093/mnras/stx721}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 470, 2617}
 
+\bibitem[{Alsing \& Wandelt(2017)}]{alsing2017}
+Alsing, J., \& Wandelt, B. 2017, \JournalTitle{arXiv:1712.00012 [astro-ph]},
+  \href{http://arxiv.org/abs/1712.00012}{{\sffamily arXiv:1712.00012
+  [astro-ph]}}
+
 \bibitem[{Alsing {et~al.}(2018)Alsing, Wandelt, \& Feeney}]{alsing2018}
 Alsing, J., Wandelt, B., \& Feeney, S. 2018, \JournalTitle{arXiv:1801.01497
   [astro-ph]}, \href{http://arxiv.org/abs/1801.01497}{{\sffamily
@@ -191,6 +196,12 @@ Broderick, A.~E., Fish, V.~L., Doeleman, S.~S., \& Loeb, A. 2011,
 \bibitem[{Cash(1979)}]{cash1979}
 Cash, W. 1979, \href{http://dx.doi.org/10.1086/156922}{\JournalTitle{The
   Astrophysical Journal}, 228, 939}
+
+\bibitem[{Charnock {et~al.}(2018)Charnock, Lavaux, \& Wandelt}]{charnock2018}
+Charnock, T., Lavaux, G., \& Wandelt, B.~D. 2018,
+  \JournalTitle{arXiv:1802.03537 [astro-ph]},
+  \href{http://arxiv.org/abs/1802.03537}{{\sffamily arXiv:1802.03537
+  [astro-ph]}}
 
 \bibitem[{Collaboration {et~al.}(2014)Collaboration, Ade, Aghanim,
   Armitage-Caplan, Arnaud, Ashdown, Atrio-Barandela, Aumont, Baccigalupi,
@@ -315,6 +326,13 @@ Giannantonio, T., Ross, A.~J., Percival, W.~J., {et~al.} 2014,
   Review D}, 89}, \href{http://arxiv.org/abs/1303.1349}{{\sffamily
   arXiv:1303.1349}}
 
+\bibitem[{Gil-Mar{\'\i}n {et~al.}(2017)Gil-Mar{\'\i}n, Percival, Verde,
+  Brownstein, Chuang, Kitaura, Rodr{\'\i}guez-Torres, \&
+  Olmstead}]{gil-marin2017}
+Gil-Mar{\'\i}n, H., Percival, W.~J., Verde, L., {et~al.} 2017,
+  \href{http://dx.doi.org/10.1093/mnras/stw2679}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 465, 1757}
+
 \bibitem[{Grieb {et~al.}(2017)Grieb, S{\'a}nchez, Salazar-Albornoz,
   Scoccimarro, Crocce, Dalla~Vecchia, Montesano, Gil-Mar{\'\i}n, Ross, Beutler,
   Rodr{\'\i}guez-Torres, Chuang, Prada, Kitaura, Cuesta, Eisenstein, Percival,
@@ -362,6 +380,12 @@ Hartlap, J., Schrabback, T., Simon, P., \& Schneider, P. 2009,
 Hastie, T., Tibshirani, R., \& Friedman, J. 2009, The {{Elements}} of
   {{Statistical Learning}}: {{Data Mining}}, {{Inference}}, and {{Prediction}},
   {{Second Edition}} ({{Springer Series}} in {{Statistics}}) ({Springer})
+
+\bibitem[{Heavens {et~al.}(2017)Heavens, Sellentin, {de Mijolla}, \&
+  Vianello}]{heavens2017}
+Heavens, A.~F., Sellentin, E., {de Mijolla}, D., \& Vianello, A. 2017,
+  \href{http://dx.doi.org/10.1093/mnras/stx2326}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 472, 4244}
 
 \bibitem[{H{\'e}rault \& Ans(1984)}]{herault1984}
 H{\'e}rault, J., \& Ans, B. 1984, \JournalTitle{Comptes Rendus de
@@ -437,6 +461,12 @@ Kitaura, F.-S., Rodr{\'\i}guez-Torres, S., Chuang, C.-H., {et~al.} 2016,
 Klypin, A., Yepes, G., Gottl{\"o}ber, S., Prada, F., \& He{\ss}, S. 2016,
   \href{http://dx.doi.org/10.1093/mnras/stw248}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 457, 4340}
+
+\bibitem[{Kraskov {et~al.}(2004)Kraskov, St\"ogbauer, \&
+  Grassberger}]{kraskov2004}
+Kraskov, A., St\"ogbauer, H., \& Grassberger, P. 2004,
+  \href{http://dx.doi.org/10.1103/PhysRevE.69.066138}{\JournalTitle{Physical
+  Review E}, 69, 066138}
 
 \bibitem[{Krishnamurthy {et~al.}(2014)Krishnamurthy, Kandasamy, Poczos, \&
   Wasserman}]{krishnamurthy2014}
@@ -524,6 +554,10 @@ Ntampaka, M., Trac, H., Sutherland, D.~J., {et~al.} 2015,
 O'Connell, R., Eisenstein, D., Vargas, M., Ho, S., \& Padmanabhan, N. 2016,
   \href{http://dx.doi.org/10.1093/mnras/stw1821}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 462, 2681}
+
+\bibitem[{Papamakarios \& Murray(2016)}]{papamakarios2016}
+Papamakarios, G., \& Murray, I. 2016, \JournalTitle{ArXiv e-prints}, 1605,
+  arXiv:1605.06376
 
 \bibitem[{Parkinson {et~al.}(2012)Parkinson, Riemer-S{\o}rensen, Blake, Poole,
   Davis, Brough, Colless, Contreras, Couch, Croom, Croton, Drinkwater, Forster,
@@ -679,6 +713,11 @@ Sutherland, D.~J., Xiong, L., P{\'o}czos, B., \& Schneider, J. 2012,
 Taylor, E.~N., Hopkins, A.~M., Baldry, I.~K., {et~al.} 2015,
   \href{http://dx.doi.org/10.1093/mnras/stu1900}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 446, 2144}
+
+\bibitem[{Tegmark {et~al.}(1997)Tegmark, Taylor, \& Heavens}]{tegmark1997}
+Tegmark, M., Taylor, A.~N., \& Heavens, A.~F. 1997,
+  \href{http://dx.doi.org/10.1086/303939}{\JournalTitle{The Astrophysical
+  Journal}, 480, 22}
 
 \bibitem[{Tinker \& {et al.}(in preparation)}]{tinkerinpreparation}
 Tinker, J.~L., \& {et al.} in preparation
